@@ -60,7 +60,7 @@ void ObcInterface<i2c_address, callback, rx_max_length, DataType>::process_inter
             break;
         
         case TW_ST_SLA_ACK:  // 0xA8
-            tx_buffer_cnt = rx_buffer[0];
+            tx_buffer_cnt = rx_buffer[0]+1;
             TWDR = memory[0];
             break;
         
