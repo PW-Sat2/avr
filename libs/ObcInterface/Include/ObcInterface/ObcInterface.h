@@ -21,6 +21,7 @@ namespace drivers {
 template<uint8_t i2c_address, void (*callback)(hal::libs::span<uint8_t>), uint8_t cmd_max_parameters, typename DataType>
 class ObcInterface {
  public:
+    static_assert(std::is_pod<DataType>::value, "Data is not a POD!");
     static_assert(sizeof(DataType) > 1, "DataType have to contain error code + at least one data field");
     static_assert(i2c_address <= 0x7F, "I2C address should be 7-bit!");
 
