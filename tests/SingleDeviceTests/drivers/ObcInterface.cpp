@@ -3,7 +3,7 @@
 #include "hal/board.h"
 #include "ObcInterface/ObcInterface.h"
 
-using namespace hal;
+using namespace hal::libs;
 
 hal::DigitalIO::GPIO<hal::bsp::pins::D2> d2;
 hal::DigitalIO::GPIO<hal::bsp::pins::D3> d3;
@@ -12,27 +12,27 @@ hal::I2C::Software i2c{d2, d3};
 
 struct Data {
     uint8_t error;
-    libs::array<uint8_t, 100> data;
+    array<uint8_t, 100> data;
 } data;
 
-libs::array<uint8_t, 10> data_arr;
-libs::span<uint8_t> data_span;
+array<uint8_t, 10> data_arr;
+span<uint8_t> data_span;
 
 
-void CommandCallback(libs::span<uint8_t> param) {
+void CommandCallback(span<uint8_t> param) {
     for(uint8_t i = 0; i < param.size(); ++i) {
         data_arr[i] = param[i];
     }
-    data_span = libs::make_span(data_arr.data(), param.size());
+    data_span = make_span(data_arr.data(), param.size());
 }
 
-::drivers::ObcInterface<0x1A, CommandCallback, 4, Data> obc;
+drivers::ObcInterface<0x1A, CommandCallback, 4, Data> obc;
 
 ISR(TWI_vect) {
-    obc.process_interrupt();
+  obc.process_interrupt();
 }
 
-void compare_spans(libs::span<uint8_t> expected, libs::span<uint8_t> actual) {
+void compare_spans(span<uint8_t> expected, span<uint8_t> actual) {
     TEST_ASSERT_EQUAL_INT(expected.size(), actual.size());
     for(size_t i = 0; i < expected.size(); ++i) {
         TEST_ASSERT_EQUAL_INT(expected[i], actual[i]);
@@ -47,38 +47,38 @@ void test_cmd_empty() {
 }
 
 void test_cmd_short() {
-    libs::array<uint8_t, 1> write = {0x00};
+    array<uint8_t, 1> write = {0x00};
     i2c.write(0x1A, write);
     compare_spans(write, data_span);
 }
 
 void test_cmd_longer() {
-    libs::array<uint8_t, 3> write = {131, 75, 84};
+    array<uint8_t, 3> write = {131, 75, 84};
     i2c.write(0x1A, write);
     compare_spans(write, data_span);
 }
 
 void test_cmd_full() {
-    libs::array<uint8_t, 4> write = {134, 65, 180, 189};
+    array<uint8_t, 4> write = {134, 65, 180, 189};
     i2c.write(0x1A, write);
     compare_spans(write, data_span);
 }
 
 void test_cmd_overflow() {
-    libs::array<uint8_t, 5> write = {101, 45, 230, 200, 10};
+    array<uint8_t, 5> write = {101, 45, 230, 200, 10};
     i2c.write(0x1A, write);
 
-    compare_spans(libs::make_span(write).subspan(0, 4), data_span);
+    compare_spans(make_span(write).subspan(0, 4), data_span);
 }
 
 void test_cmd_large_overflow() {
-    libs::array<uint8_t, 255> write;
+    array<uint8_t, 255> write;
     for (size_t i = 0; i < write.size(); ++i) {
         write[i] = i;
     }
     i2c.write(0x1A, write);
 
-    compare_spans(libs::make_span(write).subspan(0, 4), data_span);
+    compare_spans(make_span(write).subspan(0, 4), data_span);
 }
 
 // ----------------  tests reads  -------------------
@@ -86,7 +86,7 @@ void test_cmd_large_overflow() {
 void test_read_only_error() {
     for(uint16_t i = 0; i <= 0xFF; ++i) {
         data.error = i;
-        libs::array<uint8_t, 1> read;
+        array<uint8_t, 1> read;
         i2c.writeRead(0x1A, {}, read);
         TEST_ASSERT_EQUAL_INT(i, read[0]);
     }
@@ -102,8 +102,8 @@ void test_read_one_byte() {
         }
 
         for (uint8_t i = 0; i < data.data.size()-1; ++i) {
-            libs::array<uint8_t, 1> write = {i};
-            libs::array<uint8_t, 2> read;
+            array<uint8_t, 1> write = {i};
+            array<uint8_t, 2> read;
             i2c.writeRead(0x1A, write, read);
 
             TEST_ASSERT_EQUAL_INT(data.error, read[0]);
@@ -122,13 +122,13 @@ void test_read_five_bytes() {
         }
 
         for (uint8_t i = 0; i < data.data.size()-5; ++i) {
-            libs::array<uint8_t, 1> write = {i};
-            libs::array<uint8_t, 6> read;
+            array<uint8_t, 1> write = {i};
+            array<uint8_t, 6> read;
             i2c.writeRead(0x1A, write, read);
 
             TEST_ASSERT_EQUAL_INT(data.error, read[0]);
-            compare_spans(libs::make_span(data.data).subspan(i, 5),
-                          libs::make_span(read).subspan(1, 5));
+            compare_spans(make_span(data.data).subspan(i, 5),
+                          make_span(read).subspan(1, 5));
         }
 
         offset += 73;
@@ -143,12 +143,12 @@ void test_read_full() {
         for (uint8_t i = 0; i < data.data.size(); ++i) {
             data.data[i] = offset + 153 * i;
         }
-        libs::array<uint8_t, 1> write = {0};
-        libs::array<uint8_t, data.data.size()+1> read;
+        array<uint8_t, 1> write = {0};
+        array<uint8_t, data.data.size()+1> read;
         i2c.writeRead(0x1A, write, read);
 
         TEST_ASSERT_EQUAL_INT(data.error, read[0]);
-        compare_spans(data.data, libs::make_span(read).subspan(1, data.data.size()));
+        compare_spans(data.data, make_span(read).subspan(1, data.data.size()));
 
         offset += 52;
     }
@@ -160,8 +160,8 @@ void test_read_overflow() {
         data.data[i] = i;
     }
 
-    libs::array<uint8_t, 1> write = {80};
-    libs::array<uint8_t, 50> read;
+    array<uint8_t, 1> write = {80};
+    array<uint8_t, 50> read;
     i2c.writeRead(0x1A, write, read);
 
     TEST_ASSERT_EQUAL_INT(data.error, read[0]);
@@ -179,8 +179,7 @@ void test_read_overflow() {
 void TEST_ObcInterface() {
     UNITY_BEGIN();
 
-    obc.set_memory(&data);
-    obc.init();
+    obc.init(&data);
     sei();
 
     i2c.init();
