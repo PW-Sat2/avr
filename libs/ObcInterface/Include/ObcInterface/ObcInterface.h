@@ -126,11 +126,7 @@ void ObcInterface<i2c_address, callback, rx_max_length, DataType>::process_inter
 
         default:
             // unexpected situation. should be checked!
-            cli();
-            hal::Serial0.print_string("TWI Slave error!\r\n");
-            while (true) {
-                hal::Serial0.print_byte(twsr);
-            }
+            assert(false && "TWI Slave error");
     }
     TWCR |= (1 << TWINT);
 }
