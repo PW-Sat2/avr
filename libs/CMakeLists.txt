@@ -1,2 +1,3 @@
+add_subdirectory(TelemetryBuffer)
 add_subdirectory(external)
 add_subdirectory(ObcInterface)

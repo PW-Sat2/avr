@@ -3,6 +3,7 @@ add_compile_options(-Wno-error)
 add_hal_executable(unit_tests
     main.cpp
     src/CommandDispatcher.cpp
+    src/TelemetryBuffer.cpp
 )
 
 add_custom_target(unit_tests.run
@@ -17,4 +18,5 @@ target_link_libraries(unit_tests
     unity
     terminal
     ObcInterface
+    TelemetryBuffer
 )

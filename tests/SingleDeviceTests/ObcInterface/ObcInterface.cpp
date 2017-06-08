@@ -1,8 +1,8 @@
-#include "ObcInterface/ObcInterface.h"
 #include <hal/board.h>
-#include <unity.h>
-#include <array>
 #include <hal/hal>
+
+#include <unity.h>
+#include "ObcInterface/ObcInterface.h"
 
 using namespace hal::libs;
 using std::array;

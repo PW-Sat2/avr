@@ -37,7 +37,7 @@ class ObcInterface {
      * Additionally, enables pull-ups on TWI pins.
      * @param memory_ Default memory address to set a data retrieval pool
      */
-    static void init(gsl::not_null<DataType*> memory_) {
+    static void init(gsl::not_null<DataType**> memory_) {
         set_memory(memory_);
 
         hal::DigitalIO::GPIO<hal::mcu::pin_sda>().init(
@@ -64,6 +64,7 @@ class ObcInterface {
      * @param memory_ Pointer to new location.
      */
     static inline void set_memory(gsl::not_null<DataType*> memory_) {
+        printf("Set Memory to %p!\n", memory_.get());
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
             memory = reinterpret_cast<uint8_t*>(memory_.get());
         }

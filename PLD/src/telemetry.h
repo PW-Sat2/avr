@@ -1,8 +1,11 @@
-#ifndef PLD_SRC_TELEMETRY_INCLUDE_TELEMETRY_TELEMETRY_H_
-#define PLD_SRC_TELEMETRY_INCLUDE_TELEMETRY_TELEMETRY_H_
+#ifndef PLD_SRC_TELEMETRY_H_
+#define PLD_SRC_TELEMETRY_H_
 
 #include <array>
 #include <cstdint>
+
+#include <ObcInterface/ObcInterface.h>
+#include <TelemetryBuffer/TelemetryBuffer.h>
 
 namespace PLD {
 
@@ -12,21 +15,22 @@ struct Telemetry {
     };
 
     struct Photodiodes {
-        std::uint16_t X_p;
-        std::uint16_t X_m;
-        std::uint16_t Y_p;
-        std::uint16_t Y_m;
+        std::uint16_t Xp;
+        std::uint16_t Xn;
+        std::uint16_t Yp;
+        std::uint16_t Yn;
     };
 
     struct Temperatures {
         std::uint16_t supply;
-        std::uint16_t X_p;
-        std::uint16_t X_m;
-        std::uint16_t Y_p;
-        std::uint16_t Y_m;
+        std::uint16_t Xp;
+        std::uint16_t Xn;
+        std::uint16_t Yp;
+        std::uint16_t Yn;
         std::uint16_t sads;
         std::uint16_t sail;
-        std::uint16_t gyro;
+        std::uint16_t cam_nadir;
+        std::uint16_t cam_wing;
     };
 
     struct Voltages {
@@ -46,11 +50,12 @@ struct Telemetry {
     Voltages voltages;
     Radfet radfet;
 };
-static_assert(sizeof(Telemetry) == 55,
+static_assert(sizeof(Telemetry) == 57,
               "Incorrect size of Telemetry structure (padding?)");
 
-extern Telemetry telemetry;
 
 }  // namespace PLD
 
-#endif  // PLD_SRC_TELEMETRY_INCLUDE_TELEMETRY_TELEMETRY_H_
+extern TelemetryBuffer<PLD::Telemetry> telemetryBuffer;
+
+#endif  // PLD_SRC_TELEMETRY_H_

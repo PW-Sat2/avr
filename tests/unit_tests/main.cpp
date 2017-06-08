@@ -7,6 +7,7 @@ using hal::Serial0;
 
 static void run_all_tests() {
     RUN_TEST_GROUP(commands);
+    RUN_TEST_GROUP(TelemetryBuffer);
 }
 
 int main() {
