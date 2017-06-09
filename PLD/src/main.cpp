@@ -13,6 +13,7 @@
 #include "telecommands/Photodiodes.h"
 #include "telecommands/RadFET.h"
 #include "telecommands/SunSref.h"
+#include "debug/commands.h"
 
 
 using namespace hal;
@@ -50,11 +51,15 @@ ISR(TWI_vect) {
     obc.process_interrupt();
 }
 
-
 int main() {
     Serial0.init(9600);
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
+    Serial0.enable_rx_interrupt();
+
+    printf("INIT!\n");
+    pld::debug::init();
+
 
     hw = &empty_hardware;
     std::memset(&telemetry, 0xFF, sizeof(pld::Telemetry));

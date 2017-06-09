@@ -1,6 +1,7 @@
 #ifndef PLD_LIBS_MOCK_H
 #define PLD_LIBS_MOCK_H
 
+#include <hal/hal>
 #include "interface.h"
 
 namespace pld {
@@ -16,6 +17,20 @@ struct Mock : public Interface {
     void obc_interrupt_reset() override;
 };
 
+namespace mock {
+enum class MockEvent : uint8_t {
+    Init = 0,
+    Standby = 1,
+    Radfet = 2,
+    Watchdog = 3,
+    IntSet = 4,
+    IntReset = 5,
+};
+
+extern std::array<std::uint16_t, 20> adc_channels;
+extern hal::libs::FIFO_data<MockEvent, 100> events;
+
+}
 }  // namespace hardware
 }  // namespace pld
 
