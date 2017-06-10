@@ -8,12 +8,12 @@
 #include <ObcInterface/CommandDispatcher.h>
 #include <ObcInterface/ObcInterface.h>
 
+#include "debug/commands.h"
 #include "telecommands/HouseKeeping.h"
 #include "telecommands/PT1000.h"
 #include "telecommands/Photodiodes.h"
 #include "telecommands/RadFET.h"
 #include "telecommands/SunSref.h"
-#include "debug/commands.h"
 
 
 using namespace hal;

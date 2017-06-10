@@ -1,5 +1,5 @@
-#ifndef PLD_SRC_TELEMETRY_H_
-#define PLD_SRC_TELEMETRY_H_
+#ifndef PLD_PLD_LIBS_TELEMETRY_INCLUDE_TELEMETRY_TELEMETRY_H_
+#define PLD_PLD_LIBS_TELEMETRY_INCLUDE_TELEMETRY_TELEMETRY_H_
 
 #include <util/atomic.h>
 #include <array>
@@ -78,4 +78,4 @@ static_assert(std::is_pod<Telemetry>::value, "POD");
 
 }  // namespace pld
 
-#endif  // PLD_SRC_TELEMETRY_H_
+#endif  // PLD_PLD_LIBS_TELEMETRY_INCLUDE_TELEMETRY_TELEMETRY_H_

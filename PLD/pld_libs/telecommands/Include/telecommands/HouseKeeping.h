@@ -1,5 +1,5 @@
-#ifndef PLD_SRC_TELECOMMANDS_HOUSEKEEPING_H_
-#define PLD_SRC_TELECOMMANDS_HOUSEKEEPING_H_
+#ifndef PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_HOUSEKEEPING_H_
+#define PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_HOUSEKEEPING_H_
 
 #include "pld_command.h"
 
@@ -8,7 +8,7 @@ namespace telecommands {
 
 class HouseKeeping : public PldCommand<0x83> {
  public:
-    HouseKeeping(Telemetry &telemetry, hardware::Interface *&hardware)
+    HouseKeeping(Telemetry& telemetry, hardware::Interface*& hardware)
         : PldCommand(hardware), telemetry(telemetry), hardware(hardware) {
     }
 
@@ -16,18 +16,19 @@ class HouseKeeping : public PldCommand<0x83> {
         std::printf("HouseKeeping\n");
 
         Telemetry::Housekeeping hk;
-        hardware->read_adc({{hardware::AnalogChannel::HouseKeeping_3V3d, &hk.int_3v3d},
-                            {hardware::AnalogChannel::HouseKeeping_3V3_OBC, &hk.obc_3v3d}});
+        hardware->read_adc(
+            {{hardware::AnalogChannel::HouseKeeping_3V3d, &hk.int_3v3d},
+             {hardware::AnalogChannel::HouseKeeping_3V3_OBC, &hk.obc_3v3d}});
 
         telemetry.housekeeping = hk;
     }
 
  private:
-    Telemetry &telemetry;
-    hardware::Interface *&hardware;
+    Telemetry& telemetry;
+    hardware::Interface*& hardware;
 };
 
 }  // namespace telecommands
 }  // namespace pld
 
-#endif  // PLD_SRC_TELECOMMANDS_HOUSEKEEPING_H_
+#endif  // PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_HOUSEKEEPING_H_

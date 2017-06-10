@@ -1,5 +1,5 @@
-#ifndef PLD_PLD_IF_H_H
-#define PLD_PLD_IF_H_H
+#ifndef PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_INTERFACE_H_
+#define PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_INTERFACE_H_
 
 #include <telemetry/telemetry.h>
 #include <cstdint>
@@ -34,7 +34,7 @@ enum class AnalogChannel : std::uint8_t {
 struct Interface {
     struct ChannelDescriptor {
         AnalogChannel channel;
-        uint16_t * data;
+        uint16_t* data;
     };
     virtual void read_adc(std::initializer_list<ChannelDescriptor> channels) = 0;
 
@@ -50,4 +50,4 @@ using HardwareProvider = Interface*;
 }  // namespace hardware
 }  // namespace pld
 
-#endif  // PLD_PLD_IF_H_H
+#endif  // PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_INTERFACE_H_

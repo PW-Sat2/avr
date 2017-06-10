@@ -12,7 +12,7 @@ hal::libs::FIFO_data<MockEvent, 100> mock::events;
 std::array<std::uint16_t, 20> mock::adc_channels;
 
 void Mock::read_adc(std::initializer_list<ChannelDescriptor> channels) {
-    for(auto ch: channels) {
+    for (auto ch : channels) {
         uint8_t channel_ = static_cast<uint8_t>(ch.channel);
 
         events.append(static_cast<MockEvent>(100 + channel_));

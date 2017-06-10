@@ -7,9 +7,9 @@ extern "C" {
 #include "telemetry/telemetry.h"
 
 #include "telecommands/HouseKeeping.h"
+#include "telecommands/PT1000.h"
 #include "telecommands/Photodiodes.h"
 #include "telecommands/SunSref.h"
-#include "telecommands/PT1000.h"
 
 using namespace std;
 using namespace hal;
@@ -172,15 +172,17 @@ TEST(telecommands, PT1000) {
     set_adc_mock(AnalogChannel::TemperatureYn, 40009);
 
     pt1000.work({});
-    check_readouts({AnalogChannel::TemperatureSupply,
-                    AnalogChannel::TemperatureCamNadir,
-                    AnalogChannel::TemperatureCamWing,
-                    AnalogChannel::TemperatureSail,
-                    AnalogChannel::TemperatureSADS,
-                    AnalogChannel::TemperatureXp,
-                    AnalogChannel::TemperatureXn,
-                    AnalogChannel::TemperatureYp,
-                    AnalogChannel::TemperatureYn,});
+    check_readouts({
+        AnalogChannel::TemperatureSupply,
+        AnalogChannel::TemperatureCamNadir,
+        AnalogChannel::TemperatureCamWing,
+        AnalogChannel::TemperatureSail,
+        AnalogChannel::TemperatureSADS,
+        AnalogChannel::TemperatureXp,
+        AnalogChannel::TemperatureXn,
+        AnalogChannel::TemperatureYp,
+        AnalogChannel::TemperatureYn,
+    });
 
     pld::Telemetry::Temperatures readed = telemetry.temperatures;
     TEST_ASSERT_EQUAL_UINT16(40001, readed.supply);

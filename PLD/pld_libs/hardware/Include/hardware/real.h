@@ -1,5 +1,5 @@
-#ifndef PLD_LIBS_REAL_H
-#define PLD_LIBS_REAL_H
+#ifndef PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_REAL_H_
+#define PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_REAL_H_
 
 namespace pld {
 namespace hardware {
@@ -9,4 +9,4 @@ struct RealHardware : public Interface {};
 }  // namespace hardware
 }  // namespace pld
 
-#endif  // PLD_LIBS_REAL_H
+#endif  // PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_REAL_H_

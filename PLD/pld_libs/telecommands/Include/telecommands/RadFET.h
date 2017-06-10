@@ -1,5 +1,5 @@
-#ifndef PLD_SRC_TELECOMMANDS_RADFET_H_
-#define PLD_SRC_TELECOMMANDS_RADFET_H_
+#ifndef PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_RADFET_H_
+#define PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_RADFET_H_
 
 #include "pld_command.h"
 
@@ -25,4 +25,4 @@ class RadFET : public PldCommand<0x84> {
 }  // namespace telecommands
 }  // namespace pld
 
-#endif  // PLD_SRC_TELECOMMANDS_RADFET_H_
+#endif  // PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_RADFET_H_

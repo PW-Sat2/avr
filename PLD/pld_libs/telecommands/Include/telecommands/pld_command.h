@@ -1,5 +1,5 @@
-#ifndef PLD_LIBS_PLD_COMMAND_H
-#define PLD_LIBS_PLD_COMMAND_H
+#ifndef PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PLD_COMMAND_H_
+#define PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PLD_COMMAND_H_
 
 #include <ObcInterface/CommandDispatcher.h>
 #include <hardware/interface.h>
@@ -28,4 +28,4 @@ class PldCommand : public CommandWithOpcode<opcode, 0> {
 }  // namespace telecommands
 }  // namespace pld
 
-#endif  // PLD_LIBS_PLD_COMMAND_H
+#endif  // PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PLD_COMMAND_H_

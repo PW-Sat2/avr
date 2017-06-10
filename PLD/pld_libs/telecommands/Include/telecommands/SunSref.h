@@ -1,5 +1,5 @@
-#ifndef PLD_SRC_TELECOMMANDS_SUNSREF_H_
-#define PLD_SRC_TELECOMMANDS_SUNSREF_H_
+#ifndef PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_SUNSREF_H_
+#define PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_SUNSREF_H_
 
 #include "pld_command.h"
 
@@ -36,4 +36,4 @@ class SunSRef : public PldCommand<0x80> {
 }  // namespace telecommands
 }  // namespace pld
 
-#endif  // PLD_SRC_TELECOMMANDS_SUNSREF_H_
+#endif  // PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_SUNSREF_H_
