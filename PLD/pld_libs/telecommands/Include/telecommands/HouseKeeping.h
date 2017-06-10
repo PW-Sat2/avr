@@ -17,7 +17,7 @@ class HouseKeeping : public PldCommand<0x83> {
 
         Telemetry::Housekeeping hk;
         hardware->read_adc({{hardware::AnalogChannel::HouseKeeping_3V3d, &hk.int_3v3d},
-                            {hardware::AnalogChannel::HouseKeeping_3V3_OBC, &hk.int_3v3d}});
+                            {hardware::AnalogChannel::HouseKeeping_3V3_OBC, &hk.obc_3v3d}});
 
         telemetry.housekeeping = hk;
     }

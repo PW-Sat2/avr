@@ -1,3 +1,5 @@
+add_compile_options(-g)
+
 add_hal_executable(PLD
     main.cpp
     debug/mock.cpp
