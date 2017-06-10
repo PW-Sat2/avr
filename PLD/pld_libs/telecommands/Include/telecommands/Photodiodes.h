@@ -16,15 +16,13 @@ class Photodiodes : public PldCommand<0x82> {
         std::printf("Photodiodes\n");
 
         Telemetry::Photodiodes photodiodes;
-        hardware->read_adc_and_change_channel(hardware::AnalogChannel::Photodiode_B);
-        photodiodes.Xp = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::Photodiode_A);
-        photodiodes.Xn = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::Photodiode_C);
-        photodiodes.Yp = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::Photodiode_D);
-        photodiodes.Yn = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::Photodiode_D);
+
+        using hardware::AnalogChannel;
+
+        hardware->read_adc({{AnalogChannel::Photodiode_B, &photodiodes.Xp},
+                            {AnalogChannel::Photodiode_A, &photodiodes.Xn},
+                            {AnalogChannel::Photodiode_C, &photodiodes.Yp},
+                            {AnalogChannel::Photodiode_D, &photodiodes.Yn}});
 
         telemetry.photodiodes = photodiodes;
     }

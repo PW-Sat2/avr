@@ -14,27 +14,18 @@ class PT1000 : public PldCommand<0x81> {
     void work(gsl::span<const std::uint8_t>) override {
         std::printf("PT1000\n");
 
+        using hardware::AnalogChannel;
+
         Telemetry::Temperatures temperatures;
-        hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::TemperatureSADS);
-        temperatures.sads = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::TemperatureSail);
-        temperatures.sail = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::TemperatureXn);
-        temperatures.Xn = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::TemperatureXp);
-        temperatures.Xp = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::TemperatureYn);
-        temperatures.Yn = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::TemperatureYp);
-        temperatures.Yp = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::TemperatureCamNadir);
-        temperatures.cam_nadir = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::TemperatureCamWing);
-        temperatures.cam_wing = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::TemperatureSupply);
-        temperatures.supply = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::TemperatureSupply);
+        hardware->read_adc({{AnalogChannel::TemperatureSADS, &temperatures.sads},
+                            {AnalogChannel::TemperatureSail, &temperatures.sail},
+                            {AnalogChannel::TemperatureXp, &temperatures.Xp},
+                            {AnalogChannel::TemperatureXn, &temperatures.Xn},
+                            {AnalogChannel::TemperatureYp, &temperatures.Yp},
+                            {AnalogChannel::TemperatureYn, &temperatures.Yn},
+                            {AnalogChannel::TemperatureCamWing, &temperatures.cam_wing},
+                            {AnalogChannel::TemperatureCamNadir, &temperatures.cam_nadir},
+                            {AnalogChannel::TemperatureSupply, &temperatures.supply}});
 
         telemetry.temperatures = temperatures;
     }

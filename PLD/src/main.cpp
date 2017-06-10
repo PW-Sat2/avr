@@ -69,6 +69,7 @@ int main() {
 
     while (1) {
         dispatcher.dispatch();
+        hw->obc_interrupt_reset();
     }
 
     cli();

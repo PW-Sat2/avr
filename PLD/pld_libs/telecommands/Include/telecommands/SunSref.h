@@ -17,17 +17,13 @@ class SunSRef : public PldCommand<0x80> {
 
         Telemetry::SunsRef suns;
 
-        hardware->read_adc_and_change_channel(hardware::AnalogChannel::SunSRef_V0);
-        suns.voltages[0] = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::SunSRef_V1);
-        suns.voltages[1] = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::SunSRef_V2);
-        suns.voltages[2] = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::SunSRef_V3);
-        suns.voltages[3] = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::SunSRef_V4);
-        suns.voltages[4] = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::SunSRef_V4);
+        using hardware::AnalogChannel;
+
+        hardware->read_adc({{AnalogChannel::SunSRef_V0, &suns.voltages[0]},
+                            {AnalogChannel::SunSRef_V1, &suns.voltages[1]},
+                            {AnalogChannel::SunSRef_V2, &suns.voltages[2]},
+                            {AnalogChannel::SunSRef_V3, &suns.voltages[3]},
+                            {AnalogChannel::SunSRef_V4, &suns.voltages[4]}});
 
         telemetry.suns_ref = suns;
     }

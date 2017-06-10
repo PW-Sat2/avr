@@ -3,6 +3,7 @@
 
 #include <telemetry/telemetry.h>
 #include <cstdint>
+#include <gsl/gsl>
 
 namespace pld {
 namespace hardware {
@@ -31,10 +32,12 @@ enum class AnalogChannel : std::uint8_t {
 };
 
 struct Interface {
-    virtual void init()    = 0;
-    virtual void standby() = 0;
+    struct ChannelDescriptor {
+        AnalogChannel channel;
+        uint16_t * data;
+    };
+    virtual void read_adc(std::initializer_list<ChannelDescriptor> channels) = 0;
 
-    virtual uint16_t read_adc_and_change_channel(AnalogChannel next_channel) = 0;
     virtual pld::Telemetry::Radfet read_radfet() = 0;
 
     virtual void watchdog_kick()       = 0;

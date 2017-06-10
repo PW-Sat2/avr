@@ -8,7 +8,7 @@ namespace telecommands {
 
 class HouseKeeping : public PldCommand<0x83> {
  public:
-    HouseKeeping(Telemetry& telemetry, hardware::Interface*& hardware)
+    HouseKeeping(Telemetry &telemetry, hardware::Interface *&hardware)
         : PldCommand(hardware), telemetry(telemetry), hardware(hardware) {
     }
 
@@ -16,21 +16,15 @@ class HouseKeeping : public PldCommand<0x83> {
         std::printf("HouseKeeping\n");
 
         Telemetry::Housekeeping hk;
-        hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::HouseKeeping_3V3d);
-
-        hk.int_3v3d = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::HouseKeeping_3V3_OBC);
-
-        hk.obc_3v3d = hardware->read_adc_and_change_channel(
-            hardware::AnalogChannel::HouseKeeping_3V3_OBC);
+        hardware->read_adc({{hardware::AnalogChannel::HouseKeeping_3V3d, &hk.int_3v3d},
+                            {hardware::AnalogChannel::HouseKeeping_3V3_OBC, &hk.int_3v3d}});
 
         telemetry.housekeeping = hk;
     }
 
  private:
-    Telemetry& telemetry;
-    hardware::Interface*& hardware;
+    Telemetry &telemetry;
+    hardware::Interface *&hardware;
 };
 
 }  // namespace telecommands
