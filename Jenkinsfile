@@ -24,4 +24,7 @@ node('linux') {
 
 	stage 'PLD.unit_tests'
 	sh 'make PLD_unit_tests'
+
+	stage 'EGSE'
+	sh 'make EGSE'
 }

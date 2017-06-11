@@ -27,13 +27,18 @@ PLD_build:
 	cd PLD && mkdir -p cmake-build-debug && cd cmake-build-debug && cmake ..
 	make -C PLD/cmake-build-debug all
 
-PLD_unit_tests:
+PLD_unit_tests: force
 	make -C PLD/cmake-build-debug unit_tests.build
 	make -C PLD/cmake-build-debug unit_tests.run
 	make -C PLD/cmake-build-debug unit_tests_pld.build
 	make -C PLD/cmake-build-debug unit_tests_pld.run
 
-Jenkins: clean PLD_build PLD_unit_tests checkStyle checkFormat
+EGSE: force
+	mkdir -p EGSE/I2C_bridge/firmware/cmake-build-release
+	cd EGSE/I2C_bridge/firmware/cmake-build-release && cmake .. -DCMAKE_BUILD_TYPE=RELEASE
+	make -C EGSE/I2C_bridge/firmware/cmake-build-release I2C_bridge.build
+
+Jenkins: clean PLD_build PLD_unit_tests EGSE checkStyle checkFormat
 
 
 force:
