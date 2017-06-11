@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.2)
 
 set(HAL_PATH ../AVR-HAL)
-set(BOARD EVB_ATMEGA324P)
-#set(BOARD ARDUINONANO328P)
+set(HAL_MCU ATMEGA164P_44)
+set(F_CPU 8000000)
 set(CMAKE_TOOLCHAIN_FILE "${HAL_PATH}/toolchain.cmake")
 
 project(pld_libs)
