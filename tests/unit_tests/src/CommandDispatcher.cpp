@@ -145,7 +145,7 @@ void test_CommandDispatcher_dataRequestFilter() {
 }
 
 void test_CommandDispatcher() {
-    UNITY_BEGIN();
+    UnityBegin("");
     cmd = CommandDispatcher<RadFETCommand, SunSCommand>(
         {&radFETCommand, &sunSCommand});
 
@@ -159,5 +159,5 @@ void test_CommandDispatcher() {
     RUN_TEST(test_CommandDispatcher_tooLongCommandDoesNotHarm);
     RUN_TEST(test_CommandDispatcher_dataRequestFilter);
 
-    UNITY_END();
+    UnityEnd();
 }

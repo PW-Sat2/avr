@@ -191,10 +191,10 @@ void test_telecommands_Temperatures() {
 
 
 void test_telecommands() {
-    UNITY_BEGIN();
+    UnityBegin("");
     RUN_TEST(test_telecommands_HouseKeeping);
     RUN_TEST(test_telecommands_Photodiodes);
     RUN_TEST(test_telecommands_SunSRef);
     RUN_TEST(test_telecommands_Temperatures);
-    UNITY_END();
+    UnityEnd();
 }
