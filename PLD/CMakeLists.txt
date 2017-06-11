@@ -5,6 +5,8 @@ set(HAL_MCU ATMEGA164P_44)
 set(F_CPU 8000000)
 set(CMAKE_TOOLCHAIN_FILE "${HAL_PATH}/toolchain.cmake")
 
+add_definitions(-DLOG_LEVEL=LOG_LEVEL_INFO)
+
 project(pld_libs)
 
 add_subdirectory(${HAL_PATH} hal)

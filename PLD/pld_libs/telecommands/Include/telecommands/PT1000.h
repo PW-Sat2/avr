@@ -12,7 +12,7 @@ class PT1000 : public PldCommand<0x81> {
         : PldCommand(hardware), telemetry(telemetry), hardware(hardware) {
     }
     void work(gsl::span<const std::uint8_t>) override {
-        std::printf("PT1000\n");
+        LOG_INFO("Temperatures");
 
         using hardware::AnalogChannel;
 

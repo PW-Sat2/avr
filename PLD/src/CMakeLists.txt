@@ -11,4 +11,5 @@ target_link_libraries(PLD
     telecommands
     telemetry
     ObcInterface
+    logger
 )

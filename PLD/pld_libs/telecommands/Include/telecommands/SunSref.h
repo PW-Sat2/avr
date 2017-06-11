@@ -13,7 +13,7 @@ class SunSRef : public PldCommand<0x80> {
     }
 
     void work(gsl::span<const std::uint8_t>) override {
-        std::printf("SunS\n");
+        LOG_INFO("SunS");
 
         Telemetry::SunsRef suns;
 

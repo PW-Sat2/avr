@@ -13,7 +13,7 @@ class RadFET : public PldCommand<0x84> {
     }
 
     void work(gsl::span<const std::uint8_t>) override {
-        std::printf("RadFET\n");
+        LOG_INFO("RadFET");
         telemetry.radfet = hardware->read_radfet();
     }
 

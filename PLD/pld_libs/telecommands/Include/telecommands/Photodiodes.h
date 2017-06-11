@@ -13,7 +13,7 @@ class Photodiodes : public PldCommand<0x82> {
     }
 
     void work(gsl::span<const std::uint8_t>) override {
-        std::printf("Photodiodes\n");
+        LOG_INFO("Photodiodes");
 
         Telemetry::Photodiodes photodiodes;
 

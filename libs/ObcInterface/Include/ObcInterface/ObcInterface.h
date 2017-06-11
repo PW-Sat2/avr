@@ -47,12 +47,15 @@ class ObcInterface {
 
         TWAR = (i2c_address << 1);
         TWCR = (1 << TWINT) | (1 << TWEA) | (1 << TWEN) | (1 << TWIE);
+
+        LOG_INFO("Enable TWI");
     }
 
     /*!
      * Disables TWI slave interface.
      */
     static void disable() {
+        LOG_INFO("Disable TWI");
         TWCR = 0;
     }
 
@@ -64,7 +67,7 @@ class ObcInterface {
      * @param memory_ Pointer to new location.
      */
     static inline void set_memory(gsl::not_null<DataType*> memory_) {
-        printf("Set Memory to %p!\n", memory_.get());
+        LOG_INFO("Setting memory to %p", memory_.get());
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
             memory = reinterpret_cast<uint8_t*>(memory_.get());
         }

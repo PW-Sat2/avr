@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <avr/sleep.h>
 
+#include <logger.h>
+
 #include <hardware/interface.h>
 #include <hardware/mock.h>
 
@@ -61,14 +63,13 @@ int main() {
 
     pld::debug::init();
 
-
     hw = &empty_hardware;
     std::memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
     telemetry.who_am_i = 0x53;
 
     obc.init(&telemetry);
     sei();
-    printf("PLD Initialised.\n");
+    LOG_INFO("PLD Initialised.");
 
     hal::Watchdog::enable(hal::Watchdog::Period::p500ms);
 

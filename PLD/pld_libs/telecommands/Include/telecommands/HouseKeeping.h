@@ -13,7 +13,7 @@ class HouseKeeping : public PldCommand<0x83> {
     }
 
     void work(gsl::span<const std::uint8_t>) override {
-        std::printf("HouseKeeping\n");
+        LOG_INFO("HouseKeeping");
 
         Telemetry::Housekeeping hk;
         hardware->read_adc(

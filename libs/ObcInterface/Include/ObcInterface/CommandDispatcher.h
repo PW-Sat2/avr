@@ -1,6 +1,7 @@
 #ifndef LIBS_OBCINTERFACE_INCLUDE_OBCINTERFACE_COMMANDDISPATCHER_H_
 #define LIBS_OBCINTERFACE_INCLUDE_OBCINTERFACE_COMMANDDISPATCHER_H_
 
+#include <logger.h>
 #include <cstdint>
 #include <gsl/gsl>
 
@@ -98,13 +99,24 @@ class CommandDispatcher {
      * @param cmd Command as received from hardware.
      */
     void parse(gsl::span<const std::uint8_t> cmd) {
-        if (0 < cmd.size() && cmd[0] >= min_opcode &&
-            cmd.size() <= storage.size() && command_pending == false) {
-            std::copy(cmd.begin(), cmd.end(), storage.begin());
-            data = gsl::make_span(storage.data(), cmd.size());
-
-            command_pending = true;
+        if (0 == cmd.size() || cmd.size() > storage.size()) {
+            LOG_ERROR("Wrong command length!");
+            return;
         }
+
+        if (cmd[0] < min_opcode) {
+            // data readout
+            return;
+        }
+
+        if (command_pending) {
+            LOG_ERROR("Command dropped!");
+        }
+
+        std::copy(cmd.begin(), cmd.end(), storage.begin());
+        data = gsl::make_span(storage.data(), cmd.size());
+
+        command_pending = true;
     }
 
     /*!
@@ -114,15 +126,15 @@ class CommandDispatcher {
         if (command_pending == false) {
             return;
         }
-        printf("is command!\n");
         Command** cmd =
             std::find_if(commands.begin(), commands.end(), [=](Command* _) {
                 return (_->opcode() == data[0]) &&
                        (_->params() == data.size() - 1);
             });
         if (cmd != commands.end()) {
-            printf("invoke!\n");
             (*cmd)->invoke(data.subspan(1));
+        } else {
+            LOG_WARNING("No command for %d, %d", data[0], data.size() - 1);
         }
         command_pending = false;
     }
