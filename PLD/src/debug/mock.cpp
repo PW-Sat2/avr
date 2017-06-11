@@ -10,14 +10,6 @@ namespace debug {
 using namespace std;
 using namespace hardware::mock;
 
-void read_events(std::uint8_t, char* []) {
-    printf("Read events!: ");
-    while (hardware::mock::events.getLength() > 0) {
-        auto now = hardware::mock::events.get();
-        printf("%d ", now);
-    }
-}
-
 void set_adc(std::uint8_t argc, char* argv[]) {
     if (argc != 2)
         return;
@@ -47,8 +39,7 @@ ISR(USART0_RX_vect) {
 }
 
 void init() {
-    static TerminalCommandDescription cmds[] = {{"ev", read_events},
-                                                {"adc", set_adc}};
+    static TerminalCommandDescription cmds[] = {{"adc", set_adc}};
 
     terminal.SetCommandList(cmds);
 }

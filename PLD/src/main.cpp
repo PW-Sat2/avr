@@ -1,9 +1,8 @@
 #include <assert.h>
-
 #include <avr/sleep.h>
+
 #include <hardware/interface.h>
 #include <hardware/mock.h>
-#include <hal/hal>
 
 #include <ObcInterface/CommandDispatcher.h>
 #include <ObcInterface/ObcInterface.h>
@@ -52,12 +51,11 @@ ISR(TWI_vect) {
 }
 
 int main() {
-    Serial0.init(9600);
+    Serial0.init(38400);
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
     Serial0.enable_rx_interrupt();
 
-    printf("INIT!\n");
     pld::debug::init();
 
 

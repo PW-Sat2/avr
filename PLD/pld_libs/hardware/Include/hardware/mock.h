@@ -27,7 +27,6 @@ enum class MockEvent : uint8_t {
 };
 
 extern std::array<std::uint16_t, 20> adc_channels;
-extern hal::libs::FIFO_data<MockEvent, 100> events;
 
 }  // namespace mock
 }  // namespace hardware
