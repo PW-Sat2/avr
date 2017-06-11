@@ -28,10 +28,6 @@ void write(uint8_t argc, char* argv[]) {
         array[i] = atoi(argv[i + 1]);
     }
 
-    //    printf("W [%d] %d bytes: ", addr, argc-1);
-    //    for(int i = 0; i < argc-1; ++i) {
-    //        printf("%d ", array[i]);
-    //    }
     i2c.write(addr, gsl::make_span(array.data(), argc - 1));
 }
 
@@ -42,8 +38,6 @@ void read(uint8_t argc, char* argv[]) {
 
     uint8_t addr  = atoi(argv[0]);
     uint8_t bytes = atoi(argv[1]);
-
-    //    printf("R [%d] %d bytes: ", addr, bytes);
 
     auto data = gsl::make_span(array.data(), bytes);
     i2c.read(addr, data);
@@ -70,11 +64,6 @@ void write_read(uint8_t argc, char* argv[]) {
     auto write_data = gsl::make_span(WriteArray.data(), bytesToWrite);
     auto read_data  = gsl::make_span(array.data(), bytesToRead);
 
-    //    printf("WR [%d] %d bytes [ ", addr, bytesToWrite);
-    //    for(auto x: write_data) {
-    //        printf("%d ", x);
-    //    }
-    //    printf("] and reading %d: ", bytesToRead);
     i2c.writeRead(addr, write_data, read_data);
 
     for (auto x : read_data) {
@@ -106,7 +95,7 @@ ISR(USART_RX_vect) {
 }
 
 int main() {
-    Serial0.init(38400);
+    Serial0.init(250000);
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
     Serial0.enable_rx_interrupt();
