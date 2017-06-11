@@ -14,24 +14,25 @@ enum class AnalogChannel : std::uint8_t {
     SunSRef_V2,
     SunSRef_V3,
     SunSRef_V4,
+    TemperatureSupply,
+    TemperatureXp,
+    TemperatureXn,
+    TemperatureYp,
+    TemperatureYn,
+    TemperatureSADS,
+    TemperatureSail,
+    TemperatureCamNadir,
+    TemperatureCamWing,
     Photodiode_A,
     Photodiode_B,
     Photodiode_C,
     Photodiode_D,
-    TemperatureSupply,
     HouseKeeping_3V3d,
     HouseKeeping_3V3_OBC,
-    TemperatureSail,
-    TemperatureSADS,
-    TemperatureCamWing,
-    TemperatureCamNadir,
-    TemperatureXn,
-    TemperatureXp,
-    TemperatureYn,
-    TemperatureYp,
 };
 
 struct Interface {
+    virtual void init() = 0;
     struct ChannelDescriptor {
         AnalogChannel channel;
         uint16_t* data;

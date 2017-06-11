@@ -15,9 +15,8 @@ class PldCommand : public CommandWithOpcode<opcode, 0> {
     }
 
     void invoke(gsl::span<const std::uint8_t> params) override {
+        hardware->obc_interrupt_set();
         this->work(params);
-
-        hardware->obc_interrupt_reset();
     }
 
     virtual void work(gsl::span<const std::uint8_t> params) = 0;

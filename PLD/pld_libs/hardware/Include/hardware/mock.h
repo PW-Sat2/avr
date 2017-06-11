@@ -8,8 +8,8 @@ namespace pld {
 namespace hardware {
 
 struct Mock : public Interface {
-    virtual void
-    read_adc(std::initializer_list<ChannelDescriptor> channels) override;
+    virtual void init() override;
+    virtual void read_adc(std::initializer_list<ChannelDescriptor> channels) override;
     Telemetry::Radfet read_radfet() override;
     void watchdog_kick() override;
     void obc_interrupt_set() override;

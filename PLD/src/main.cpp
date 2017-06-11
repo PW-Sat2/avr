@@ -51,6 +51,9 @@ ISR(TWI_vect) {
 }
 
 int main() {
+    hal::Watchdog::disable();
+    empty_hardware.init();
+
     Serial0.init(38400);
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
@@ -64,9 +67,13 @@ int main() {
 
     obc.init(&telemetry);
     sei();
+    printf("PLD Initialised.\n");
+
+    hal::Watchdog::enable(hal::Watchdog::Period::p500ms);
 
     while (1) {
         dispatcher.dispatch();
+        hw->watchdog_kick();
         hw->obc_interrupt_reset();
     }
 

@@ -26,8 +26,8 @@ Terminal terminal;
 ISR(USART0_RX_vect) {
     char now = UDR0;
 
-    static char buf[100];
-    static hal::libs::FIFO<char> fifo{buf, 100};
+    static char buf[20];
+    static hal::libs::FIFO<char> fifo{buf, 20};
 
     if (now == '\n') {
         fifo.append(0);
