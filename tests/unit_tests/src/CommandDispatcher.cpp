@@ -1,9 +1,7 @@
 #include "ObcInterface/CommandDispatcher.h"
 #include <cstdint>
 #include <gsl/gsl>
-extern "C" {
-#include "unity_fixture.h"
-};
+#include "unity.h"
 
 class CommandMock {
  public:
@@ -41,35 +39,12 @@ class SunSCommand : public CommandWithOpcode<0xDC, 3>, public CommandMock {
     }
 };
 
-TEST_GROUP(CommandDispatcher);
-
 RadFETCommand radFETCommand;
 SunSCommand sunSCommand;
 
 CommandDispatcher<RadFETCommand, SunSCommand> cmd;
 
-TEST_SETUP(CommandDispatcher) {
-    cmd = CommandDispatcher<RadFETCommand, SunSCommand>(
-        {&radFETCommand, &sunSCommand});
-}
-TEST_TEAR_DOWN(CommandDispatcher) {
-    radFETCommand.invoked();
-    sunSCommand.invoked();
-}
-
-TEST_GROUP_RUNNER(commands) {
-    RUN_TEST_CASE(CommandDispatcher, noCommandInvoked);
-    RUN_TEST_CASE(CommandDispatcher, tooShortCommand);
-    RUN_TEST_CASE(CommandDispatcher, radfetNoParams);
-    RUN_TEST_CASE(CommandDispatcher, radfetWrongNumberOfParams);
-    RUN_TEST_CASE(CommandDispatcher, sunsParamsOK);
-    RUN_TEST_CASE(CommandDispatcher, commandGetsDispatched);
-    RUN_TEST_CASE(CommandDispatcher, bufferCorruptedAfterParse);
-    RUN_TEST_CASE(CommandDispatcher, tooLongCommandDoesNotHarm);
-    RUN_TEST_CASE(CommandDispatcher, dataRequestFilter);
-}
-
-TEST(CommandDispatcher, noCommandInvoked) {
+void test_CommandDispatcher_noCommandInvoked() {
     uint8_t data[] = {0x00};
     cmd.parse(data);
     TEST_ASSERT_FALSE(radFETCommand.invoked());
@@ -79,7 +54,7 @@ TEST(CommandDispatcher, noCommandInvoked) {
     TEST_ASSERT_FALSE(sunSCommand.invoked());
 }
 
-TEST(CommandDispatcher, tooShortCommand) {
+void test_CommandDispatcher_tooShortCommand() {
     uint8_t data[] = {};
     cmd.parse(gsl::make_span(data, 0));
     TEST_ASSERT_FALSE(radFETCommand.invoked());
@@ -89,7 +64,7 @@ TEST(CommandDispatcher, tooShortCommand) {
     TEST_ASSERT_FALSE(sunSCommand.invoked());
 }
 
-TEST(CommandDispatcher, radfetNoParams) {
+void test_CommandDispatcher_radfetNoParams() {
     uint8_t data[] = {0xAB};
     cmd.parse(data);
     TEST_ASSERT_FALSE(radFETCommand.invoked());
@@ -106,7 +81,7 @@ TEST(CommandDispatcher, radfetNoParams) {
     TEST_ASSERT_FALSE(sunSCommand.invoked());
 }
 
-TEST(CommandDispatcher, radfetWrongNumberOfParams) {
+void test_CommandDispatcher_radfetWrongNumberOfParams() {
     uint8_t data[] = {0xAB, 1};
     cmd.parse(data);
     cmd.dispatch();
@@ -114,7 +89,7 @@ TEST(CommandDispatcher, radfetWrongNumberOfParams) {
     TEST_ASSERT_FALSE(sunSCommand.invoked());
 }
 
-TEST(CommandDispatcher, sunsParamsOK) {
+void test_CommandDispatcher_sunsParamsOK() {
     uint8_t data[] = {0xDC, 1, 2, 3};
     cmd.parse(data);
     TEST_ASSERT_FALSE(radFETCommand.invoked());
@@ -126,7 +101,7 @@ TEST(CommandDispatcher, sunsParamsOK) {
     TEST_ASSERT_EQUAL_HEX8_ARRAY(params, sunSCommand.params_buffer.data(), 3);
 }
 
-TEST(CommandDispatcher, commandGetsDispatched) {
+void test_CommandDispatcher_commandGetsDispatched() {
     uint8_t data[] = {0xDC, 0xFF, 0xFF, 0xFF};
     cmd.parse(data);
     TEST_ASSERT_FALSE(radFETCommand.invoked());
@@ -139,7 +114,7 @@ TEST(CommandDispatcher, commandGetsDispatched) {
     TEST_ASSERT_FALSE(sunSCommand.invoked());
 }
 
-TEST(CommandDispatcher, bufferCorruptedAfterParse) {
+void test_CommandDispatcher_bufferCorruptedAfterParse() {
     uint8_t data[] = {0xDC, 1, 2, 3};
     cmd.parse(data);
     TEST_ASSERT_FALSE(radFETCommand.invoked());
@@ -153,7 +128,7 @@ TEST(CommandDispatcher, bufferCorruptedAfterParse) {
     TEST_ASSERT_EQUAL_HEX8_ARRAY(params, sunSCommand.params_buffer.data(), 3);
 }
 
-TEST(CommandDispatcher, tooLongCommandDoesNotHarm) {
+void test_CommandDispatcher_tooLongCommandDoesNotHarm() {
     uint8_t data[100] = {0xDC};
     cmd.parse(data);
     cmd.dispatch();
@@ -161,10 +136,27 @@ TEST(CommandDispatcher, tooLongCommandDoesNotHarm) {
     TEST_ASSERT_FALSE(sunSCommand.invoked());
 }
 
-TEST(CommandDispatcher, dataRequestFilter) {
+void test_CommandDispatcher_dataRequestFilter() {
     uint8_t data[100] = {0xDC};
     cmd.parse(data);
     cmd.dispatch();
     TEST_ASSERT_FALSE(radFETCommand.invoked());
     TEST_ASSERT_FALSE(sunSCommand.invoked());
+}
+
+void test_CommandDispatcher() {
+    UNITY_BEGIN();
+    cmd = CommandDispatcher<RadFETCommand, SunSCommand>(
+        {&radFETCommand, &sunSCommand});
+
+    RUN_TEST(test_CommandDispatcher_noCommandInvoked);
+    RUN_TEST(test_CommandDispatcher_tooShortCommand);
+    RUN_TEST(test_CommandDispatcher_radfetNoParams);
+    RUN_TEST(test_CommandDispatcher_radfetWrongNumberOfParams);
+    RUN_TEST(test_CommandDispatcher_sunsParamsOK);
+    RUN_TEST(test_CommandDispatcher_commandGetsDispatched);
+    RUN_TEST(test_CommandDispatcher_bufferCorruptedAfterParse);
+    RUN_TEST(test_CommandDispatcher_tooLongCommandDoesNotHarm);
+    RUN_TEST(test_CommandDispatcher_dataRequestFilter);
+    UNITY_END();
 }

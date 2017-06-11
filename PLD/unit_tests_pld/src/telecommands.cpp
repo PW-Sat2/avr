@@ -1,7 +1,5 @@
 #include <hal/hal>
-extern "C" {
-#include "unity_fixture.h"
-};
+#include "unity.h"
 
 #include "hardware/interface.h"
 #include "telemetry/telemetry.h"
@@ -15,17 +13,8 @@ using namespace std;
 using namespace hal;
 using namespace hal::libs;
 
-TEST_GROUP(telecommands);
-
-TEST_GROUP_RUNNER(telecommands) {
-    RUN_TEST_CASE(telecommands, HouseKeeping);
-    RUN_TEST_CASE(telecommands, Photodiodes);
-    RUN_TEST_CASE(telecommands, SunSRef);
-    RUN_TEST_CASE(telecommands, PT1000);
-}
-
 std::array<uint16_t, 20> adc_mock_data;
-FIFO_data<uint8_t, 100> commands;
+FIFO_data<uint8_t, 20> commands;
 
 class MockHW : public pld::hardware::Interface {
  public:
@@ -61,13 +50,6 @@ pld::Telemetry telemetry;
 MockHW hw;
 pld::hardware::HardwareProvider hw_ptr;
 
-TEST_SETUP(telecommands) {
-    hw_ptr = &hw;
-    memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
-}
-TEST_TEAR_DOWN(telecommands) {
-}
-
 void set_adc_mock(pld::hardware::AnalogChannel channel, uint16_t value) {
     adc_mock_data[static_cast<uint8_t>(channel)] = value;
 }
@@ -90,7 +72,9 @@ void check_readouts(std::initializer_list<pld::hardware::AnalogChannel> channels
 
 using namespace pld::hardware;
 
-TEST(telecommands, HouseKeeping) {
+void test_telecommands_HouseKeeping() {
+    hw_ptr = &hw;
+    memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
     pld::telecommands::HouseKeeping hk(telemetry, hw_ptr);
 
     set_adc_mock(AnalogChannel::HouseKeeping_3V3d, 12345);
@@ -116,7 +100,9 @@ TEST(telecommands, HouseKeeping) {
     TEST_ASSERT_EQUAL_UINT16(41578, readed.obc_3v3d);
 }
 
-TEST(telecommands, Photodiodes) {
+void test_telecommands_Photodiodes() {
+    hw_ptr = &hw;
+    memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
     pld::telecommands::Photodiodes phd(telemetry, hw_ptr);
 
     set_adc_mock(AnalogChannel::Photodiode_A, 60001);
@@ -137,7 +123,9 @@ TEST(telecommands, Photodiodes) {
     TEST_ASSERT_EQUAL_UINT16(60004, readed.Yn);
 }
 
-TEST(telecommands, SunSRef) {
+void test_telecommands_SunSRef() {
+    hw_ptr = &hw;
+    memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
     pld::telecommands::SunSRef suns(telemetry, hw_ptr);
 
     set_adc_mock(AnalogChannel::SunSRef_V0, 50001);
@@ -161,7 +149,9 @@ TEST(telecommands, SunSRef) {
     TEST_ASSERT_EQUAL_UINT16(50005, readed.voltages[4]);
 }
 
-TEST(telecommands, PT1000) {
+void test_telecommands_Temperatures() {
+    hw_ptr = &hw;
+    memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
     pld::telecommands::PT1000 pt1000(telemetry, hw_ptr);
 
     set_adc_mock(AnalogChannel::TemperatureSupply, 40001);
@@ -197,4 +187,14 @@ TEST(telecommands, PT1000) {
     TEST_ASSERT_EQUAL_UINT16(40007, readed.Xn);
     TEST_ASSERT_EQUAL_UINT16(40008, readed.Yp);
     TEST_ASSERT_EQUAL_UINT16(40009, readed.Yn);
+}
+
+
+void test_telecommands() {
+    UNITY_BEGIN();
+    RUN_TEST(test_telecommands_HouseKeeping);
+    RUN_TEST(test_telecommands_Photodiodes);
+    RUN_TEST(test_telecommands_SunSRef);
+    RUN_TEST(test_telecommands_Temperatures);
+    UNITY_END();
 }

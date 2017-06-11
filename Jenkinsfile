@@ -13,12 +13,15 @@ node('linux') {
 	stage 'clean'
 	sh 'make clean'
 
-	stage 'print style'
-	sh 'cat .clang-format'
-
 	stage 'checkStyle'
 	sh 'make checkStyle'
 	
 	stage 'checkFormat'
 	sh 'make checkFormat'
+
+	stage 'PLD.build'
+	sh 'make PLD_build'
+
+	stage 'PLD.unit_tests'
+	sh 'make PLD_unit_tests'
 }

@@ -12,10 +12,8 @@ set(UNITY_PATH ${CMAKE_CURRENT_BINARY_DIR}/unity-src)
 
 add_library(unity
     ${UNITY_PATH}/src/unity.c
-    ${UNITY_PATH}/extras/fixture/src/unity_fixture.c
 )
 
 target_include_directories(unity PUBLIC
     ${UNITY_PATH}/src
-    ${UNITY_PATH}/extras/fixture/src
 )
