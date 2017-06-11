@@ -129,7 +129,7 @@ void test_CommandDispatcher_bufferCorruptedAfterParse() {
 }
 
 void test_CommandDispatcher_tooLongCommandDoesNotHarm() {
-    uint8_t data[100] = {0xDC};
+    uint8_t data[] = {0xDC};
     cmd.parse(data);
     cmd.dispatch();
     TEST_ASSERT_FALSE(radFETCommand.invoked());
@@ -137,7 +137,7 @@ void test_CommandDispatcher_tooLongCommandDoesNotHarm() {
 }
 
 void test_CommandDispatcher_dataRequestFilter() {
-    uint8_t data[100] = {0xDC};
+    uint8_t data[] = {0xDC};
     cmd.parse(data);
     cmd.dispatch();
     TEST_ASSERT_FALSE(radFETCommand.invoked());
@@ -158,5 +158,6 @@ void test_CommandDispatcher() {
     RUN_TEST(test_CommandDispatcher_bufferCorruptedAfterParse);
     RUN_TEST(test_CommandDispatcher_tooLongCommandDoesNotHarm);
     RUN_TEST(test_CommandDispatcher_dataRequestFilter);
+
     UNITY_END();
 }
