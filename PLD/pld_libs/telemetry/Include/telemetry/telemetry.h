@@ -65,13 +65,14 @@ struct Telemetry {
         std::array<std::uint32_t, 3> vth;
     };
 
+    uint8_t who_am_i;
     details::Atomic<SunsRef> suns_ref;
     details::Atomic<Temperatures> temperatures;
     details::Atomic<Photodiodes> photodiodes;
     details::Atomic<Housekeeping> housekeeping;
     details::Atomic<Radfet> radfet;
 };
-static_assert(sizeof(Telemetry) == 56,
+static_assert(sizeof(Telemetry) == 57,
               "Incorrect size of Telemetry structure (padding?)");
 static_assert(std::is_pod<Telemetry>::value, "POD");
 

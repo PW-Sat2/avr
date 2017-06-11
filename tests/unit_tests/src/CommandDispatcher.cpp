@@ -48,12 +48,7 @@ SunSCommand sunSCommand;
 
 CommandDispatcher<RadFETCommand, SunSCommand> cmd;
 
-
-template<class... T>
-void foo(T... t) {
-}
 TEST_SETUP(CommandDispatcher) {
-    foo(radFETCommand, sunSCommand);
     cmd = CommandDispatcher<RadFETCommand, SunSCommand>(
         {&radFETCommand, &sunSCommand});
 }

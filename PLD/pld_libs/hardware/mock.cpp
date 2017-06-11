@@ -27,7 +27,10 @@ void Mock::read_adc(std::initializer_list<ChannelDescriptor> channels) {
 
 Telemetry::Radfet Mock::read_radfet() {
     Telemetry::Radfet rf;
-    _delay_ms(200);
+    for (uint8_t i = 0; i < 10; ++i) {
+        _delay_ms(200);
+        this->watchdog_kick();
+    }
     return rf;
 }
 

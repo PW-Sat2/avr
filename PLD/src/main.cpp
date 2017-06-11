@@ -42,7 +42,7 @@ void CommandCallback(gsl::span<const uint8_t> _c) {
     dispatcher.parse(_c);
 }
 
-::drivers::ObcInterface<0x1A, CommandCallback, CommandDispatcherType::max_command_length, pld::Telemetry>
+::drivers::ObcInterface<0x30, CommandCallback, CommandDispatcherType::max_command_length, pld::Telemetry>
     obc;
 
 
@@ -64,6 +64,7 @@ int main() {
 
     hw = &empty_hardware;
     std::memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
+    telemetry.who_am_i = 0x53;
 
     obc.init(&telemetry);
     sei();

@@ -29,6 +29,9 @@ FIFO_data<uint8_t, 100> commands;
 
 class MockHW : public pld::hardware::Interface {
  public:
+    void init() override {
+        TEST_FAIL_MESSAGE("init");
+    }
     void read_adc(std::initializer_list<ChannelDescriptor> channels) override {
         for (auto ch : channels) {
             auto channel = static_cast<uint8_t>(ch.channel);
