@@ -37,7 +37,7 @@ class ObcInterface {
      * Additionally, enables pull-ups on TWI pins.
      * @param memory_ Default memory address to set a data retrieval pool
      */
-    static void init(gsl::not_null<DataType**> memory_) {
+    static void init(gsl::not_null<DataType*> memory_) {
         set_memory(memory_);
 
         hal::DigitalIO::GPIO<hal::mcu::pin_sda>().init(
@@ -108,10 +108,9 @@ void ObcInterface<i2c_address, callback, rx_max_length, DataType>::process_inter
             break;
 
         case TW_ST_SLA_ACK:  // 0xA8
-            tx_buffer_cnt   = rx_buffer[0] + 1;
+            tx_buffer_cnt   = rx_buffer[0];
             memory_buffered = memory;
-            TWDR            = memory_buffered[0];
-            break;
+        // fallthrough
 
         case TW_ST_DATA_ACK:  // 0xB8
             if (tx_buffer_cnt < tx_buffer_cnt_max) {

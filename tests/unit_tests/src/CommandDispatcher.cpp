@@ -23,7 +23,7 @@ class CommandMock {
 class RadFETCommand : public CommandWithOpcode<0xAB, 0>, public CommandMock {
  public:
  private:
-    void invoke(gsl::span<uint8_t> params) override {
+    void invoke(gsl::span<const uint8_t> params) override {
         TEST_ASSERT_EQUAL_INT(0, params.size());
         invoked_ = true;
     }
@@ -31,10 +31,10 @@ class RadFETCommand : public CommandWithOpcode<0xAB, 0>, public CommandMock {
 
 class SunSCommand : public CommandWithOpcode<0xDC, 3>, public CommandMock {
  public:
-    gsl::span<uint8_t> params_buffer;
+    gsl::span<const uint8_t> params_buffer;
 
  private:
-    void invoke(gsl::span<uint8_t> params) override {
+    void invoke(gsl::span<const uint8_t> params) override {
         TEST_ASSERT_EQUAL_INT(3, params.size());
         invoked_      = true;
         params_buffer = params;
@@ -63,37 +63,16 @@ TEST_TEAR_DOWN(CommandDispatcher) {
 }
 
 TEST_GROUP_RUNNER(commands) {
-    //    RUN_TEST_CASE(CommandDispatcher, noCommandsDoesNotHarm); printf(" ");
     RUN_TEST_CASE(CommandDispatcher, noCommandInvoked);
-    printf(" ");
     RUN_TEST_CASE(CommandDispatcher, tooShortCommand);
-    printf(" ");
     RUN_TEST_CASE(CommandDispatcher, radfetNoParams);
-    printf(" ");
     RUN_TEST_CASE(CommandDispatcher, radfetWrongNumberOfParams);
-    printf(" ");
     RUN_TEST_CASE(CommandDispatcher, sunsParamsOK);
-    printf(" ");
     RUN_TEST_CASE(CommandDispatcher, commandGetsDispatched);
-    printf(" ");
     RUN_TEST_CASE(CommandDispatcher, bufferCorruptedAfterParse);
-    printf(" ");
     RUN_TEST_CASE(CommandDispatcher, tooLongCommandDoesNotHarm);
-    printf(" ");
     RUN_TEST_CASE(CommandDispatcher, dataRequestFilter);
-    printf(" ");
 }
-
-// TEST(CommandDispatcher, noCommandsDoesNotHarm) {
-//    cmd = CommandDispatcher({});
-//    uint8_t data[] = {0x00};
-//    cmd.parse(data);
-//    TEST_ASSERT_FALSE(radFETCommand.invoked());
-//    TEST_ASSERT_FALSE(sunSCommand.invoked());
-//    cmd.dispatch();
-//    TEST_ASSERT_FALSE(radFETCommand.invoked());
-//    TEST_ASSERT_FALSE(sunSCommand.invoked());
-//}
 
 TEST(CommandDispatcher, noCommandInvoked) {
     uint8_t data[] = {0x00};

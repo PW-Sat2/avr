@@ -14,9 +14,9 @@ class Command {
      * It can be assumed that correct number of arguments will be passed.
      * @param params Parameters passed by OBC.
      */
-    virtual void invoke(gsl::span<std::uint8_t> params) = 0;
-    virtual std::uint8_t opcode()                       = 0;
-    virtual std::uint8_t params()                       = 0;
+    virtual void invoke(gsl::span<const std::uint8_t> params) = 0;
+    virtual std::uint8_t opcode()                             = 0;
+    virtual std::uint8_t params()                             = 0;
 };
 
 /*!
@@ -114,12 +114,14 @@ class CommandDispatcher {
         if (command_pending == false) {
             return;
         }
+        printf("is command!\n");
         Command** cmd =
             std::find_if(commands.begin(), commands.end(), [=](Command* _) {
                 return (_->opcode() == data[0]) &&
                        (_->params() == data.size() - 1);
             });
         if (cmd != commands.end()) {
+            printf("invoke!\n");
             (*cmd)->invoke(data.subspan(1));
         }
         command_pending = false;
@@ -132,7 +134,7 @@ class CommandDispatcher {
     std::array<std::uint8_t, max_command_length> storage;
     gsl::span<std::uint8_t> data;
 
-    bool command_pending = false;
+    volatile bool command_pending = false;
 };
 
 #endif  // LIBS_OBCINTERFACE_INCLUDE_OBCINTERFACE_COMMANDDISPATCHER_H_

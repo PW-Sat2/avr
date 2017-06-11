@@ -1,2 +1,1 @@
-add_subdirectory(SingleDeviceTests)
 add_subdirectory(unit_tests)

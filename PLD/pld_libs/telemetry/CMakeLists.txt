@@ -1,8 +1,7 @@
-set(NAME ObcInterface)
+set(NAME telemetry)
 
 add_library(${NAME} STATIC
-    Include/ObcInterface/ObcInterface.h
-    Include/ObcInterface/CommandDispatcher.h
+    Include/telemetry/telemetry.h
 )
 
 target_include_directories(${NAME} PUBLIC Include)
