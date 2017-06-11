@@ -28,7 +28,9 @@ PLD_build:
 	make -C PLD/cmake-build-debug all
 
 PLD_unit_tests:
+	make -C PLD/cmake-build-debug unit_tests.build
 	make -C PLD/cmake-build-debug unit_tests.run
+	make -C PLD/cmake-build-debug unit_tests_pld.build
 	make -C PLD/cmake-build-debug unit_tests_pld.run
 
 Jenkins: clean PLD_build PLD_unit_tests checkStyle checkFormat
