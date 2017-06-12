@@ -73,14 +73,12 @@ void check_readouts(std::initializer_list<pld::hardware::AnalogChannel> channels
 using namespace pld::hardware;
 
 void test_telecommands_HouseKeeping() {
-    hw_ptr = &hw;
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
-    pld::telecommands::HouseKeeping hk(telemetry, hw_ptr);
 
     set_adc_mock(AnalogChannel::HouseKeeping_3V3d, 12345);
     set_adc_mock(AnalogChannel::HouseKeeping_3V3_OBC, 52687);
 
-    hk.work({});
+    pld::telecommands::HouseKeeping().invoke(telemetry, hw, {});
     check_readouts({AnalogChannel::HouseKeeping_3V3d,
                     AnalogChannel::HouseKeeping_3V3_OBC});
 
@@ -91,7 +89,7 @@ void test_telecommands_HouseKeeping() {
     set_adc_mock(AnalogChannel::HouseKeeping_3V3d, 31204);
     set_adc_mock(AnalogChannel::HouseKeeping_3V3_OBC, 41578);
 
-    hk.work({});
+    pld::telecommands::HouseKeeping().invoke(telemetry, hw, {});
     check_readouts({AnalogChannel::HouseKeeping_3V3d,
                     AnalogChannel::HouseKeeping_3V3_OBC});
 
@@ -101,16 +99,14 @@ void test_telecommands_HouseKeeping() {
 }
 
 void test_telecommands_Photodiodes() {
-    hw_ptr = &hw;
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
-    pld::telecommands::Photodiodes phd(telemetry, hw_ptr);
 
     set_adc_mock(AnalogChannel::Photodiode_A, 60001);
     set_adc_mock(AnalogChannel::Photodiode_B, 60002);
     set_adc_mock(AnalogChannel::Photodiode_C, 60003);
     set_adc_mock(AnalogChannel::Photodiode_D, 60004);
 
-    phd.work({});
+    pld::telecommands::Photodiodes().invoke(telemetry, hw, {});
     check_readouts({AnalogChannel::Photodiode_A,
                     AnalogChannel::Photodiode_B,
                     AnalogChannel::Photodiode_C,
@@ -124,9 +120,7 @@ void test_telecommands_Photodiodes() {
 }
 
 void test_telecommands_SunSRef() {
-    hw_ptr = &hw;
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
-    pld::telecommands::SunSRef suns(telemetry, hw_ptr);
 
     set_adc_mock(AnalogChannel::SunSRef_V0, 50001);
     set_adc_mock(AnalogChannel::SunSRef_V1, 50002);
@@ -134,7 +128,7 @@ void test_telecommands_SunSRef() {
     set_adc_mock(AnalogChannel::SunSRef_V3, 50004);
     set_adc_mock(AnalogChannel::SunSRef_V4, 50005);
 
-    suns.work({});
+    pld::telecommands::SunSRef().invoke(telemetry, hw, {});
     check_readouts({AnalogChannel::SunSRef_V0,
                     AnalogChannel::SunSRef_V1,
                     AnalogChannel::SunSRef_V2,
@@ -150,9 +144,7 @@ void test_telecommands_SunSRef() {
 }
 
 void test_telecommands_Temperatures() {
-    hw_ptr = &hw;
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
-    pld::telecommands::PT1000 pt1000(telemetry, hw_ptr);
 
     set_adc_mock(AnalogChannel::TemperatureSupply, 40001);
     set_adc_mock(AnalogChannel::TemperatureCamNadir, 40002);
@@ -164,7 +156,7 @@ void test_telecommands_Temperatures() {
     set_adc_mock(AnalogChannel::TemperatureYp, 40008);
     set_adc_mock(AnalogChannel::TemperatureYn, 40009);
 
-    pt1000.work({});
+    pld::telecommands::PT1000().invoke(telemetry, hw, {});
     check_readouts({
         AnalogChannel::TemperatureSupply,
         AnalogChannel::TemperatureCamNadir,

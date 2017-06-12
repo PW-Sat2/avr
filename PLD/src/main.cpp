@@ -16,40 +16,38 @@
 #include "telecommands/RadFET.h"
 #include "telecommands/SunSref.h"
 
-
 using namespace hal;
 using namespace hal::libs;
 
 pld::hardware::Mock empty_hardware;
-pld::hardware::HardwareProvider hw;
+pld::hardware::Interface* hw;
 
 pld::Telemetry telemetry;
 
-using CommandDispatcherType = CommandDispatcher<pld::telecommands::SunSRef,
-                                                pld::telecommands::RadFET,
-                                                pld::telecommands::PT1000,
-                                                pld::telecommands::Photodiodes,
-                                                pld::telecommands::HouseKeeping>;
+struct Executor {
+    template<typename Command>
+    void invoke(Command& cmd, gsl::span<uint8_t> args) {
+        cmd.invoke(telemetry, *hw, args);
+    }
+};
 
-pld::telecommands::SunSRef sunS(telemetry, hw);
-pld::telecommands::RadFET radFET(telemetry, hw);
-pld::telecommands::PT1000 pt1000(telemetry, hw);
-pld::telecommands::Photodiodes photodiodes(telemetry, hw);
-pld::telecommands::HouseKeeping houseKeeping(telemetry, hw);
-
-CommandDispatcherType
-    dispatcher({&sunS, &radFET, &pt1000, &photodiodes, &houseKeeping});
+CommandDispatcher<Executor,
+                  pld::telecommands::SunSRef,
+                  pld::telecommands::RadFET,
+                  pld::telecommands::PT1000,
+                  pld::telecommands::Photodiodes,
+                  pld::telecommands::HouseKeeping>
+    dispatcher;
 
 void CommandCallback(gsl::span<const uint8_t> _c) {
     dispatcher.parse(_c);
 }
 
-::drivers::ObcInterface<0x30, CommandCallback, CommandDispatcherType::max_command_length, pld::Telemetry>
-    obc;
-
+using Obc =
+    ::drivers::ObcInterface<0x30, CommandCallback, decltype(dispatcher)::max_command_length, pld::Telemetry>;
 
 ISR(TWI_vect) {
-    obc.process_interrupt();
+    Obc::process_interrupt();
 }
 
 int main() {
@@ -64,10 +62,10 @@ int main() {
     pld::debug::init();
 
     hw = &empty_hardware;
-    std::memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
+    telemetry.init();
     telemetry.who_am_i = 0x53;
 
-    obc.init(&telemetry);
+    Obc::init(&telemetry);
     sei();
     LOG_INFO("PLD Initialised.");
 

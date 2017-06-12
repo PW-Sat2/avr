@@ -6,8 +6,6 @@ add_library(${NAME} STATIC
     Include/telecommands/PT1000.h
     Include/telecommands/RadFET.h
     Include/telecommands/SunSref.h
-
-    Include/telecommands/pld_command.h
 )
 
 target_include_directories(${NAME} PUBLIC Include)

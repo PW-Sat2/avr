@@ -14,35 +14,41 @@ class CommandMock {
         return _;
     }
 
- protected:
     bool invoked_;
-};
-
-class RadFETCommand : public CommandWithOpcode<0xAB, 0>, public CommandMock {
- public:
- private:
-    void invoke(gsl::span<const uint8_t> params) override {
-        TEST_ASSERT_EQUAL_INT(0, params.size());
-        invoked_ = true;
-    }
-};
-
-class SunSCommand : public CommandWithOpcode<0xDC, 3>, public CommandMock {
- public:
     gsl::span<const uint8_t> params_buffer;
-
- private:
-    void invoke(gsl::span<const uint8_t> params) override {
-        TEST_ASSERT_EQUAL_INT(3, params.size());
-        invoked_      = true;
-        params_buffer = params;
-    }
 };
 
-RadFETCommand radFETCommand;
-SunSCommand sunSCommand;
+struct Executor {
+    template<typename Command>
+    void invoke(Command& cmd, gsl::span<uint8_t> args) {
+        cmd.invoke(args);
+    }
+} executor;
 
-CommandDispatcher<RadFETCommand, SunSCommand> cmd;
+template<uint8_t opcode, uint8_t parameters>
+class MockCommand : public Command<opcode, parameters> {
+ public:
+    MockCommand(CommandMock& mock) : mock(mock) {
+    }
+
+    void invoke(gsl::span<const uint8_t> params) {
+        LOG_INFO("RadFET at %p", this);
+        TEST_ASSERT_EQUAL_INT(parameters, params.size());
+        mock.invoked_      = true;
+        mock.params_buffer = params;
+    }
+    CommandMock& mock;
+};
+
+using RadFETCommand = MockCommand<0xAB, 0>;
+using SunSCommand   = MockCommand<0xDC, 3>;
+
+
+CommandMock radFETCommand;
+CommandMock sunSCommand;
+
+CommandDispatcher<Executor, RadFETCommand, SunSCommand>
+    cmd(executor, RadFETCommand(radFETCommand), SunSCommand(sunSCommand));
 
 void test_CommandDispatcher_noCommandInvoked() {
     uint8_t data[] = {0x00};
@@ -146,8 +152,6 @@ void test_CommandDispatcher_dataRequestFilter() {
 
 void test_CommandDispatcher() {
     UnityBegin("");
-    cmd = CommandDispatcher<RadFETCommand, SunSCommand>(
-        {&radFETCommand, &sunSCommand});
 
     RUN_TEST(test_CommandDispatcher_noCommandInvoked);
     RUN_TEST(test_CommandDispatcher_tooShortCommand);

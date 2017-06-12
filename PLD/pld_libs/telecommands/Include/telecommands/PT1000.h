@@ -1,23 +1,23 @@
 #ifndef PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PT1000_H_
 #define PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PT1000_H_
 
-#include "pld_command.h"
+#include <ObcInterface/Command.h>
+#include <logger.h>
 
 namespace pld {
 namespace telecommands {
 
-class PT1000 : public PldCommand<0x81> {
+class PT1000 : public Command<0x81, 0> {
  public:
-    PT1000(Telemetry& telemetry, hardware::Interface*& hardware)
-        : PldCommand(hardware), telemetry(telemetry), hardware(hardware) {
-    }
-    void work(gsl::span<const std::uint8_t>) override {
+    void invoke(Telemetry& telemetry,
+                hardware::Interface& hardware,
+                gsl::span<const std::uint8_t>) {
         LOG_INFO("Temperatures");
 
         using hardware::AnalogChannel;
 
         Telemetry::Temperatures temperatures;
-        hardware->read_adc(
+        hardware.read_adc(
             {{AnalogChannel::TemperatureSADS, &temperatures.sads},
              {AnalogChannel::TemperatureSail, &temperatures.sail},
              {AnalogChannel::TemperatureXp, &temperatures.Xp},
@@ -30,10 +30,6 @@ class PT1000 : public PldCommand<0x81> {
 
         telemetry.temperatures = temperatures;
     }
-
- private:
-    Telemetry& telemetry;
-    hardware::Interface*& hardware;
 };
 
 }  // namespace telecommands
