@@ -3,7 +3,10 @@
 
 using namespace hal;
 
-using i2c = hal::I2C::Hardware;
+constexpr static auto pin_INT0 = 32;
+hal::DigitalIO::GPIO<pin_INT0> pin;
+
+hal::I2C::Hardware i2c;
 
 static std::array<uint8_t, 300> array;
 
@@ -78,10 +81,29 @@ void write_read(uint8_t argc, char* argv[]) {
     }
 }
 
+void pin_read(uint8_t, char*[]) {
+    if (pin.read()) {
+        printf("1");
+    }
+    else {
+        printf("0");
+    }
+}
+
+libs::FIFO_data<uint8_t, 50> fifo;
+
+void events(uint8_t, char*[]) {
+    while(fifo.getLength()) {
+        printf("%d", fifo.get());
+    }
+}
+
 TerminalCommandDescription tcs[] = {{"?", help},
                                     {"w", write},
                                     {"r", read},
-                                    {"wr", write_read}};
+                                    {"wr", write_read},
+                                    {"pin", pin_read},
+                                    {"ev", events}};
 
 Terminal terminal;
 
@@ -101,8 +123,18 @@ ISR(USART_RX_vect) {
     }
 }
 
+
+
+ISR(INT0_vect) {
+    if (pin.read()) {
+        fifo.append(1);
+    } else {
+        fifo.append(0);
+    }
+}
+
 int main() {
-    Serial0.init(250000);
+    Serial0.init(38400);
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
     Serial0.enable_rx_interrupt();
@@ -110,9 +142,14 @@ int main() {
     i2c::init<100000>();
     i2c::enable_internal_pullups();
 
+    pin.init(hal::DigitalIO::Interface::Mode::INPUT_PULLUP);
+    hal::DigitalIO::ExternalInterrupt::Line<0> line(hal::DigitalIO::ExternalInterrupt::Mode::change);
+    line.enable();
     sei();
 
     terminal.SetCommandList(tcs);
+
+
 
     while (1) {
     }

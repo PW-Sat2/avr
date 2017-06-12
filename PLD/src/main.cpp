@@ -29,6 +29,7 @@ pld::Telemetry telemetry;
 struct Executor {
     template<typename Command>
     void invoke(Command& cmd, gsl::span<uint8_t> args) {
+        hw->obc_interrupt_set();
         cmd.invoke(telemetry, *hw, args);
     }
 };
