@@ -2,7 +2,7 @@ add_compile_options(-Wno-error)
 
 add_hal_executable(unit_tests
     main.cpp
-    src/CommandDispatcher.cpp
+    src/CommandDispatcherTest.cpp
 )
 
 add_custom_target(unit_tests.run

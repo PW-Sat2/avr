@@ -1,9 +1,9 @@
 #ifndef PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_INTERFACE_H_
 #define PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_INTERFACE_H_
 
-#include <telemetry/telemetry.h>
 #include <cstdint>
 #include <gsl/gsl>
+#include "telemetry/telemetry.h"
 
 namespace pld {
 namespace hardware {

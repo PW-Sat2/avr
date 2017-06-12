@@ -1,9 +1,9 @@
 #ifndef LIBS_OBCINTERFACE_INCLUDE_OBCINTERFACE_COMMANDDISPATCHER_H_
 #define LIBS_OBCINTERFACE_INCLUDE_OBCINTERFACE_COMMANDDISPATCHER_H_
 
-#include <logger.h>
 #include <cstdint>
 #include <gsl/gsl>
+#include "logger.h"
 
 #include "Command.h"
 
@@ -18,14 +18,13 @@
  * readout. When command is received by the device @refitem parse method should
  * be invoked (e.g. in ISR). Later, in main thread @refitem dispatch should be
  * invoked.
- * @tparam Executor which will be invoked on match. In particular, is should implement invoke method, such as:
- * \code
- * struct Executor {
- *     template<typename Command>
- *     void invoke(Command& cmd, gsl::span<uint8_t> args);
+ * @tparam Executor which will be invoked on match. In particular, is should
+ * implement invoke method, such as: \code struct Executor { template<typename
+ * Command> void invoke(Command& cmd, gsl::span<uint8_t> args);
  * };
  * \endcode
- * @tparam Types Types of telecommands. Every one of them should be inherited from Command.
+ * @tparam Types Types of telecommands. Every one of them should be inherited
+ * from Command.
  */
 template<class Executor, class... Types>
 class CommandDispatcher : private Executor, private Types... {
@@ -48,7 +47,8 @@ class CommandDispatcher : private Executor, private Types... {
 
  public:
     /*!
-     * Default ctor. Every telecommand and executor default constructors will be invoked.
+     * Default ctor. Every telecommand and executor default constructors will be
+     * invoked.
      */
     CommandDispatcher() = default;
 
@@ -124,12 +124,12 @@ class CommandDispatcher : private Executor, private Types... {
     volatile bool command_pending = false;
 
     template<uint8_t index>
-    void run_command(uint8_t opcode, const gsl::span<uint8_t> &args) {
+    void run_command(uint8_t opcode, const gsl::span<uint8_t>& args) {
         LOG_WARNING("No command for %d, %d", opcode, args.size());
     }
 
     template<uint8_t index, class Head, class... Tail>
-    void run_command(uint8_t opcode, const gsl::span<uint8_t> &args) {
+    void run_command(uint8_t opcode, const gsl::span<uint8_t>& args) {
         if (Head::opcode == opcode && Head::params == args.size()) {
             Executor::invoke(static_cast<Head&>(*this), args);
         } else {

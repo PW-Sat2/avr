@@ -1,8 +1,8 @@
 #ifndef PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PHOTODIODES_H_
 #define PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PHOTODIODES_H_
 
-#include <ObcInterface/Command.h>
-#include <logger.h>
+#include "ObcInterface/Command.h"
+#include "logger.h"
 
 namespace pld {
 namespace telecommands {

@@ -14,7 +14,7 @@ void help(uint8_t, char* []) {
     printf(
         "  r - Read n bytes. r $address $nr_of_bytes (for example r 10 5)\n");
     printf("  wr - Write and read. wr $address $data... $nr_of_bytes (for "
-           "example r 10 1 2 3 7)\n");
+           "example wr 10 1 2 3 15)\n");
 }
 
 void write(uint8_t argc, char* argv[]) {
@@ -38,6 +38,9 @@ void read(uint8_t argc, char* argv[]) {
 
     uint8_t addr  = atoi(argv[0]);
     uint8_t bytes = atoi(argv[1]);
+    if (bytes == 0) {
+        return;
+    }
 
     auto data = gsl::make_span(array.data(), bytes);
     i2c.read(addr, data);
@@ -57,7 +60,11 @@ void write_read(uint8_t argc, char* argv[]) {
     uint8_t bytesToRead  = atoi(argv[argc - 1]);
 
     static std::array<uint8_t, 10> WriteArray;
-    for (int i = 0; i < argc - 2; ++i) {
+    if (bytesToWrite > WriteArray.size()) {
+        return;
+    }
+
+    for (int i = 0; i < bytesToWrite; ++i) {
         WriteArray[i] = atoi(argv[i + 1]);
     }
 

@@ -1,8 +1,8 @@
 #include <avr/interrupt.h>
-#include <hal/libs/terminal/terminal.h>
 #include <hal/hal>
+#include "hal/libs/terminal/terminal.h"
 
-#include <hardware/mock.h>
+#include "hardware/mock.h"
 
 namespace pld {
 namespace debug {
