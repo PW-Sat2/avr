@@ -63,8 +63,8 @@ class CommandDispatcher : private Executor, private Types... {
      * @param executor Executor object to use
      * @param types Telecommand objects.
      */
-    CommandDispatcher(Executor executor, Types&&... types)
-        : Executor(std::move(executor)), Types{std::forward<Types>(types)}... {
+    CommandDispatcher(Executor executor, Types... types)
+        : Executor(std::move(executor)), Types{std::move(types)}... {
     }
 
     /*!

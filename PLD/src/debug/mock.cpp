@@ -15,7 +15,7 @@ void set_adc(std::uint8_t argc, char* argv[]) {
         return;
 
     uint8_t channel = atoi(argv[0]);
-    uint32_t value  = atoi(argv[1]);
+    uint16_t value  = atoi(argv[1]);
 
     assert(channel < adc_channels.size());
     adc_channels[channel] = value;

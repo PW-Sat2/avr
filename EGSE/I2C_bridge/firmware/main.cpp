@@ -38,7 +38,7 @@ void read(uint8_t argc, char* argv[]) {
 
     uint8_t addr  = atoi(argv[0]);
     uint8_t bytes = atoi(argv[1]);
-    if (bytes == 0) {
+    if (bytes == 0 || bytes > array.size()) {
         return;
     }
 
