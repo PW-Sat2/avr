@@ -6,21 +6,18 @@
 #include <cstdint>
 
 namespace pld {
-
 namespace details {
-
 
 template<class T>
 class Atomic {
  public:
-    T& operator=(const T& rhs) {
+    void operator=(const T& rhs) {
         ATOMIC_BLOCK(ATOMIC_FORCEON) {
             value = rhs;
         }
-        return value;
     }
 
-    operator T() {
+    operator T() const {
         return value;
     }
 
@@ -71,6 +68,10 @@ struct Telemetry {
     details::Atomic<Photodiodes> photodiodes;
     details::Atomic<Housekeeping> housekeeping;
     details::Atomic<Radfet> radfet;
+
+    void init() {
+        std::memset(this, 0xFF, sizeof(pld::Telemetry));
+    }
 };
 static_assert(sizeof(Telemetry) == 57,
               "Incorrect size of Telemetry structure (padding?)");
