@@ -71,7 +71,7 @@ void write_read(uint8_t argc, char* argv[]) {
     auto write_data = gsl::make_span(WriteArray.data(), bytesToWrite);
     auto read_data  = gsl::make_span(array.data(), bytesToRead);
 
-    i2c.writeRead(addr, write_data, read_data);
+    i2c.write_read(addr, write_data, read_data);
 
     for (auto x : read_data) {
         printf("%d ", x);
