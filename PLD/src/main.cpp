@@ -20,7 +20,7 @@
 using namespace hal;
 using namespace hal::libs;
 
-pld::hardware::Mock empty_hardware;
+pld::hardware::Mock mock_hardware;
 pld::hardware::RealHardware real_hardware;
 pld::hardware::Interface* hw;
 
@@ -53,17 +53,18 @@ ISR(TWI_vect) {
 }
 
 int main() {
-    hal::Watchdog::disable();
-    empty_hardware.init();
+    hal::Watchdog::enable(hal::Watchdog::Period::p500ms);
 
     Serial0.init(38400);
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
     Serial0.enable_rx_interrupt();
 
+    real_hardware.init();
+    mock_hardware.init();
+
     pld::debug::init();
 
-    real_hardware.init();
     hw = &real_hardware;
 
     telemetry.init();
@@ -73,12 +74,17 @@ int main() {
     sei();
     LOG_INFO("PLD Initialised.");
 
-    hal::Watchdog::enable(hal::Watchdog::Period::p500ms);
 
     while (1) {
         dispatcher.dispatch();
         hw->watchdog_kick();
         hw->obc_interrupt_reset();
+
+        if (pld::debug::mock()) {
+            hw = &mock_hardware;
+        } else {
+            hw = &real_hardware;
+        }
     }
 
     cli();

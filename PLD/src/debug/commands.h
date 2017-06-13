@@ -5,6 +5,9 @@ namespace pld {
 namespace debug {
 
 void init();
+
+bool mock();
+
 }
 }  // namespace pld
 
