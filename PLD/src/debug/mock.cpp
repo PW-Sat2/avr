@@ -1,5 +1,6 @@
 #include <avr/interrupt.h>
 #include <hal/hal>
+#include <logger.h>
 #include "hal/libs/terminal/terminal.h"
 
 #include "hardware/mock.h"
@@ -21,6 +22,21 @@ void set_adc(std::uint8_t argc, char* argv[]) {
     adc_channels[channel] = value;
 }
 
+bool mock_ = false;
+
+void set_mock(std::uint8_t argc, char* argv[]) {
+    if (argc != 1)
+        return;
+
+    if (argv[0][0] == '1') {
+        mock_ = true;
+        LOG_INFO("Mock");
+    } else {
+        mock_ = false;
+        LOG_INFO("Real HW");
+    }
+}
+
 Terminal terminal;
 
 ISR(USART0_RX_vect) {
@@ -38,8 +54,13 @@ ISR(USART0_RX_vect) {
     }
 }
 
+bool mock() {
+    return mock_;
+}
+
 void init() {
-    static TerminalCommandDescription cmds[] = {{"adc", set_adc}};
+    static TerminalCommandDescription cmds[] = {{"adc", set_adc},
+                                                {"mock", set_mock}};
 
     terminal.SetCommandList(cmds);
 }
