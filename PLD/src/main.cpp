@@ -5,6 +5,7 @@
 
 #include "hardware/interface.h"
 #include "hardware/mock.h"
+#include "hardware/real.h"
 
 #include "ObcInterface/CommandDispatcher.h"
 #include "ObcInterface/ObcInterface.h"
@@ -20,6 +21,7 @@ using namespace hal;
 using namespace hal::libs;
 
 pld::hardware::Mock empty_hardware;
+pld::hardware::RealHardware real_hardware;
 pld::hardware::Interface* hw;
 
 pld::Telemetry telemetry;
@@ -61,7 +63,9 @@ int main() {
 
     pld::debug::init();
 
-    hw = &empty_hardware;
+    real_hardware.init();
+    hw = &real_hardware;
+
     telemetry.init();
     telemetry.who_am_i = 0x53;
 
