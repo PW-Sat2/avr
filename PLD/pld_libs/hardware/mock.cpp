@@ -10,8 +10,8 @@ using obc_int_pin = hal::DigitalIO::GPIO<33>;
 using led1 = hal::DigitalIO::GPIO<36>;
 
 void Mock::init() {
-    obc_int_pin::init(hal::DigitalIO::Interface::Mode::OUTPUT);
-    led1::init(hal::DigitalIO::Interface::Mode::OUTPUT);
+    obc_int_pin::init(hal::DigitalIO::Mode::OUTPUT);
+    led1::init(hal::DigitalIO::Mode::OUTPUT);
     this->obc_interrupt_reset();
 }
 

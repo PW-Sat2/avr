@@ -41,9 +41,9 @@ class ObcInterface {
         set_memory(memory_);
 
         hal::DigitalIO::GPIO<hal::mcu::pin_sda>::init(
-            hal::DigitalIO::Interface::Mode::INPUT_PULLUP);
+            hal::DigitalIO::Mode::INPUT_PULLUP);
         hal::DigitalIO::GPIO<hal::mcu::pin_scl>::init(
-            hal::DigitalIO::Interface::Mode::INPUT_PULLUP);
+            hal::DigitalIO::Mode::INPUT_PULLUP);
 
         TWAR = (i2c_address << 1);
         TWCR = (1 << TWINT) | (1 << TWEA) | (1 << TWEN) | (1 << TWIE);

@@ -16,25 +16,21 @@ class Mux {
  private:
 };
 
-class ADC128 : public hal::drivers::ADC128 {
- public:
-    ADC128() : hal::drivers::ADC128(spi) {
-    }
-
-    void init() {
-        spi.init();
-    }
-
- private:
+namespace ADC128 {
     using cs = hal::DigitalIO::GPIO<9>;
 
-    hal::SPI::Hardware<cs,
+    using spi = hal::SPI::Hardware<cs,
                        hal::SPI::HardwareClockDivisor::SPIHard_DIV_4,
                        hal::SPI::Polarity::idle_high,
                        hal::SPI::Phase::trailing_sample,
-                       hal::SPI::DataOrder::MSB_first>
-        spi;
+                       hal::SPI::DataOrder::MSB_first>;
+
+    static void init() {
+        spi::init();
+    }
 };
+
+using adc128 = hal::drivers::ADC128<ADC128::spi>;
 
 using watchdog_pin = hal::DigitalIO::GPIO<44>;
 hal::devices::TPS3813<watchdog_pin, 10> tps3813;
@@ -42,32 +38,31 @@ hal::devices::TPS3813<watchdog_pin, 10> tps3813;
 using interrupt = hal::DigitalIO::GPIO<10>;
 
 static Mux mux;
-static ADC128 adc128;
 
-constexpr static hal::drivers::ADC128::Channel channel_to_adc_input_[] = {
-    hal::drivers::ADC128::Channel::IN0,  //    SunSRef_V0,
-    hal::drivers::ADC128::Channel::IN1,  //    SunSRef_V1,
-    hal::drivers::ADC128::Channel::IN2,  //    SunSRef_V2,
-    hal::drivers::ADC128::Channel::IN3,  //    SunSRef_V3,
-    hal::drivers::ADC128::Channel::IN4,  //    SunSRef_V4,
-    hal::drivers::ADC128::Channel::IN5,  //    Photodiode_A,
-    hal::drivers::ADC128::Channel::IN5,  //    Photodiode_B,
-    hal::drivers::ADC128::Channel::IN5,  //    Photodiode_C,
-    hal::drivers::ADC128::Channel::IN5,  //    Photodiode_D,
-    hal::drivers::ADC128::Channel::IN5,  //    TemperatureSupply,
-    hal::drivers::ADC128::Channel::IN5,  //    HouseKeeping_3V3d,
-    hal::drivers::ADC128::Channel::IN5,  //    HouseKeeping_3V3_OBC,
-    hal::drivers::ADC128::Channel::IN6,  //    TemperatureSail,
-    hal::drivers::ADC128::Channel::IN6,  //    TemperatureSADS,
-    hal::drivers::ADC128::Channel::IN6,  //    TemperatureCamWing,
-    hal::drivers::ADC128::Channel::IN6,  //    TemperatureCamNadir,
-    hal::drivers::ADC128::Channel::IN6,  //    TemperatureXn,
-    hal::drivers::ADC128::Channel::IN6,  //    TemperatureXp,
-    hal::drivers::ADC128::Channel::IN6,  //    TemperatureYn,
-    hal::drivers::ADC128::Channel::IN6   //    TemperatureYp,
+constexpr static hal::drivers::ADC128_::Channel channel_to_adc_input_[] = {
+    hal::drivers::ADC128_::Channel::IN0,  //    SunSRef_V0,
+    hal::drivers::ADC128_::Channel::IN1,  //    SunSRef_V1,
+    hal::drivers::ADC128_::Channel::IN2,  //    SunSRef_V2,
+    hal::drivers::ADC128_::Channel::IN3,  //    SunSRef_V3,
+    hal::drivers::ADC128_::Channel::IN4,  //    SunSRef_V4,
+    hal::drivers::ADC128_::Channel::IN5,  //    Photodiode_A,
+    hal::drivers::ADC128_::Channel::IN5,  //    Photodiode_B,
+    hal::drivers::ADC128_::Channel::IN5,  //    Photodiode_C,
+    hal::drivers::ADC128_::Channel::IN5,  //    Photodiode_D,
+    hal::drivers::ADC128_::Channel::IN5,  //    TemperatureSupply,
+    hal::drivers::ADC128_::Channel::IN5,  //    HouseKeeping_3V3d,
+    hal::drivers::ADC128_::Channel::IN5,  //    HouseKeeping_3V3_OBC,
+    hal::drivers::ADC128_::Channel::IN6,  //    TemperatureSail,
+    hal::drivers::ADC128_::Channel::IN6,  //    TemperatureSADS,
+    hal::drivers::ADC128_::Channel::IN6,  //    TemperatureCamWing,
+    hal::drivers::ADC128_::Channel::IN6,  //    TemperatureCamNadir,
+    hal::drivers::ADC128_::Channel::IN6,  //    TemperatureXn,
+    hal::drivers::ADC128_::Channel::IN6,  //    TemperatureXp,
+    hal::drivers::ADC128_::Channel::IN6,  //    TemperatureYn,
+    hal::drivers::ADC128_::Channel::IN6   //    TemperatureYp,
 };
 
-constexpr static hal::drivers::ADC128::Channel
+constexpr static hal::drivers::ADC128_::Channel
 channel_to_adc_input(pld::hardware::AnalogChannel channel) {
     return channel_to_adc_input_[static_cast<int>(channel)];
 }
@@ -105,7 +100,7 @@ channel_to_mux_channel(pld::hardware::AnalogChannel channel) {
 }
 
 void pld::hardware::RealHardware::init() {
-    adc128.init();
+    ADC128::init();
     mux.mux.init();
     mux.mux.enable();
     tps3813.init();
@@ -115,11 +110,11 @@ void pld::hardware::RealHardware::read_adc(
     std::initializer_list<ChannelDescriptor> channels) {
     auto writer = channels.begin();
 
-    adc128.read_and_change_channel(channel_to_adc_input(writer->channel));
+    adc128::read_and_change_channel(channel_to_adc_input(writer->channel));
 
     while (writer != channels.end() - 1) {
         mux.mux.select(channel_to_mux_channel(writer->channel));
-        *writer->data = adc128.read_and_change_channel(
+        *writer->data = adc128::read_and_change_channel(
             channel_to_adc_input((writer + 1)->channel));
         writer++;
     }
@@ -127,7 +122,7 @@ void pld::hardware::RealHardware::read_adc(
     auto last = channels.end() - 1;
     mux.mux.select(channel_to_mux_channel(last->channel));
     *last->data =
-        adc128.read_and_change_channel(channel_to_adc_input(last->channel));
+        adc128::read_and_change_channel(channel_to_adc_input(last->channel));
 }
 
 pld::Telemetry::Radfet pld::hardware::RealHardware::read_radfet() {
