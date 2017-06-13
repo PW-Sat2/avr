@@ -1,21 +1,24 @@
 #include <hardware/real.h>
 #include <hal/hal>
 
-class Mux : public hal::devices::ADG708 {
+using namespace hal;
+using namespace devices;
+
+class Mux {
  public:
-    Mux() : ADG708(A0, A1, A2, EN) {
-    }
+    using A0 = hal::DigitalIO::GPIO<42>;
+    using A1 = hal::DigitalIO::GPIO<40>;
+    using A2 = hal::DigitalIO::GPIO<41>;
+    using EN = hal::DigitalIO::GPIO<43>;
+
+    ADG708<A0, A1, A2, EN> mux;
 
  private:
-    hal::DigitalIO::GPIO<42> A0;
-    hal::DigitalIO::GPIO<40> A1;
-    hal::DigitalIO::GPIO<41> A2;
-    hal::DigitalIO::GPIO<43> EN;
 };
 
 class ADC128 : public hal::drivers::ADC128 {
  public:
-    ADC128() : hal::drivers::ADC128(spi), spi(cs) {
+    ADC128() : hal::drivers::ADC128(spi) {
     }
 
     void init() {
@@ -23,19 +26,20 @@ class ADC128 : public hal::drivers::ADC128 {
     }
 
  private:
-    hal::DigitalIO::GPIO<9> cs;
+    using cs = hal::DigitalIO::GPIO<9>;
 
-    hal::SPI::Hardware<hal::SPI::HardwareClockDivisor::SPIHard_DIV_4,
+    hal::SPI::Hardware<cs,
+                       hal::SPI::HardwareClockDivisor::SPIHard_DIV_4,
                        hal::SPI::Polarity::idle_high,
                        hal::SPI::Phase::trailing_sample,
                        hal::SPI::DataOrder::MSB_first>
         spi;
 };
 
-hal::DigitalIO::GPIO<44> watchdog_pin;
-hal::devices::TPS3813<10> tps3813(watchdog_pin);
+using watchdog_pin = hal::DigitalIO::GPIO<44>;
+hal::devices::TPS3813<watchdog_pin, 10> tps3813;
 
-hal::DigitalIO::GPIO<10> interrupt;
+using interrupt = hal::DigitalIO::GPIO<10>;
 
 static Mux mux;
 static ADC128 adc128;
@@ -68,9 +72,9 @@ channel_to_adc_input(pld::hardware::AnalogChannel channel) {
     return channel_to_adc_input_[static_cast<int>(channel)];
 }
 
-using Channel = hal::devices::ADG708::Channel;
+using Channel = hal::devices::ADG708_::Channel;
 
-constexpr static hal::devices::ADG708::Channel channel_to_mux_channel_[] = {
+constexpr static Channel channel_to_mux_channel_[] = {
     Channel::S1,  //    SunSRef_V0,
     Channel::S1,  //    SunSRef_V1,
     Channel::S1,  //    SunSRef_V2,
@@ -95,15 +99,15 @@ constexpr static hal::devices::ADG708::Channel channel_to_mux_channel_[] = {
     Channel::S4   //    TemperatureYp,
 };
 
-constexpr static hal::devices::ADG708::Channel
+constexpr static Channel
 channel_to_mux_channel(pld::hardware::AnalogChannel channel) {
     return channel_to_mux_channel_[static_cast<int>(channel)];
 }
 
 void pld::hardware::RealHardware::init() {
     adc128.init();
-    mux.init();
-    mux.enable();
+    mux.mux.init();
+    mux.mux.enable();
     tps3813.init();
 }
 
@@ -114,14 +118,14 @@ void pld::hardware::RealHardware::read_adc(
     adc128.read_and_change_channel(channel_to_adc_input(writer->channel));
 
     while (writer != channels.end() - 1) {
-        mux.select(channel_to_mux_channel(writer->channel));
+        mux.mux.select(channel_to_mux_channel(writer->channel));
         *writer->data = adc128.read_and_change_channel(
             channel_to_adc_input((writer + 1)->channel));
         writer++;
     }
 
     auto last = channels.end() - 1;
-    mux.select(channel_to_mux_channel(last->channel));
+    mux.mux.select(channel_to_mux_channel(last->channel));
     *last->data =
         adc128.read_and_change_channel(channel_to_adc_input(last->channel));
 }
@@ -136,9 +140,9 @@ void pld::hardware::RealHardware::watchdog_kick() {
 }
 
 void pld::hardware::RealHardware::obc_interrupt_set() {
-    interrupt.set();
+    interrupt::set();
 }
 
 void pld::hardware::RealHardware::obc_interrupt_reset() {
-    interrupt.reset();
+    interrupt::reset();
 }
