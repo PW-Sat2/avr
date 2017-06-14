@@ -1,12 +1,13 @@
 #include <hal/libs/terminal/terminal.h>
 #include <hal/hal>
+#include <hal/boards/ARDUINONANO328P/hal/board.h>
 
 using namespace hal;
 
 constexpr static auto pin_INT0 = 32;
-hal::DigitalIO::GPIO<pin_INT0> pin;
+using pin = hal::DigitalIO::GPIO<pin_INT0>;
 
-hal::I2C::Hardware i2c;
+using i2c = hal::I2C::Hardware;
 
 static std::array<uint8_t, 300> array;
 
@@ -82,7 +83,7 @@ void write_read(uint8_t argc, char* argv[]) {
 }
 
 void pin_read(uint8_t, char*[]) {
-    if (pin.read()) {
+    if (pin::read()) {
         printf("1");
     }
     else {
@@ -98,12 +99,19 @@ void events(uint8_t, char*[]) {
     }
 }
 
+void led(uint8_t argc, char* argv[]) {
+    if (argc < 1)
+        return;
+    bsp::LED::write(atoi(argv[0]));
+}
+
 TerminalCommandDescription tcs[] = {{"?", help},
                                     {"w", write},
                                     {"r", read},
                                     {"wr", write_read},
                                     {"pin", pin_read},
-                                    {"ev", events}};
+                                    {"ev", events},
+                                    {"led", led}};
 
 Terminal terminal;
 
@@ -126,9 +134,11 @@ ISR(USART_RX_vect) {
 
 
 ISR(INT0_vect) {
-    if (pin.read()) {
+    if (pin::read()) {
+//        bsp::LED::on();
         fifo.append(1);
     } else {
+//        bsp::LED::off();
         fifo.append(0);
     }
 }
@@ -139,12 +149,14 @@ int main() {
     Serial0.redirect_stderr();
     Serial0.enable_rx_interrupt();
 
+    bsp::LED::init();
+
     i2c::init<100000>();
     i2c::enable_internal_pullups();
 
-    pin.init(hal::DigitalIO::Interface::Mode::INPUT_PULLUP);
-    hal::DigitalIO::ExternalInterrupt::Line<0> line(hal::DigitalIO::ExternalInterrupt::Mode::change);
-    line.enable();
+    pin::init(hal::DigitalIO::Mode::INPUT_PULLUP);
+    using line = hal::DigitalIO::ExternalInterrupt::Line<0, hal::DigitalIO::ExternalInterrupt::Mode::change>;
+    line::enable();
     sei();
 
     terminal.SetCommandList(tcs);

@@ -15,3 +15,5 @@ add_hal_executable(I2C_bridge
 target_link_libraries(I2C_bridge
     terminal
 )
+
+add_definitions("-Wno-error")
