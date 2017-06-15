@@ -1,0 +1,3 @@
+[submodule "AVR-HAL"]
+	path = AVR-HAL
+	url = https://github.com/PW-Sat2/AVR-HAL
