@@ -9,28 +9,29 @@ using A0 = DigitalIO::GPIO<42>;
 using A1 = DigitalIO::GPIO<40>;
 using A2 = DigitalIO::GPIO<41>;
 using EN = DigitalIO::GPIO<43>;
-}
+}  // namespace Mux
 
 namespace ADCx {
-    using cs = DigitalIO::GPIO<9>;
+using cs = DigitalIO::GPIO<9>;
 
-    using spi = SPI::Hardware<cs,
-                       SPI::HardwareClockDivisor::SPIHard_DIV_4,
-                       SPI::Polarity::idle_high,
-                       SPI::Phase::trailing_sample,
-                       SPI::DataOrder::MSB_first>;
-}
+using spi = SPI::Hardware<cs,
+                          SPI::HardwareClockDivisor::SPIHard_DIV_4,
+                          SPI::Polarity::idle_high,
+                          SPI::Phase::trailing_sample,
+                          SPI::DataOrder::MSB_first>;
+}  // namespace ADCx
 
 using adg708 = ADG708::ADG708<Mux::A0, Mux::A1, Mux::A2, Mux::EN>;
 using adc128 = devices::ADC128::ADC128<ADCx::spi>;
 
 using watchdog_pin = hal::DigitalIO::GPIO<44>;
-using tps3813 = hal::devices::TPS3813<watchdog_pin, 10>;
+using tps3813      = hal::devices::TPS3813<watchdog_pin, 10>;
 
 using interrupt = hal::DigitalIO::GPIO<10>;
 
 
 using ADCChannel = devices::ADC128::Channel;
+
 constexpr static ADCChannel channel_to_adc_input_[] = {
     ADCChannel::IN0,  //    SunSRef_V0,
     ADCChannel::IN1,  //    SunSRef_V1,
@@ -54,8 +55,7 @@ constexpr static ADCChannel channel_to_adc_input_[] = {
     ADCChannel::IN6   //    TemperatureYp,
 };
 
-constexpr static auto
-channel_to_adc_input(pld::hardware::AnalogChannel channel) {
+constexpr static auto channel_to_adc_input(pld::hardware::AnalogChannel channel) {
     return channel_to_adc_input_[static_cast<int>(channel)];
 }
 
@@ -86,8 +86,7 @@ constexpr static MuxChannel channel_to_mux_channel_[] = {
     MuxChannel::S4   //    TemperatureYp,
 };
 
-constexpr static auto
-channel_to_mux_channel(pld::hardware::AnalogChannel channel) {
+constexpr static auto channel_to_mux_channel(pld::hardware::AnalogChannel channel) {
     return channel_to_mux_channel_[static_cast<int>(channel)];
 }
 

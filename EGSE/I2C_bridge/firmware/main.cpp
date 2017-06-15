@@ -3,7 +3,7 @@
 
 using namespace hal;
 
-hal::I2C::Hardware i2c;
+using i2c = hal::I2C::Hardware;
 
 static std::array<uint8_t, 300> array;
 
@@ -28,7 +28,7 @@ void write(uint8_t argc, char* argv[]) {
         array[i] = atoi(argv[i + 1]);
     }
 
-    i2c.write(addr, gsl::make_span(array.data(), argc - 1));
+    i2c::write(addr, gsl::make_span(array.data(), argc - 1));
 }
 
 void read(uint8_t argc, char* argv[]) {
@@ -43,7 +43,7 @@ void read(uint8_t argc, char* argv[]) {
     }
 
     auto data = gsl::make_span(array.data(), bytes);
-    i2c.read(addr, data);
+    i2c::read(addr, data);
 
     for (auto i : data) {
         printf("%d ", i);
@@ -71,7 +71,7 @@ void write_read(uint8_t argc, char* argv[]) {
     auto write_data = gsl::make_span(WriteArray.data(), bytesToWrite);
     auto read_data  = gsl::make_span(array.data(), bytesToRead);
 
-    i2c.write_read(addr, write_data, read_data);
+    i2c::write_read(addr, write_data, read_data);
 
     for (auto x : read_data) {
         printf("%d ", x);
@@ -107,8 +107,8 @@ int main() {
     Serial0.redirect_stderr();
     Serial0.enable_rx_interrupt();
 
-    i2c.init<100000>();
-    i2c.enable_internal_pullups();
+    i2c::init<100000>();
+    i2c::enable_internal_pullups();
 
     sei();
 

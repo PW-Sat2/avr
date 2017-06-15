@@ -7,7 +7,7 @@ using namespace mock;
 
 std::array<std::uint16_t, 20> mock::adc_channels;
 using obc_int_pin = hal::DigitalIO::GPIO<33>;
-using led1 = hal::DigitalIO::GPIO<36>;
+using led1        = hal::DigitalIO::GPIO<36>;
 
 void Mock::init() {
     obc_int_pin::init(hal::DigitalIO::Mode::OUTPUT);
