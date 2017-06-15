@@ -6,12 +6,12 @@ namespace hardware {
 using namespace mock;
 
 std::array<std::uint16_t, 20> mock::adc_channels;
-hal::DigitalIO::GPIO<33> obc_int_pin;
-hal::DigitalIO::GPIO<36> led1;
+using obc_int_pin = hal::DigitalIO::GPIO<33>;
+using led1 = hal::DigitalIO::GPIO<36>;
 
 void Mock::init() {
-    obc_int_pin.init(hal::DigitalIO::Interface::Mode::OUTPUT);
-    led1.init(hal::DigitalIO::Interface::Mode::OUTPUT);
+    obc_int_pin::init(hal::DigitalIO::Mode::OUTPUT);
+    led1::init(hal::DigitalIO::Mode::OUTPUT);
     this->obc_interrupt_reset();
 }
 
@@ -39,13 +39,13 @@ void Mock::watchdog_kick() {
 }
 
 void Mock::obc_interrupt_set() {
-    obc_int_pin.set();
-    led1.set();
+    obc_int_pin::set();
+    led1::set();
 }
 
 void Mock::obc_interrupt_reset() {
-    obc_int_pin.reset();
-    led1.reset();
+    obc_int_pin::reset();
+    led1::reset();
 }
 
 }  // namespace hardware
