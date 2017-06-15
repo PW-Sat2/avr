@@ -1,6 +1,6 @@
 #include <avr/interrupt.h>
-#include <hal/hal>
 #include <logger.h>
+#include <hal/hal>
 #include "hal/libs/terminal/terminal.h"
 
 #include "hardware/mock.h"
