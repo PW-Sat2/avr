@@ -1,10 +1,11 @@
+#include <hal/board.h>
 #include <hal/libs/terminal/terminal.h>
 #include <hal/hal>
-#include <hal/boards/ARDUINONANO328P/hal/board.h>
 
 using namespace hal;
 
 constexpr static auto pin_INT0 = 32;
+
 using pin = hal::DigitalIO::GPIO<pin_INT0>;
 
 using i2c = hal::I2C::Hardware;
@@ -82,19 +83,18 @@ void write_read(uint8_t argc, char* argv[]) {
     }
 }
 
-void pin_read(uint8_t, char*[]) {
+void pin_read(uint8_t, char* []) {
     if (pin::read()) {
         printf("1");
-    }
-    else {
+    } else {
         printf("0");
     }
 }
 
 libs::FIFO_data<uint8_t, 50> fifo;
 
-void events(uint8_t, char*[]) {
-    while(fifo.getLength()) {
+void events(uint8_t, char* []) {
+    while (fifo.getLength()) {
         printf("%d", fifo.get());
     }
 }
@@ -132,13 +132,12 @@ ISR(USART_RX_vect) {
 }
 
 
-
 ISR(INT0_vect) {
     if (pin::read()) {
-//        bsp::LED::on();
+        //        bsp::LED::on();
         fifo.append(1);
     } else {
-//        bsp::LED::off();
+        //        bsp::LED::off();
         fifo.append(0);
     }
 }
@@ -155,7 +154,8 @@ int main() {
     i2c::enable_internal_pullups();
 
     pin::init(hal::DigitalIO::Mode::INPUT_PULLUP);
-    using line = hal::DigitalIO::ExternalInterrupt::Line<0, hal::DigitalIO::ExternalInterrupt::Mode::change>;
+    using line =
+        hal::DigitalIO::ExternalInterrupt::Line<0, hal::DigitalIO::ExternalInterrupt::Mode::change>;
     line::enable();
     sei();
 

@@ -52,10 +52,6 @@ EPS_B_unit_tests:
 ## -------------------------- NON-FLIGHT STUFF  -------------------------------------
 
 EGSE:
-	mkdir -p EGSE/I2C_bridge/firmware/cmake-build-release
-	cd EGSE/I2C_bridge/firmware/cmake-build-release && cmake .. -DCMAKE_BUILD_TYPE=RELEASE
-	make -C EGSE/I2C_bridge/firmware/cmake-build-release I2C_bridge.build
-
-
-
-
+	mkdir -p EGSE/OBCMock/firmware/cmake-build-release
+	cd EGSE/OBCMock/firmware/cmake-build-release && cmake .. -DCMAKE_BUILD_TYPE=RELEASE
+	make -C EGSE/OBCMock/firmware/cmake-build-release I2C_bridge.build
