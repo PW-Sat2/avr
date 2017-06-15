@@ -1,8 +1,7 @@
-from base64 import b64decode
 from functools import wraps
 
 
-class OBCMixin:
+class CommandsMixin:
     def __init__(self):
         pass
 
@@ -25,24 +24,27 @@ def decode_return(decoder):
     return wrap
 
 
+def decode_ints():
+    def p(s):
+        return [int(i) for i in s.split()]
+    return decode_return(p)
+
+
 def decode_words():
     def p(s):
         return s.split()
-
     return decode_return(p)
 
 
 def decode_lines():
     def p(s):
         return s.split('\n')
-
     return decode_return(p)
 
 
 def decode_bool():
     def p(s):
         return s == '1'
-
     return decode_return(p)
 
 

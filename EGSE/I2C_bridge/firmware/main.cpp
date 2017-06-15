@@ -161,8 +161,9 @@ int main() {
 
     terminal.SetCommandList(tcs);
 
-
+    Watchdog::enable(Watchdog::Period::p2000ms);
 
     while (1) {
+        Watchdog::kick();
     }
 }

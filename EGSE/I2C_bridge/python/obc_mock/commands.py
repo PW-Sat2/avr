@@ -2,7 +2,8 @@ from string import Formatter
 import logging
 from mock import Mock
 
-class OBC(Mock):
+
+class Commands(Mock):
     def __init__(self, terminal):
         self.log = logging.getLogger("OBC")
 

@@ -1,11 +1,12 @@
-from obc_mixin import OBCMixin, command, decode_bool, decode_return
+from commands_mixin import CommandsMixin, command, decode_bool, decode_return, decode_ints
 
 
 class Event:
     low_to_high = 1
     high_to_low = 0
 
-class Mock(OBCMixin):
+
+class Mock(CommandsMixin):
     @command("led {0}")
     def led(self):
         pass
@@ -14,7 +15,6 @@ class Mock(OBCMixin):
     @command("pin")
     def pin(self):
         pass
-
 
     def _parse_events(result):
         events = []
@@ -29,10 +29,16 @@ class Mock(OBCMixin):
     def get_events(self):
         pass
 
-    def dx(result):
-        print "a", result
-
-    @decode_return(dx)
     def write(self, addr, data):
         _data = [str(i) for i in data]
-        self._command("w %d " % addr + " ".join(_data) + "\n")
+        self._command("w %d " % addr + " ".join(_data))
+
+    @decode_ints()
+    @command("r {0} {1}")
+    def read(self, addr, n_bytes):
+        pass
+
+    @decode_ints()
+    def write_read(self, addr, write, read_bytes):
+        _write = [str(i) for i in write]
+        return self._command("wr %d " % addr + " ".join(_write) + " %d" % read_bytes)
