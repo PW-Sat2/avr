@@ -25,6 +25,18 @@ node('linux') {
 	stage 'PLD.unit_tests'
 	sh 'make PLD_unit_tests'
 
+	stage 'EPS_A.build'
+	sh 'make EPS_A_build'
+
+	stage 'EPS_A.unit_tests'
+	sh 'make EPS_A_unit_tests'
+
+	stage 'EPS_B.build'
+	sh 'make EPS_B_build'
+
+	stage 'EPS_B.unit_tests'
+	sh 'make EPS_B_unit_tests'
+
 	stage 'EGSE'
 	sh 'make EGSE'
 }

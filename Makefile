@@ -6,7 +6,6 @@ all: PLD_build PLD_unit_tests EPS_A_build EPS_A_unit_tests EPS_B_build EPS_B_uni
 .PHONY: checkStyle format checkFormat PLD_build EPS_A_build EPS_B_build PLD_unit_tests EPS_A_unit_tests EPS_B_unit_tests EGSE 
 
 clean:
-	rm -rf tmp
 	rm -rf PLD/cmake-build-release
 	rm -rf EPS_A/cmake-build-release
 	rm -rf EPS_B/cmake-build-release
