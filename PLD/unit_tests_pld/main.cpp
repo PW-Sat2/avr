@@ -13,6 +13,5 @@ int main() {
 
     test_telecommands();
 
-    cli();
-    sleep_mode();
+    hal::libs::sim::stop_simulation();
 }

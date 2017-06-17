@@ -13,6 +13,5 @@ int main() {
 
     test_CommandDispatcher();
 
-    cli();
-    sleep_mode();
+    hal::libs::sim::stop_simulation();
 }
