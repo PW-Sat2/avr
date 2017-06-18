@@ -101,20 +101,20 @@ void test_telecommands_HouseKeeping() {
 void test_telecommands_Photodiodes() {
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
 
-    set_adc_mock(AnalogChannel::Photodiode_A, 60001);
-    set_adc_mock(AnalogChannel::Photodiode_B, 60002);
-    set_adc_mock(AnalogChannel::Photodiode_C, 60003);
-    set_adc_mock(AnalogChannel::Photodiode_D, 60004);
+    set_adc_mock(AnalogChannel::PhotodiodeXp, 60001);
+    set_adc_mock(AnalogChannel::PhotodiodeXn, 60002);
+    set_adc_mock(AnalogChannel::PhotodiodeYp, 60003);
+    set_adc_mock(AnalogChannel::PhotodiodeYn, 60004);
 
     pld::telecommands::Photodiodes().invoke(telemetry, hw, {});
-    check_readouts({AnalogChannel::Photodiode_A,
-                    AnalogChannel::Photodiode_B,
-                    AnalogChannel::Photodiode_C,
-                    AnalogChannel::Photodiode_D});
+    check_readouts({AnalogChannel::PhotodiodeXp,
+                    AnalogChannel::PhotodiodeXn,
+                    AnalogChannel::PhotodiodeYp,
+                    AnalogChannel::PhotodiodeYn});
 
     pld::Telemetry::Photodiodes readed = telemetry.photodiodes;
-    TEST_ASSERT_EQUAL_UINT16(60002, readed.Xp);
-    TEST_ASSERT_EQUAL_UINT16(60001, readed.Xn);
+    TEST_ASSERT_EQUAL_UINT16(60001, readed.Xp);
+    TEST_ASSERT_EQUAL_UINT16(60002, readed.Xn);
     TEST_ASSERT_EQUAL_UINT16(60003, readed.Yp);
     TEST_ASSERT_EQUAL_UINT16(60004, readed.Yn);
 }

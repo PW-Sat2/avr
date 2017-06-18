@@ -16,10 +16,10 @@ checkStyle:
 	@cpplint $(LINTER_PARAMS) $(SOURCES)
 
 format:
-	clang-format -i $(SOURCES)
+	@clang-format-5.0 -i $(SOURCES)
 
 checkFormat:
-	@! clang-format $(SOURCES) -output-replacements-xml | grep -c "<replacement " >/dev/null
+	@! clang-format-5.0 $(SOURCES) -output-replacements-xml | grep -c "<replacement " >/dev/null
 	@echo "Format OK"
 
 ## -------------------------- BUILD PROJECTS -------------------------------------
