@@ -9,26 +9,29 @@ namespace pld {
 namespace hardware {
 
 enum class AnalogChannel : std::uint8_t {
-    SunSRef_V0,
-    SunSRef_V1,
-    SunSRef_V2,
-    SunSRef_V3,
-    SunSRef_V4,
-    TemperatureSupply,
-    TemperatureXp,
-    TemperatureXn,
-    TemperatureYp,
-    TemperatureYn,
-    TemperatureSADS,
-    TemperatureSail,
-    TemperatureCamNadir,
-    TemperatureCamWing,
-    Photodiode_A,
-    Photodiode_B,
-    Photodiode_C,
-    Photodiode_D,
-    HouseKeeping_3V3d,
-    HouseKeeping_3V3_OBC,
+    SunSRef_V0,  //            0
+    SunSRef_V1,  //            1
+    SunSRef_V2,  //            2
+    SunSRef_V3,  //            3
+    SunSRef_V4,  //            4
+
+    TemperatureSupply,    //   5
+    TemperatureXp,        //   6
+    TemperatureXn,        //   7
+    TemperatureYp,        //   8
+    TemperatureYn,        //   9
+    TemperatureSADS,      //  10
+    TemperatureSail,      //  11
+    TemperatureCamNadir,  //  12
+    TemperatureCamWing,   //  13
+
+    PhotodiodeXp,  //         14
+    PhotodiodeXn,  //         15
+    PhotodiodeYp,  //         16
+    PhotodiodeYn,  //         17
+
+    HouseKeeping_3V3d,     // 18
+    HouseKeeping_3V3_OBC,  // 19
 };
 
 struct Interface {

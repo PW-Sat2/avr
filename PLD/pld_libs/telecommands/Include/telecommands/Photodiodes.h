@@ -18,10 +18,10 @@ class Photodiodes : public Command<0x82, 0> {
 
         using hardware::AnalogChannel;
 
-        hardware.read_adc({{AnalogChannel::Photodiode_B, &photodiodes.Xp},
-                           {AnalogChannel::Photodiode_A, &photodiodes.Xn},
-                           {AnalogChannel::Photodiode_C, &photodiodes.Yp},
-                           {AnalogChannel::Photodiode_D, &photodiodes.Yn}});
+        hardware.read_adc({{AnalogChannel::PhotodiodeXp, &photodiodes.Xp},
+                           {AnalogChannel::PhotodiodeXn, &photodiodes.Xn},
+                           {AnalogChannel::PhotodiodeYp, &photodiodes.Yp},
+                           {AnalogChannel::PhotodiodeYn, &photodiodes.Yn}});
 
         telemetry.photodiodes = photodiodes;
     }

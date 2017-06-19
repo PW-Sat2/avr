@@ -1,7 +1,12 @@
+#include <hal/board.h>
 #include <hal/libs/terminal/terminal.h>
 #include <hal/hal>
 
 using namespace hal;
+
+constexpr static auto pin_INT0 = 32;
+
+using pin = hal::DigitalIO::GPIO<pin_INT0>;
 
 using i2c = hal::I2C::Hardware;
 
@@ -78,10 +83,35 @@ void write_read(uint8_t argc, char* argv[]) {
     }
 }
 
+void pin_read(uint8_t, char* []) {
+    if (pin::read()) {
+        printf("1");
+    } else {
+        printf("0");
+    }
+}
+
+libs::FIFO_data<uint8_t, 50> fifo;
+
+void events(uint8_t, char* []) {
+    while (fifo.getLength()) {
+        printf("%d", fifo.get());
+    }
+}
+
+void led(uint8_t argc, char* argv[]) {
+    if (argc < 1)
+        return;
+    bsp::LED::write(atoi(argv[0]));
+}
+
 TerminalCommandDescription tcs[] = {{"?", help},
                                     {"w", write},
                                     {"r", read},
-                                    {"wr", write_read}};
+                                    {"wr", write_read},
+                                    {"pin", pin_read},
+                                    {"ev", events},
+                                    {"led", led}};
 
 Terminal terminal;
 
@@ -101,19 +131,39 @@ ISR(USART_RX_vect) {
     }
 }
 
+
+ISR(INT0_vect) {
+    if (pin::read()) {
+        //        bsp::LED::on();
+        fifo.append(1);
+    } else {
+        //        bsp::LED::off();
+        fifo.append(0);
+    }
+}
+
 int main() {
-    Serial0.init(250000);
+    Serial0.init(38400);
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
     Serial0.enable_rx_interrupt();
 
+    bsp::LED::init();
+
     i2c::init<100000>();
     i2c::enable_internal_pullups();
 
+    pin::init(hal::DigitalIO::Mode::INPUT_PULLUP);
+    using line =
+        hal::DigitalIO::ExternalInterrupt::Line<0, hal::DigitalIO::ExternalInterrupt::Mode::change>;
+    line::enable();
     sei();
 
     terminal.SetCommandList(tcs);
 
+    Watchdog::enable(Watchdog::Period::p2000ms);
+
     while (1) {
+        Watchdog::kick();
     }
 }

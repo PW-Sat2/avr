@@ -4,6 +4,7 @@
 #include <util/atomic.h>
 #include <array>
 #include <cstdint>
+#include <cstring>
 
 namespace pld {
 namespace details {
