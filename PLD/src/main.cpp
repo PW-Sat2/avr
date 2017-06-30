@@ -10,12 +10,12 @@
 #include "ObcInterface/CommandDispatcher.h"
 #include "ObcInterface/ObcInterface.h"
 
+#include "commands/HouseKeeping.h"
+#include "commands/PT1000.h"
+#include "commands/Photodiodes.h"
+#include "commands/RadFET.h"
+#include "commands/SunSref.h"
 #include "debug/commands.h"
-#include "telecommands/HouseKeeping.h"
-#include "telecommands/PT1000.h"
-#include "telecommands/Photodiodes.h"
-#include "telecommands/RadFET.h"
-#include "telecommands/SunSref.h"
 
 using namespace hal;
 using namespace hal::libs;
@@ -35,11 +35,11 @@ struct Executor {
 };
 
 CommandDispatcher<Executor,
-                  pld::telecommands::SunSRef,
-                  pld::telecommands::RadFET,
-                  pld::telecommands::PT1000,
-                  pld::telecommands::Photodiodes,
-                  pld::telecommands::HouseKeeping>
+                  pld::commands::SunSRef,
+                  pld::commands::RadFET,
+                  pld::commands::PT1000,
+                  pld::commands::Photodiodes,
+                  pld::commands::HouseKeeping>
     dispatcher;
 
 void CommandCallback(gsl::span<const uint8_t> _c) {

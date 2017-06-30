@@ -1,11 +1,11 @@
-#ifndef PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_RADFET_H_
-#define PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_RADFET_H_
+#ifndef PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_RADFET_H_
+#define PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_RADFET_H_
 
 #include "ObcInterface/Command.h"
 #include "logger.h"
 
 namespace pld {
-namespace telecommands {
+namespace commands {
 
 class RadFET : public Command<0x84, 0> {
  public:
@@ -17,7 +17,7 @@ class RadFET : public Command<0x84, 0> {
     }
 };
 
-}  // namespace telecommands
+}  // namespace commands
 }  // namespace pld
 
-#endif  // PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_RADFET_H_
+#endif  // PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_RADFET_H_

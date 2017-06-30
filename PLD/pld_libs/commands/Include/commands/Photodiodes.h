@@ -1,11 +1,11 @@
-#ifndef PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PHOTODIODES_H_
-#define PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PHOTODIODES_H_
+#ifndef PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_PHOTODIODES_H_
+#define PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_PHOTODIODES_H_
 
 #include "ObcInterface/Command.h"
 #include "logger.h"
 
 namespace pld {
-namespace telecommands {
+namespace commands {
 
 class Photodiodes : public Command<0x82, 0> {
  public:
@@ -27,7 +27,7 @@ class Photodiodes : public Command<0x82, 0> {
     }
 };
 
-}  // namespace telecommands
+}  // namespace commands
 }  // namespace pld
 
-#endif  // PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PHOTODIODES_H_
+#endif  // PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_PHOTODIODES_H_

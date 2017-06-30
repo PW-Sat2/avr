@@ -8,7 +8,7 @@ add_hal_executable(PLD
 
 target_link_libraries(PLD
     terminal
-    telecommands
+    commands
     telemetry
     ObcInterface
     logger

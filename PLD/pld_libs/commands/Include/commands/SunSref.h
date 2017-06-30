@@ -1,11 +1,11 @@
-#ifndef PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_SUNSREF_H_
-#define PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_SUNSREF_H_
+#ifndef PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_SUNSREF_H_
+#define PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_SUNSREF_H_
 
 #include "ObcInterface/Command.h"
 #include "logger.h"
 
 namespace pld {
-namespace telecommands {
+namespace commands {
 
 class SunSRef : public Command<0x80, 0> {
  public:
@@ -28,7 +28,7 @@ class SunSRef : public Command<0x80, 0> {
     }
 };
 
-}  // namespace telecommands
+}  // namespace commands
 }  // namespace pld
 
-#endif  // PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_SUNSREF_H_
+#endif  // PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_SUNSREF_H_

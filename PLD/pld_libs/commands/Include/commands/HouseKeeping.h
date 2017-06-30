@@ -1,11 +1,11 @@
-#ifndef PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_HOUSEKEEPING_H_
-#define PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_HOUSEKEEPING_H_
+#ifndef PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_HOUSEKEEPING_H_
+#define PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_HOUSEKEEPING_H_
 
 #include "ObcInterface/Command.h"
 #include "logger.h"
 
 namespace pld {
-namespace telecommands {
+namespace commands {
 
 class HouseKeeping : public Command<0x83, 0> {
  public:
@@ -23,7 +23,7 @@ class HouseKeeping : public Command<0x83, 0> {
     }
 };
 
-}  // namespace telecommands
+}  // namespace commands
 }  // namespace pld
 
-#endif  // PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_HOUSEKEEPING_H_
+#endif  // PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_HOUSEKEEPING_H_
