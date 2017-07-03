@@ -10,7 +10,8 @@ namespace hardware {
 
 struct RealHardware : public Interface {
     virtual void init() override;
-    virtual Telemetry::ALS als_measure(uint8_t gain, uint8_t itime) override;
+    virtual void als_measure(uint8_t gain, uint8_t itime, std::uint32_t& status, suns::Telemetry::LightData& vl, suns::Telemetry::LightData& ir) override;
+    virtual void temperatures_measure(suns::Telemetry::Temperatures& temperature_data) override;
     virtual void watchdog_kick() override;
     virtual void obc_interrupt_set() override;
     virtual void obc_interrupt_reset() override;

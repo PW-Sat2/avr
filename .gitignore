@@ -3,3 +3,5 @@ tmp
 **/cmake-build-debug
 **/.idea
 *.pyc
+PLD/build/
+SunS/build/
