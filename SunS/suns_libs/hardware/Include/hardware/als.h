@@ -4,7 +4,7 @@
 #include <hal/hal>
 
 namespace BH1730FVCMulti {
-enum class Gain : uint8_t {
+enum class Gain : std::uint8_t {
     GAIN_1 = 0b00,
     GAIN_2 = 0b01,
     GAIN_64 = 0b10,
@@ -18,20 +18,19 @@ class BH1730FVCMulti : hal::libs::PureStatic {
          i2c::init();
     }
 
-    static uint8_t set_integration_time(uint8_t cycle) {
-        uint8_t result = 0;
-        result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
-        if (result != 0) {
+    static std::uint8_t set_integration_time(std::uint8_t cycle) {
+        std::uint8_t result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
+        if (result > 15) {
             return result;
         }
 
-        result = i2c::write(COMMAND_REGISTER | TIMING);
-        if (result != 0) {
+        result |= i2c::write(COMMAND_REGISTER | TIMING);
+        if (result > 15) {
             return result;
         }
 
-        result = i2c::write(static_cast<uint8_t>(256-cycle));
-        if (result != 0) {
+        result |= i2c::write(static_cast<std::uint8_t>(256-cycle));
+        if (result > 15) {
             return result;
         }
 
@@ -40,21 +39,19 @@ class BH1730FVCMulti : hal::libs::PureStatic {
     }
 
 
-    static uint8_t set_gain(Gain gain) {
-        uint8_t result = 0;
-
-        result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
-        if (result != 0) {
+    static std::uint8_t set_gain(Gain gain) {
+        std::uint8_t result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
+        if (result > 15) {
             return result;
         }
 
-        result = i2c::write(COMMAND_REGISTER | GAIN);
-        if (result != 0) {
+        result |= i2c::write(COMMAND_REGISTER | GAIN);
+        if (result > 15) {
             return result;
         }
 
-        result = i2c::write(static_cast<uint8_t>(gain));
-        if (result != 0) {
+        result |= i2c::write(static_cast<std::uint8_t>(gain));
+        if (result > 15) {
             return result;
         }
 
@@ -63,76 +60,99 @@ class BH1730FVCMulti : hal::libs::PureStatic {
         return result;
     }
 
-    static uint8_t read_part_id(std::array<uint8_t, 4>& ids) {
-        i2c::start(address, SoftI2CMulti::Action::START_WRITE);
+    static std::uint8_t read_part_id(std::array<std::uint8_t, 4>& ids) {
+        std::uint8_t result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
+        if (result > 15) {
+            return result;
+        }
 
-        uint8_t result = i2c::write(COMMAND_REGISTER | ID);
+        result |= i2c::write(COMMAND_REGISTER | ID);
+        if (result > 15) {
+            return result;
+        }
 
         i2c::stop();
 
-        i2c::start(address, SoftI2CMulti::Action::START_READ);
+        result |= i2c::start(address, SoftI2CMulti::Action::START_READ);
+        if (result > 15) {
+            return result;
+        }
 
-        ids = i2c::read(false);
+        result = i2c::read(ids, false);
+        if (result > 15) {
+            return result;
+        }
 
         i2c::stop();
 
         return result;
     }
 
-    static uint8_t read_ambient_light(std::array<uint16_t, 4>& VL, std::array<uint16_t, 4>& IR) {
-        std::array<uint8_t, 4> DATA0MSB;
-        std::array<uint8_t, 4> DATA0LSB;
-        std::array<uint8_t, 4> DATA1MSB;
-        std::array<uint8_t, 4> DATA1LSB;
-        uint8_t result = 0;
+    static std::uint8_t read_ambient_light(std::array<std::uint16_t, 4>& VL, std::array<std::uint16_t, 4>& IR) {
+        std::array<std::uint8_t, 4> vl_msb, vl_lsb, ir_msb, ir_lsb;
 
-        result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
-        if (result != 0) {
+        std::uint8_t result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
+        if (result > 15) {
             return result;
         }
 
-        result = i2c::write(COMMAND_REGISTER | DATA0LOW);
-        if (result != 0) {
+        result |= i2c::write(COMMAND_REGISTER | DATA0LOW);
+        if (result > 15) {
             return result;
         }
 
         i2c::stop();
 
-        result = i2c::start(address, SoftI2CMulti::Action::START_READ);
-        if (result != 0) {
+        result |= i2c::start(address, SoftI2CMulti::Action::START_READ);
+        if (result > 15) {
             return result;
         }
 
-        DATA0LSB = i2c::read(true);
-        DATA0MSB = i2c::read(true);
-        DATA1LSB = i2c::read(true);
-        DATA1MSB = i2c::read(false);
+        result = i2c::read(vl_lsb, true);
+        if (result > 15) {
+            return result;
+        }
+
+        result = i2c::read(vl_msb, true);
+        if (result > 15) {
+            return result;
+        }
+
+        result = i2c::read(ir_lsb, true);
+        if (result > 15) {
+            return result;
+        }
+
+        result = i2c::read(ir_msb, false);
+        if (result > 15) {
+            return result;
+        }
 
         i2c::stop();
 
         for (uint8_t i = 0; i < 4; i++) {
-            VL[i] = (static_cast<uint16_t>(DATA0MSB[i]) << 8) | DATA0LSB[i];
-            IR[i] = (static_cast<uint16_t>(DATA1MSB[i]) << 8) | DATA1LSB[i];
+            hal::libs::write_mask<0, 8>(VL[i], vl_lsb[i]);
+            hal::libs::write_mask<8, 8>(VL[i], vl_msb[i]);
+            hal::libs::write_mask<0, 8>(IR[i], ir_lsb[i]);
+            hal::libs::write_mask<8, 8>(IR[i], ir_msb[i]);
         }
 
         return result;
     }
 
-    static uint8_t trigger() {
-        uint8_t result = 0;
-
-        result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
-        if (result != 0) {
+    static std::uint8_t trigger() {
+        std::uint8_t result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
+        if (result > 15) {
             return result;
         }
 
-        result = i2c::write(COMMAND_REGISTER | CONTROL);
-        if (result != 0) {
+        result |= i2c::write(COMMAND_REGISTER | CONTROL);
+        if (result > 15) {
             return result;
         }
 
-        result = i2c::write(ONE_SHOT | VL_IR | ADC_EN | ADC_POWER_ON);
-        if (result != 0) {
+        result |= i2c::write(ONE_SHOT | VL_IR | ADC_EN | ADC_POWER_ON);
+        if (result > 15) {
             return result;
         }
 
@@ -141,28 +161,41 @@ class BH1730FVCMulti : hal::libs::PureStatic {
     }
 
 
-    static std::array<bool, 4> adc_valid() {
-        i2c::start(address, SoftI2CMulti::Action::START_WRITE);
+    static std::uint8_t adc_valid(std::uint8_t& data_status) {
+        std::uint8_t result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
+        if (result > 15) {
+            return result;
+        }
 
-        i2c::write(COMMAND_REGISTER | CONTROL);
+        result |= i2c::write(COMMAND_REGISTER | CONTROL);
+        if (result > 15) {
+            return result;
+        }
 
         i2c::stop();
 
-        i2c::start(address, SoftI2CMulti::Action::START_READ);
-
-        std::array<bool, 4> result;
-        std::array<uint8_t, 4> control_registers = i2c::read(false);
-
-        for(uint8_t i = 0; i < 4; i++) {
-            result[i] = hal::libs::read_bit<4>(control_registers[i]);
+        result |= i2c::start(address, SoftI2CMulti::Action::START_READ);
+        if (result > 15) {
+            return result;
         }
+
+        std::array<std::uint8_t, 4> control_registers;
+        result = i2c::read(control_registers, false);
+        if (result > 15) {
+            return result;
+        }
+
+        hal::libs::write_bit<0>(data_status, hal::libs::read_bit<4>(control_registers[0]));
+        hal::libs::write_bit<1>(data_status, hal::libs::read_bit<4>(control_registers[1]));
+        hal::libs::write_bit<2>(data_status, hal::libs::read_bit<4>(control_registers[2]));
+        hal::libs::write_bit<3>(data_status, hal::libs::read_bit<4>(control_registers[3]));
 
         i2c::stop();
         return result;
     }
 
  private:
-    static constexpr uint8_t address = 0b0101001;
+    static constexpr std::uint8_t address = 0b0101001;
 
     enum RegisterAddr {
         CONTROL = 0x00,
@@ -183,7 +216,7 @@ class BH1730FVCMulti : hal::libs::PureStatic {
     enum Commands {
         TRIGGER_MEASUREMENT = 0b10010100,
         COMMAND_REGISTER = 0b10000000,
-        SPECIAL_COMMAND = 0b11000000,
+        SPECIAL_COMMAND = 0b11100000,
         DATA_REGISTER = 0b0000000000,
         ADC_EN = 0b00000010,
         ADC_POWER_ON = 0b00000001,
