@@ -5,3 +5,4 @@ tmp
 *.pyc
 PLD/build/
 SunS/build/
+EGSE/SunS_Fixture/firmware/build/
