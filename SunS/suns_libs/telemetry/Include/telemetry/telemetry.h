@@ -4,6 +4,7 @@
 #include <util/atomic.h>
 #include <array>
 #include <cstdint>
+#include <cstring>
 
 namespace suns {
 namespace details {
@@ -37,24 +38,23 @@ struct Telemetry {
         std::uint16_t panel_d;
     };
 
-    struct LightChannelData {
-        std::uint16_t a;
-        std::uint16_t b;
-        std::uint16_t c;
-        std::uint16_t d;
+    struct LightData {
+        std::array<std::uint16_t, 4> als_1;
+        std::array<std::uint16_t, 4> als_2;
+        std::array<std::uint16_t, 4> als_3;
     };
 
-    struct VL {
-        LightChannelData als_1;
-        LightChannelData als_2;
-        LightChannelData als_3;
+    struct Params {
+        uint8_t gain;
+        uint8_t itime;
     };
 
     uint8_t who_am_i;
     uint32_t status;
-    details::Atomic<VL> als_vl;
-    details::Atomic<Temperatures> temperatures;
-    details::Atomic<IR> als_ir;
+    details::Atomic<LightData> vl_data;
+    details::Atomic<Temperatures> temperature_data;
+    details::Atomic<LightData> ir_data;
+    details::Atomic<Params> parameters;
 
     void init() {
         std::memset(this, 0xFF, sizeof(suns::Telemetry));
