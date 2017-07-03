@@ -25,6 +25,7 @@ suns::Telemetry telemetry;
 struct Executor {
     template<typename Command>
     void invoke(Command& cmd, gsl::span<uint8_t> args) {
+        hw->obc_interrupt_set();
         cmd.invoke(telemetry, *hw, args);
     }
 };
@@ -45,13 +46,12 @@ ISR(TWI_vect) {
 }
 
 int main() {
-    LOG_INFO("SunS Initialised.");
-    //hal::Watchdog::enable(hal::Watchdog::Period::p500ms);
-
+    hal::Watchdog::disable();
     Serial0.init(9600);
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
     Serial0.enable_rx_interrupt();
+    LOG_INFO("SunS Start.");
 
     real_hardware.init();
     mock_hardware.init();
