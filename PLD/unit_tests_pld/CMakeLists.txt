@@ -4,7 +4,6 @@ add_hal_executable(unit_tests_pld
     main.cpp
     src/commands.cpp
     src/AD7714.cpp
-    src/telecommands.cpp
 )
 
 add_custom_target(unit_tests_pld.run

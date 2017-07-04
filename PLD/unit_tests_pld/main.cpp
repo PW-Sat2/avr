@@ -13,7 +13,6 @@ int main() {
     Serial0.redirect_stderr();
 
     test_commands();
-    test_telecommands();
     test_AD7714();
 
     hal::libs::sim::stop_simulation();

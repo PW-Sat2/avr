@@ -1,5 +1,5 @@
-#include "unity.h"
 #include "AD7714.h"
+#include "unity.h"
 
 using namespace hal;
 using namespace hal::libs;
@@ -17,44 +17,53 @@ struct pinIO {
         return value;
     }
 };
+
 bool pinIO::was_initialised, pinIO::value;
 
 
-
 struct spi {
-    struct MockElement {
-        uint8_t expected;
-        uint8_t out;
-    };
+    static std::array<uint8_t, 20> reads_buffer;
+    static hal::libs::FIFO_data<uint8_t, 20> write_buffer;
+    static uint8_t ptr;
 
-    static std::array<MockElement, 10> data;
-    static uint8_t length, ptr;
-
-    static void schedule(std::initializer_list<const MockElement> mock_data) {
-        length = mock_data.size();
-        std::copy(mock_data.begin(), mock_data.end(), data.begin());
+    static void reset() {
         ptr = 0;
+        write_buffer.flush();
+    }
+
+    static void schedule_reads(std::initializer_list<uint8_t> buf) {
+        std::copy(buf.begin(), buf.end(), reads_buffer.begin());
+    }
+
+    static void check_writes(std::initializer_list<uint8_t> expects) {
+        TEST_ASSERT_EQUAL_UINT8(expects.size(), write_buffer.getLength());
+
+        for (auto now : expects) {
+            auto top = write_buffer.get();
+            ptr--;
+            TEST_ASSERT_EQUAL_HEX8(now, top);
+        }
+        TEST_ASSERT_EQUAL(0, ptr);
     }
 
     static void write(gsl::span<const uint8_t> out) {
-        for(auto x : out) {
-            TEST_ASSERT_EQUAL_HEX8(data[ptr++].expected, x);
+        for (auto x : out) {
+            write_buffer.append(x);
+            ptr++;
         }
     }
 
     static void read(gsl::span<uint8_t> in) {
-        for(auto& x : in) {
-            TEST_ASSERT_EQUAL_HEX8(0, data[ptr].expected);
-            x = data[ptr++].out;
+        for (auto& x : in) {
+            x = reads_buffer[ptr++];
+            write_buffer.append(0);
         }
     }
-
-    static void check() {
-        TEST_ASSERT_EQUAL_UINT8(length, ptr);
-    }
 };
-std::array<spi::MockElement, 10> spi::data;
-uint8_t spi::length, spi::ptr;
+
+std::array<uint8_t, 20> spi::reads_buffer;
+hal::libs::FIFO_data<uint8_t, 20> spi::write_buffer;
+uint8_t spi::ptr = 0;
 
 using ad7714 = ::devices::AD7714::AD7714<spi, pinIO>;
 
@@ -68,28 +77,77 @@ void test_AD7714_init() {
 
 void test_AD7714_data_ready() {
     pinIO::value = true;
-    TEST_ASSERT_FALSE(ad7714::data_is_ready());
+    TEST_ASSERT_FALSE(ad7714::data_ready());
     pinIO::value = false;
-    TEST_ASSERT_TRUE(ad7714::data_is_ready());
-    TEST_ASSERT_TRUE(ad7714::data_is_ready());
+    TEST_ASSERT_TRUE(ad7714::data_ready());
+    TEST_ASSERT_TRUE(ad7714::data_ready());
     pinIO::value = true;
-    TEST_ASSERT_FALSE(ad7714::data_is_ready());
+    TEST_ASSERT_FALSE(ad7714::data_ready());
+}
+
+void check_channel_change(AD7714::Channels channel, uint8_t nr) {
+    ad7714::change_channel(channel);
+    spi::check_writes(
+        {0x20 | nr,  // comm register; write to filter high; channel nr
+         0xEF,       // unipolar; 24b; curr. boost; filter 4000
+         0x30 | nr,  // comm register; write to filter low; channel nr
+         0xA0,       // filter 4000
+         0x10 | nr,  // comm register; write to mode; channel nr
+         0x20});     // self calib mode
 }
 
 void test_AD7714_change_channel() {
-    spi::schedule({{0x20, 0},  // comm register; write to filter high; channel 0
-                                         {0xEF, 0}, // unipolar; 24b; curr. boost; filter 4000
-                                         {0x38, 0},  // comm register; write to filter low; channel 0
-                                         {0xA0, 0}});  // filter 4000
+    check_channel_change(AD7714::Channels::AIN_1_6, 0);
+    check_channel_change(AD7714::Channels::AIN_2_6, 1);
+    check_channel_change(AD7714::Channels::AIN_3_6, 2);
+    check_channel_change(AD7714::Channels::AIN_4_6, 3);
 
-    ad7714::change_channel(AD7714::Channels::AIN1_CH);
+    check_channel_change(AD7714::Channels::AIN_1_2, 4);
+    check_channel_change(AD7714::Channels::AIN_3_4, 5);
+    check_channel_change(AD7714::Channels::AIN_5_6, 6);
+    check_channel_change(AD7714::Channels::TEST, 7);
+}
 
-    spi::check();
+void test_AD7714_read_data_case(AD7714::Channels channel,
+                                uint8_t a,
+                                uint8_t b,
+                                uint8_t c,
+                                uint32_t expected) {
+    ad7714::change_channel(channel);
+    spi::reset();
+
+    spi::schedule_reads({0,  // comm register
+                         a,
+                         b,
+                         c});
+
+    TEST_ASSERT_EQUAL_HEX32(expected, ad7714::read_data_no_wait());
+
+    spi::check_writes({0x58 | num(channel),  // read from data register
+                       0,
+                       0,
+                       0});
 }
 
 void test_AD7714_read_data() {
-    // spi::schedule(std::array<uint8_t, 4>{0, 0, 0, 0}, std::array<uint8_t, 4>{0, 0, 0, 0});
-    TEST_ASSERT_EQUAL_UINT32(0, ad7714::read_data_no_wait());
+    test_AD7714_read_data_case(
+        AD7714::Channels::AIN_1_6, 0x12, 0x34, 0x56, 0x123456);
+    test_AD7714_read_data_case(
+        AD7714::Channels::AIN_2_6, 0x43, 0x8A, 0x4F, 0x438A4F);
+    test_AD7714_read_data_case(
+        AD7714::Channels::AIN_1_2, 0xFF, 0xFF, 0xFF, 0xFFFFFF);
+    test_AD7714_read_data_case(
+        AD7714::Channels::AIN_3_4, 0x00, 0x00, 0x00, 0x000000);
+}
+
+void test_AD7714_channel_and_read() {
+    spi::schedule_reads({0, 0, 0, 0, 0, 0, 0, 0x58, 0xA7, 0xFE});
+
+    ad7714::change_channel(AD7714::Channels::AIN_4_6);
+
+    TEST_ASSERT_EQUAL_HEX32(0x58A7FE, ad7714::read_data_no_wait());
+
+    spi::check_writes({0x23, 0xEF, 0x33, 0xA0, 0x13, 0x20, 0x5B, 0, 0, 0});
 }
 
 void test_AD7714() {
@@ -98,5 +156,6 @@ void test_AD7714() {
     RUN_TEST(test_AD7714_data_ready);
     RUN_TEST(test_AD7714_change_channel);
     RUN_TEST(test_AD7714_read_data);
+    RUN_TEST(test_AD7714_channel_and_read);
     UnityEnd();
 }

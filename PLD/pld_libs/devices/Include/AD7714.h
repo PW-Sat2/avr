@@ -1,40 +1,77 @@
-#ifndef PLD_LIBS_AD7714_H
-#define PLD_LIBS_AD7714_H
+#ifndef PLD_PLD_LIBS_DEVICES_INCLUDE_AD7714_H_
+#define PLD_PLD_LIBS_DEVICES_INCLUDE_AD7714_H_
 
 #include <hal/hal>
 
 namespace devices {
 namespace AD7714 {
 
+/*!
+ * AD7714 channels.
+ * Notation: AIN_positive_negative.
+ * TEST channel is shorted in the device (noise measurements).
+ */
 enum class Channels : std::uint8_t {
-    AIN1_CH   = 0,
-    AIN2_CH   = 1,
-    AIN3_CH   = 2,
-    AIN4_CH   = 3,
-    AIN5_CH   = 6,
-    AIN1_2_CH = 4,
-    AIN3_4_CH = 5,
-    AIN5_6_CH = 6,
-    TEST_CH   = 7,
+    AIN_1_6 = 0,
+    AIN_2_6 = 1,
+    AIN_3_6 = 2,
+    AIN_4_6 = 3,
+
+    AIN_1_2 = 4,
+    AIN_3_4 = 5,
+    AIN_5_6 = 6,
+    TEST    = 7,
 };
 
+/*!
+ * AD7714 device driver. Uses SPI and GPIO pin.
+ * SPI settings depends on configuration pin on the device.
+ *
+ * Example usage:
+ * \code
+ * ad7714::init();
+ * ad7714::change_channel(AD7714::Channels::AIN_1_6);
+ * while(!ad7714::data_ready());
+ * auto val = ad7714::read_data_no_wait();
+ * \endcode
+ * @tparam SPI
+ * @tparam pin_DRDY
+ */
 template<typename SPI, typename pin_DRDY>
 class AD7714 {
  public:
+    /*!
+     * Initialises data ready pin as INPUT_PULLUP.
+     */
     static void init() {
         pin_DRDY::init(hal::DigitalIO::Mode::INPUT_PULLUP);
     }
 
+    /*!
+     * This method should be invoked when channel is changed.
+     * It sets filter and performs calibration automatically.
+     * @param channel Channel to read from
+     */
     static void change_channel(Channels channel) {
         actual_channel = channel;
         set_filter();
         start_calibration();
     }
 
-    static bool data_is_ready() {
+    /*!
+     * Checks if new data is available.
+     * After read this flag will become false, after next conversion finishes it
+     * will become true again.
+     * @return True if new data is ready to be read.
+     */
+    static bool data_ready() {
         return !pin_DRDY::read();
     }
 
+    /*!
+     * Reads data without waiting.
+     * @return Data read from the DATA register.
+     */
     static uint24_t read_data_no_wait() {
         std::array<std::uint8_t, 3> data;
         read_register(Registers::DATA_REG, data);
@@ -54,7 +91,6 @@ class AD7714 {
         ZERO_SCALE_CALIB_REG = 6 << 4,
         FULL_SCALE_CALIB_REG = 7 << 4,
     };
-
 
     enum class Modes : std::uint8_t {
         NORMAL_MODE           = 0 << 5,
@@ -77,7 +113,6 @@ class AD7714 {
         GAIN_128 = 7 << 2,
     };
 
-
     enum class Polarity : std::uint8_t {
         BIPOLAR  = 0 << 7,
         UNIPOLAR = 1 << 7,
@@ -92,6 +127,7 @@ class AD7714 {
     };
 
 
+    // Configuration
     static constexpr std::uint16_t filter = 4000;
     static constexpr Gain gain            = Gain::GAIN_1;
 
@@ -99,8 +135,8 @@ class AD7714 {
     static constexpr CurrentBoost currentBoost = CurrentBoost::ENABLED;
     static constexpr DataLength data_length    = DataLength::DATA_24b;
 
-    static Channels actual_channel;
 
+    static Channels actual_channel;
 
     static_assert((filter >= 19) && (filter <= 4000),
                   "Allowed filter value is 19 - 4000");
@@ -111,7 +147,8 @@ class AD7714 {
                                               num(currentBoost) |  //
                                               num(data_length) |   //
                                               hal::libs::high_byte(filter);
-        write_register(Registers::FILTER_HIGH_REG, std::array<uint8_t, 1>{filter_high_register});
+        write_register(Registers::FILTER_HIGH_REG,
+                       std::array<uint8_t, 1>{filter_high_register});
 
         constexpr auto filter_low_register = hal::libs::low_byte(filter);
         write_register(Registers::FILTER_LOW_REG, filter_low_register);
@@ -144,9 +181,9 @@ class AD7714 {
 
     static void
     write_to_comm_register(Registers registers, CommRegisterOperation operation) {
-         std::uint8_t out = num(registers) |  //
-                                     num(operation) |  //
-                                     num(actual_channel);
+        std::uint8_t out = num(registers) |  //
+                           num(operation) |  //
+                           num(actual_channel);
         SPI::write(out);
     }
 };
@@ -156,4 +193,4 @@ Channels AD7714<SPI, pin_DRDY>::actual_channel;
 }  // namespace AD7714
 }  // namespace devices
 
-#endif  // PLD_LIBS_AD7714_H
+#endif  // PLD_PLD_LIBS_DEVICES_INCLUDE_AD7714_H_
