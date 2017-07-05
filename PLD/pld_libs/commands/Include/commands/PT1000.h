@@ -1,11 +1,11 @@
-#ifndef PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PT1000_H_
-#define PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PT1000_H_
+#ifndef PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_PT1000_H_
+#define PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_PT1000_H_
 
 #include "ObcInterface/Command.h"
 #include "logger.h"
 
 namespace pld {
-namespace telecommands {
+namespace commands {
 
 class PT1000 : public Command<0x81, 0> {
  public:
@@ -32,7 +32,7 @@ class PT1000 : public Command<0x81, 0> {
     }
 };
 
-}  // namespace telecommands
+}  // namespace commands
 }  // namespace pld
 
-#endif  // PLD_PLD_LIBS_TELECOMMANDS_INCLUDE_TELECOMMANDS_PT1000_H_
+#endif  // PLD_PLD_LIBS_COMMANDS_INCLUDE_COMMANDS_PT1000_H_

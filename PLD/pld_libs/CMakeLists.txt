@@ -1,3 +1,3 @@
 add_subdirectory(hardware)
 add_subdirectory(telemetry)
-add_subdirectory(telecommands)
+add_subdirectory(commands)

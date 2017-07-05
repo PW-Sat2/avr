@@ -4,10 +4,10 @@
 #include "hardware/interface.h"
 #include "telemetry/telemetry.h"
 
-#include "telecommands/HouseKeeping.h"
-#include "telecommands/PT1000.h"
-#include "telecommands/Photodiodes.h"
-#include "telecommands/SunSref.h"
+#include "commands/HouseKeeping.h"
+#include "commands/PT1000.h"
+#include "commands/Photodiodes.h"
+#include "commands/SunSref.h"
 
 using namespace std;
 using namespace hal;
@@ -72,13 +72,13 @@ void check_readouts(std::initializer_list<pld::hardware::AnalogChannel> channels
 
 using namespace pld::hardware;
 
-void test_telecommands_HouseKeeping() {
+void test_commands_HouseKeeping() {
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
 
     set_adc_mock(AnalogChannel::HouseKeeping_3V3d, 12345);
     set_adc_mock(AnalogChannel::HouseKeeping_3V3_OBC, 52687);
 
-    pld::telecommands::HouseKeeping().invoke(telemetry, hw, {});
+    pld::commands::HouseKeeping().invoke(telemetry, hw, {});
     check_readouts({AnalogChannel::HouseKeeping_3V3d,
                     AnalogChannel::HouseKeeping_3V3_OBC});
 
@@ -89,7 +89,7 @@ void test_telecommands_HouseKeeping() {
     set_adc_mock(AnalogChannel::HouseKeeping_3V3d, 31204);
     set_adc_mock(AnalogChannel::HouseKeeping_3V3_OBC, 41578);
 
-    pld::telecommands::HouseKeeping().invoke(telemetry, hw, {});
+    pld::commands::HouseKeeping().invoke(telemetry, hw, {});
     check_readouts({AnalogChannel::HouseKeeping_3V3d,
                     AnalogChannel::HouseKeeping_3V3_OBC});
 
@@ -98,7 +98,7 @@ void test_telecommands_HouseKeeping() {
     TEST_ASSERT_EQUAL_UINT16(41578, readed.obc_3v3d);
 }
 
-void test_telecommands_Photodiodes() {
+void test_commands_Photodiodes() {
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
 
     set_adc_mock(AnalogChannel::PhotodiodeXp, 60001);
@@ -106,7 +106,7 @@ void test_telecommands_Photodiodes() {
     set_adc_mock(AnalogChannel::PhotodiodeYp, 60003);
     set_adc_mock(AnalogChannel::PhotodiodeYn, 60004);
 
-    pld::telecommands::Photodiodes().invoke(telemetry, hw, {});
+    pld::commands::Photodiodes().invoke(telemetry, hw, {});
     check_readouts({AnalogChannel::PhotodiodeXp,
                     AnalogChannel::PhotodiodeXn,
                     AnalogChannel::PhotodiodeYp,
@@ -119,7 +119,7 @@ void test_telecommands_Photodiodes() {
     TEST_ASSERT_EQUAL_UINT16(60004, readed.Yn);
 }
 
-void test_telecommands_SunSRef() {
+void test_commands_SunSRef() {
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
 
     set_adc_mock(AnalogChannel::SunSRef_V0, 50001);
@@ -128,7 +128,7 @@ void test_telecommands_SunSRef() {
     set_adc_mock(AnalogChannel::SunSRef_V3, 50004);
     set_adc_mock(AnalogChannel::SunSRef_V4, 50005);
 
-    pld::telecommands::SunSRef().invoke(telemetry, hw, {});
+    pld::commands::SunSRef().invoke(telemetry, hw, {});
     check_readouts({AnalogChannel::SunSRef_V0,
                     AnalogChannel::SunSRef_V1,
                     AnalogChannel::SunSRef_V2,
@@ -143,7 +143,7 @@ void test_telecommands_SunSRef() {
     TEST_ASSERT_EQUAL_UINT16(50005, readed.voltages[4]);
 }
 
-void test_telecommands_Temperatures() {
+void test_commands_Temperatures() {
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
 
     set_adc_mock(AnalogChannel::TemperatureSupply, 40001);
@@ -156,7 +156,7 @@ void test_telecommands_Temperatures() {
     set_adc_mock(AnalogChannel::TemperatureYp, 40008);
     set_adc_mock(AnalogChannel::TemperatureYn, 40009);
 
-    pld::telecommands::PT1000().invoke(telemetry, hw, {});
+    pld::commands::PT1000().invoke(telemetry, hw, {});
     check_readouts({
         AnalogChannel::TemperatureSupply,
         AnalogChannel::TemperatureCamNadir,
@@ -182,11 +182,11 @@ void test_telecommands_Temperatures() {
 }
 
 
-void test_telecommands() {
+void test_commands() {
     UnityBegin("");
-    RUN_TEST(test_telecommands_HouseKeeping);
-    RUN_TEST(test_telecommands_Photodiodes);
-    RUN_TEST(test_telecommands_SunSRef);
-    RUN_TEST(test_telecommands_Temperatures);
+    RUN_TEST(test_commands_HouseKeeping);
+    RUN_TEST(test_commands_Photodiodes);
+    RUN_TEST(test_commands_SunSRef);
+    RUN_TEST(test_commands_Temperatures);
     UnityEnd();
 }

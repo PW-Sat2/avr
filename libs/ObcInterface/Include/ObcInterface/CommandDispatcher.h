@@ -23,7 +23,7 @@
  * Command> void invoke(Command& cmd, gsl::span<uint8_t> args);
  * };
  * \endcode
- * @tparam Types Types of telecommands. Every one of them should be inherited
+ * @tparam Types Types of commands. Every one of them should be inherited
  * from Command.
  */
 template<class Executor, class... Types>
@@ -47,21 +47,21 @@ class CommandDispatcher : private Executor, private Types... {
 
  public:
     /*!
-     * Default ctor. Every telecommand and executor default constructors will be
+     * Default ctor. Every command and executor default constructors will be
      * invoked.
      */
     CommandDispatcher() = default;
 
     /*!
-     * Specialise executor, telecommands will be created using default ctors.
+     * Specialise executor, commands will be created using default ctors.
      * @param executor Executor object to use.
      */
     CommandDispatcher(Executor executor) : Executor(std::move(executor)) {
     }
     /*!
-     * Fully specialise executors and telecommands.
+     * Fully specialise executors and commands.
      * @param executor Executor object to use
-     * @param types Telecommand objects.
+     * @param types Command objects.
      */
     CommandDispatcher(Executor executor, Types... types)
         : Executor(std::move(executor)), Types{std::move(types)}... {
@@ -69,7 +69,7 @@ class CommandDispatcher : private Executor, private Types... {
 
     /*!
      * Maximal supported length of command. Longer commands passed cause runtime
-     * error. It is calculated from the types of telecommands.
+     * error. It is calculated from the types of commands.
      */
     constexpr static uint8_t max_command_length =
         Crawler<Types...>::max_params + 1;

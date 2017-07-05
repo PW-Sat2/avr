@@ -5,7 +5,7 @@
 
 /*!
  * Command opcode and params definitions.
- * Every telecommand should derive from it.
+ * Every command should derive from it.
  */
 template<std::uint8_t command_opcode, std::uint8_t command_params>
 class Command {
