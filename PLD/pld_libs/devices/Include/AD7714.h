@@ -44,6 +44,7 @@ enum class Gain : std::uint8_t {
  *
  * Example usage:
  * \code
+ * using ad7714 = AD7714::AD7714<...>;
  * ad7714::init();
  * ad7714::change_channel(AD7714::Channels::AIN_1_6, AD7714::Gain::GAIN_1);
  * while(!ad7714::data_ready());
@@ -53,7 +54,7 @@ enum class Gain : std::uint8_t {
  * @tparam pin_DRDY
  */
 template<typename SPI, typename pin_DRDY>
-class AD7714 {
+class AD7714 : hal::libs::PureStatic {
  public:
     /*!
      * Initialises data ready pin as INPUT_PULLUP.
