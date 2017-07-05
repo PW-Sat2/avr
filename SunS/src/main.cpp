@@ -46,6 +46,7 @@ ISR(TWI_vect) {
 }
 
 int main() {
+    hal::Watchdog::enable(hal::Watchdog::Period::p8000ms);
     hal::Watchdog::disable();
     Serial0.init(9600);
     Serial0.redirect_stdio();

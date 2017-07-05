@@ -9,7 +9,6 @@ using namespace libs;
 using hal::Analog::InternalADC;
 using hal::Analog::AnalogGPIO;
 
-constexpr std::uint32_t timeout = 80000;
 using interrupt = hal::DigitalIO::GPIO<42>;
 
 namespace analog_pins {
@@ -32,6 +31,8 @@ void init() {
 }  // namespace analog_pins
 
 namespace als {
+constexpr std::uint32_t als_timeout = 1600; //16000
+
 namespace first {
 using sda_a  = hal::DigitalIO::GPIO<16>;
 using sda_b  = hal::DigitalIO::GPIO<11>;
@@ -39,7 +40,7 @@ using sda_c  = hal::DigitalIO::GPIO<40>;
 using sda_d  = hal::DigitalIO::GPIO<30>;
 using scl  = hal::DigitalIO::GPIO<3>;
 
-using i2c = SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, timeout>;
+using i2c = SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, als_timeout>;
 using als = BH1730FVCMulti::BH1730FVCMulti<i2c>;
 }  // namespace first
 
@@ -50,7 +51,7 @@ using sda_c  = hal::DigitalIO::GPIO<43>;
 using sda_d  = hal::DigitalIO::GPIO<31>;
 using scl  = hal::DigitalIO::GPIO<41>;
 
-using i2c = SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, timeout>;
+using i2c = SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, als_timeout>;
 using als = BH1730FVCMulti::BH1730FVCMulti<i2c>;
 }  // namespace second
 
@@ -61,7 +62,7 @@ using sda_c  = hal::DigitalIO::GPIO<44>;
 using sda_d  = hal::DigitalIO::GPIO<32>;
 using scl  = hal::DigitalIO::GPIO<13>;
 
-using i2c = SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, timeout>;
+using i2c = SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, als_timeout>;
 using als = BH1730FVCMulti::BH1730FVCMulti<i2c>;
 }  // namespace third
 
@@ -76,7 +77,8 @@ void init() {
     third::als::init();
 }
 
-void check_part_id(std::uint32_t& als_presense, std::array<std::uint8_t, 4>& ids, const std::uint8_t offset) {
+template<typename T>
+void check_part_id(std::uint32_t& als_presense, T& ids, const std::uint8_t offset) {
     constexpr std::uint8_t expected_id = 113;
     for (std::uint8_t i = 0; i < 4; i++) {
         if (expected_id != ids[i]) {
@@ -153,66 +155,52 @@ void trigger(std::uint32_t& status) {
     status |= temp_status;
 }
 
-void wait_expected_time(const std::uint8_t itime) {
+void wait_for_als(std::uint32_t& status, const std::uint8_t itime) {
+    constexpr std::uint8_t adc_valid = 15;
+    constexpr std::uint8_t adc_one_cycle_time = 3;
     constexpr std::uint8_t adc_internal_calculation_time = 10;
-    constexpr std::uint8_t adc_one_cycle_time = 4;
+    volatile std::uint8_t als_timeout_cnt = 0;
+
+    std::uint32_t temp_status_1 = 0, temp_status_2 = 0, temp_status_3 = 0;
+    std::uint8_t adc_state_1 = 0, adc_state_2 = 0, adc_state_3 = 0;
 
     _delay_ms(adc_internal_calculation_time);
 
-    for (volatile uint8_t i = 0; i < itime; i++) {
+    do {
+        temp_status_1 |= first::als::adc_valid(adc_state_1);
+        temp_status_2 |= second::als::adc_valid(adc_state_2);
+        temp_status_3 |= third::als::adc_valid(adc_state_3);
+
+        if (adc_valid == (adc_state_1 & adc_state_2 & adc_state_3)) {
+            break;
+        }
+
         _delay_ms(adc_one_cycle_time);
-    }
+        als_timeout_cnt++;
+    } while (als_timeout_cnt < itime);
+
+    write_mask<0, 4>(temp_status_1, read_mask<0, 3>(temp_status_1));
+    write_mask<8, 4>(temp_status_2, read_mask<0, 3>(temp_status_2));
+    write_mask<16, 4>(temp_status_3, read_mask<0, 3>(temp_status_3));
+
+    status |= temp_status_1;
+    status |= temp_status_2;
+    status |= temp_status_3;
 }
 
 void read_light(std::uint32_t& status, suns::Telemetry::LightData& vl, suns::Telemetry::LightData& ir) {
+
     std::uint32_t temp_status = 0;
-    std::uint8_t adc_state = 0;
-
-    constexpr std::uint8_t adc_valid = 15;
-    volatile std::uint32_t timeout_cnt = 0;
-    constexpr std::uint32_t adc_timeout_cnt = 500;
-    constexpr std::uint8_t adc_timeout_delay = 10;
-
-    do {
-        temp_status = first::als::adc_valid(adc_state);
-        write_mask<0, 5>(temp_status, read_mask<0, 4>(temp_status));
-        status |= temp_status;
-        if (timeout_cnt > 0) {
-            _delay_ms(adc_timeout_delay);
-        }
-        timeout_cnt++;
-    } while ((adc_valid != adc_state) && (adc_timeout_cnt > timeout_cnt));
-
     temp_status = first::als::read_ambient_light(vl.als_1, ir.als_1);
-    write_mask<0, 5>(temp_status, read_mask<0, 4>(temp_status));
+    write_mask<0, 4>(temp_status, read_mask<0, 3>(temp_status));
     status |= temp_status;
-
-    do {
-        temp_status = second::als::adc_valid(adc_state);
-        write_mask<9, 5>(temp_status, read_mask<0, 4>(temp_status));
-        status |= temp_status;
-        if (timeout_cnt > 0) {
-            _delay_ms(adc_timeout_delay);
-        }
-        timeout_cnt++;
-    } while ((adc_valid != adc_state) && (adc_timeout_cnt > timeout_cnt));
 
     temp_status = second::als::read_ambient_light(vl.als_2, ir.als_2);
-    write_mask<9, 5>(temp_status, read_mask<0, 4>(temp_status));
+    write_mask<8, 4>(temp_status, read_mask<0, 3>(temp_status));
     status |= temp_status;
 
-    do {
-        temp_status = third::als::adc_valid(adc_state);
-        write_mask<18, 5>(temp_status, read_mask<0, 4>(temp_status));
-        status |= temp_status;
-        if (timeout_cnt > 0) {
-            _delay_ms(adc_timeout_delay);
-        }
-        timeout_cnt++;
-    } while ((adc_valid != adc_state) && (adc_timeout_cnt > timeout_cnt));
-
     temp_status = third::als::read_ambient_light(vl.als_3, ir.als_3);
-    write_mask<18, 5>(temp_status, read_mask<0, 4>(temp_status));
+    write_mask<16, 4>(temp_status, read_mask<0, 3>(temp_status));
     status |= temp_status;
 }
 
@@ -235,7 +223,7 @@ void suns::hardware::RealHardware::als_measure(std::uint8_t gain, std::uint8_t i
     als::all::set_itime(status, itime);
     als::all::set_gain(status, static_cast<BH1730FVCMulti::Gain>(gain));
     als::all::trigger(status);
-    als::all::wait_expected_time(itime);
+    als::all::wait_for_als(status, itime);
     als::all::read_light(status, vl, ir);
 }
 

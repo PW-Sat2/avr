@@ -20,19 +20,10 @@ class BH1730FVCMulti : hal::libs::PureStatic {
 
     static std::uint8_t set_integration_time(std::uint8_t cycle) {
         std::uint8_t result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
-        if (result > 15) {
-            return result;
-        }
 
         result |= i2c::write(COMMAND_REGISTER | TIMING);
-        if (result > 15) {
-            return result;
-        }
 
         result |= i2c::write(static_cast<std::uint8_t>(256-cycle));
-        if (result > 15) {
-            return result;
-        }
 
         i2c::stop();
         return result;
@@ -41,19 +32,10 @@ class BH1730FVCMulti : hal::libs::PureStatic {
 
     static std::uint8_t set_gain(Gain gain) {
         std::uint8_t result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
-        if (result > 15) {
-            return result;
-        }
 
         result |= i2c::write(COMMAND_REGISTER | GAIN);
-        if (result > 15) {
-            return result;
-        }
 
         result |= i2c::write(static_cast<std::uint8_t>(gain));
-        if (result > 15) {
-            return result;
-        }
 
         i2c::stop();
 
@@ -62,26 +44,13 @@ class BH1730FVCMulti : hal::libs::PureStatic {
 
     static std::uint8_t read_part_id(std::array<std::uint8_t, 4>& ids) {
         std::uint8_t result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
-        if (result > 15) {
-            return result;
-        }
 
         result |= i2c::write(COMMAND_REGISTER | ID);
-        if (result > 15) {
-            return result;
-        }
 
         i2c::stop();
 
         result |= i2c::start(address, SoftI2CMulti::Action::START_READ);
-        if (result > 15) {
-            return result;
-        }
-
-        result = i2c::read(ids, false);
-        if (result > 15) {
-            return result;
-        }
+        result |= i2c::read(ids, false);
 
         i2c::stop();
 
@@ -92,41 +61,17 @@ class BH1730FVCMulti : hal::libs::PureStatic {
         std::array<std::uint8_t, 4> vl_msb, vl_lsb, ir_msb, ir_lsb;
 
         std::uint8_t result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
-        if (result > 15) {
-            return result;
-        }
 
         result |= i2c::write(COMMAND_REGISTER | DATA0LOW);
-        if (result > 15) {
-            return result;
-        }
 
         i2c::stop();
 
         result |= i2c::start(address, SoftI2CMulti::Action::START_READ);
-        if (result > 15) {
-            return result;
-        }
 
         result = i2c::read(vl_lsb, true);
-        if (result > 15) {
-            return result;
-        }
-
         result = i2c::read(vl_msb, true);
-        if (result > 15) {
-            return result;
-        }
-
         result = i2c::read(ir_lsb, true);
-        if (result > 15) {
-            return result;
-        }
-
         result = i2c::read(ir_msb, false);
-        if (result > 15) {
-            return result;
-        }
 
         i2c::stop();
 
@@ -142,19 +87,10 @@ class BH1730FVCMulti : hal::libs::PureStatic {
 
     static std::uint8_t trigger() {
         std::uint8_t result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
-        if (result > 15) {
-            return result;
-        }
 
         result |= i2c::write(COMMAND_REGISTER | CONTROL);
-        if (result > 15) {
-            return result;
-        }
 
         result |= i2c::write(ONE_SHOT | VL_IR | ADC_EN | ADC_POWER_ON);
-        if (result > 15) {
-            return result;
-        }
 
         i2c::stop();
         return result;
@@ -163,27 +99,15 @@ class BH1730FVCMulti : hal::libs::PureStatic {
 
     static std::uint8_t adc_valid(std::uint8_t& data_status) {
         std::uint8_t result = i2c::start(address, SoftI2CMulti::Action::START_WRITE);
-        if (result > 15) {
-            return result;
-        }
 
         result |= i2c::write(COMMAND_REGISTER | CONTROL);
-        if (result > 15) {
-            return result;
-        }
 
         i2c::stop();
 
         result |= i2c::start(address, SoftI2CMulti::Action::START_READ);
-        if (result > 15) {
-            return result;
-        }
 
         std::array<std::uint8_t, 4> control_registers;
         result = i2c::read(control_registers, false);
-        if (result > 15) {
-            return result;
-        }
 
         hal::libs::write_bit<0>(data_status, hal::libs::read_bit<4>(control_registers[0]));
         hal::libs::write_bit<1>(data_status, hal::libs::read_bit<4>(control_registers[1]));

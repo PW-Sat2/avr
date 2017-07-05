@@ -10,14 +10,6 @@ void Mock::init() {
     this->obc_interrupt_reset();
 }
 
-/*Telemetry::LightData Mock::read_radfet() {
-    Telemetry::LightData rf;
-    for (uint8_t i = 0; i < 10; ++i) {
-        _delay_ms(200);
-        this->watchdog_kick();
-    }
-    return rf;
-}*/
 
 void Mock::watchdog_kick() {
     hal::Watchdog::kick();

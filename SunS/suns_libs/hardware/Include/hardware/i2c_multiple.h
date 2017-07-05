@@ -26,7 +26,7 @@ class SoftI2CMulti : hal::libs::PureStatic {
         sda_pull_low();
         _delay_loop_1(hDelay);
 
-        return write((address << 1) | static_cast<uint8_t>(start_action));
+        return write((address << 1) | num(start_action));
     }
 
     static void stop() {
@@ -39,14 +39,8 @@ class SoftI2CMulti : hal::libs::PureStatic {
     }
 
     static uint8_t write(uint8_t data) {
-        uint8_t result = 0;
-
         for (int8_t i = 7; i >= 0; i--) {
             shift_bit(hal::libs::read_bit(data, i));
-
-            if (wait_for_clk_high()) {
-                hal::libs::write_bit<4>(result, 1);
-            }
         }
 
         _scl::reset();
@@ -58,7 +52,7 @@ class SoftI2CMulti : hal::libs::PureStatic {
         _scl::init(hal::DigitalIO::Mode::INPUT);
         _delay_loop_1(hDelay);
 
-        result |= read_ack();
+        std::uint8_t result = read_ack();
 
         _scl::reset();
         _scl::init(hal::DigitalIO::Mode::OUTPUT);
@@ -71,8 +65,6 @@ class SoftI2CMulti : hal::libs::PureStatic {
         std::array<uint8_t, 4> SDA_read_data = {0};
         for (int8_t i = 7; i >= 0; i--) {
             _scl_low_high();
-            wait_for_clk_high();
-
             write_bit_runtime(SDA_read_data[0], _sda_a::read(), i);
             write_bit_runtime(SDA_read_data[1], _sda_b::read(), i);
             write_bit_runtime(SDA_read_data[2], _sda_c::read(), i);
@@ -105,8 +97,8 @@ class SoftI2CMulti : hal::libs::PureStatic {
     }
 
  private:
-    static constexpr uint8_t qDelay{30};
-    static constexpr uint8_t hDelay{50};
+    static constexpr uint8_t qDelay{3};
+    static constexpr uint8_t hDelay{5};
 
     static void sda_pull_low() {
         _sda_a::reset();
@@ -127,7 +119,8 @@ class SoftI2CMulti : hal::libs::PureStatic {
         _sda_d::init(hal::DigitalIO::Mode::INPUT);
     }
 
-    static inline void write_bit_runtime(uint8_t& dest, bool val, uint8_t pos) {
+    template<typename T1, typename T2>
+    static inline void write_bit_runtime(T1& dest, bool val, T2 pos) {
         if (val) {
             dest |= (val << pos);
         } else {
@@ -149,18 +142,6 @@ class SoftI2CMulti : hal::libs::PureStatic {
         _delay_loop_1(hDelay);
         _scl::init(hal::DigitalIO::Mode::INPUT);
         _delay_loop_1(hDelay);
-    }
-
-    static bool wait_for_clk_high() {
-        volatile uint32_t timeout = 0;
-        while (0 == _scl::read()) {
-            if (timeout < _timeout) {
-                timeout++;
-            } else {
-                return true;
-            }
-        }
-        return false;
     }
 
     static uint8_t read_ack() {
