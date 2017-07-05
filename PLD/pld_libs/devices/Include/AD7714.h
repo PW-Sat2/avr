@@ -24,13 +24,28 @@ enum class Channels : std::uint8_t {
 };
 
 /*!
+ * AD7714 Gain options.
+ * Input differential voltage is multiplied by number and measured by ADC.
+ */
+enum class Gain : std::uint8_t {
+    GAIN_1   = 0 << 2,
+    GAIN_2   = 1 << 2,
+    GAIN_4   = 2 << 2,
+    GAIN_8   = 3 << 2,
+    GAIN_16  = 4 << 2,
+    GAIN_32  = 5 << 2,
+    GAIN_64  = 6 << 2,
+    GAIN_128 = 7 << 2,
+};
+
+/*!
  * AD7714 device driver. Uses SPI and GPIO pin.
  * SPI settings depends on configuration pin on the device.
  *
  * Example usage:
  * \code
  * ad7714::init();
- * ad7714::change_channel(AD7714::Channels::AIN_1_6);
+ * ad7714::change_channel(AD7714::Channels::AIN_1_6, AD7714::Gain::GAIN_1);
  * while(!ad7714::data_ready());
  * auto val = ad7714::read_data_no_wait();
  * \endcode
@@ -51,11 +66,12 @@ class AD7714 {
      * This method should be invoked when channel is changed.
      * It sets filter and performs calibration automatically.
      * @param channel Channel to read from
+     * @param gain Gain to be set on this channel
      */
-    static void change_channel(Channels channel) {
+    static void change_channel(Channels channel, Gain gain) {
         actual_channel = channel;
         set_filter();
-        start_calibration();
+        start_calibration(gain);
     }
 
     /*!
@@ -102,16 +118,6 @@ class AD7714 {
         ZERO_SCALE_SELF_CALIB = 6 << 5,
         FULL_SCALE_SELF_CALIB = 7 << 5,
     };
-    enum class Gain : std::uint8_t {
-        GAIN_1   = 0 << 2,
-        GAIN_2   = 1 << 2,
-        GAIN_4   = 2 << 2,
-        GAIN_8   = 3 << 2,
-        GAIN_16  = 4 << 2,
-        GAIN_32  = 5 << 2,
-        GAIN_64  = 6 << 2,
-        GAIN_128 = 7 << 2,
-    };
 
     enum class Polarity : std::uint8_t {
         BIPOLAR  = 0 << 7,
@@ -129,7 +135,6 @@ class AD7714 {
 
     // Configuration
     static constexpr std::uint16_t filter = 4000;
-    static constexpr Gain gain            = Gain::GAIN_1;
 
     static constexpr Polarity polarity         = Polarity::UNIPOLAR;
     static constexpr CurrentBoost currentBoost = CurrentBoost::ENABLED;
@@ -154,11 +159,11 @@ class AD7714 {
         write_register(Registers::FILTER_LOW_REG, filter_low_register);
     }
 
-    static void start_calibration() {
-        set_mode(Modes::SELF_CALIB);
+    static void start_calibration(const Gain gain) {
+        set_mode(Modes::SELF_CALIB, gain);
     }
 
-    static void set_mode(const Modes mode) {
+    static void set_mode(const Modes mode, const Gain gain) {
         std::uint8_t mode_register_value = num(mode) | num(gain);
         write_register(Registers::MODE_REG, mode_register_value);
     }

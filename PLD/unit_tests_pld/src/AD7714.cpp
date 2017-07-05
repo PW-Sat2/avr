@@ -85,27 +85,38 @@ void test_AD7714_data_ready() {
     TEST_ASSERT_FALSE(ad7714::data_ready());
 }
 
-void check_channel_change(AD7714::Channels channel, uint8_t nr) {
-    ad7714::change_channel(channel);
+void check_channel_change(AD7714::Channels channel,
+                          uint8_t channel_nr,
+                          AD7714::Gain gain,
+                          uint8_t gain_nr) {
+    ad7714::change_channel(channel, gain);
     spi::check_writes(
-        {0x20 | nr,  // comm register; write to filter high; channel nr
-         0xEF,       // unipolar; 24b; curr. boost; filter 4000
-         0x30 | nr,  // comm register; write to filter low; channel nr
-         0xA0,       // filter 4000
-         0x10 | nr,  // comm register; write to mode; channel nr
-         0x20});     // self calib mode
+        {0x20 | channel_nr,  // comm register; write to filter high; channel
+                             // channel_nr
+         0xEF,               // unipolar; 24b; curr. boost; filter 4000
+         0x30 | channel_nr,  // comm register; write to filter low; channel
+                             // channel_nr
+         0xA0,               // filter 4000
+         0x10 | channel_nr,  // comm register; write to mode; channel channel_nr
+         0x20 | gain_nr});   // self calib mode
 }
 
 void test_AD7714_change_channel() {
-    check_channel_change(AD7714::Channels::AIN_1_6, 0);
-    check_channel_change(AD7714::Channels::AIN_2_6, 1);
-    check_channel_change(AD7714::Channels::AIN_3_6, 2);
-    check_channel_change(AD7714::Channels::AIN_4_6, 3);
+    check_channel_change(AD7714::Channels::AIN_1_6, 0, AD7714::Gain::GAIN_1, 0);
+    check_channel_change(
+        AD7714::Channels::AIN_2_6, 1, AD7714::Gain::GAIN_128, 0b11100);
+    check_channel_change(
+        AD7714::Channels::AIN_3_6, 2, AD7714::Gain::GAIN_32, 0b10100);
+    check_channel_change(
+        AD7714::Channels::AIN_4_6, 3, AD7714::Gain::GAIN_64, 0b11000);
 
-    check_channel_change(AD7714::Channels::AIN_1_2, 4);
-    check_channel_change(AD7714::Channels::AIN_3_4, 5);
-    check_channel_change(AD7714::Channels::AIN_5_6, 6);
-    check_channel_change(AD7714::Channels::TEST, 7);
+    check_channel_change(
+        AD7714::Channels::AIN_1_2, 4, AD7714::Gain::GAIN_2, 0b00100);
+    check_channel_change(
+        AD7714::Channels::AIN_3_4, 5, AD7714::Gain::GAIN_4, 0b01000);
+    check_channel_change(
+        AD7714::Channels::AIN_5_6, 6, AD7714::Gain::GAIN_8, 0b01100);
+    check_channel_change(AD7714::Channels::TEST, 7, AD7714::Gain::GAIN_16, 0b10000);
 }
 
 void test_AD7714_read_data_case(AD7714::Channels channel,
@@ -113,7 +124,7 @@ void test_AD7714_read_data_case(AD7714::Channels channel,
                                 uint8_t b,
                                 uint8_t c,
                                 uint32_t expected) {
-    ad7714::change_channel(channel);
+    ad7714::change_channel(channel, AD7714::Gain::GAIN_1);
     spi::reset();
 
     spi::schedule_reads({0,  // comm register
@@ -143,11 +154,11 @@ void test_AD7714_read_data() {
 void test_AD7714_channel_and_read() {
     spi::schedule_reads({0, 0, 0, 0, 0, 0, 0, 0x58, 0xA7, 0xFE});
 
-    ad7714::change_channel(AD7714::Channels::AIN_4_6);
+    ad7714::change_channel(AD7714::Channels::AIN_4_6, AD7714::Gain::GAIN_32);
 
     TEST_ASSERT_EQUAL_HEX32(0x58A7FE, ad7714::read_data_no_wait());
 
-    spi::check_writes({0x23, 0xEF, 0x33, 0xA0, 0x13, 0x20, 0x5B, 0, 0, 0});
+    spi::check_writes({0x23, 0xEF, 0x33, 0xA0, 0x13, 0x34, 0x5B, 0, 0, 0});
 }
 
 void test_AD7714() {
