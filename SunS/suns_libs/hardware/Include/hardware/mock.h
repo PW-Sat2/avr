@@ -9,7 +9,7 @@ namespace hardware {
 
 struct Mock : public Interface {
     virtual void init() override;
-    virtual void als_measure(uint8_t gain, uint8_t itime, std::uint32_t& status, suns::Telemetry::LightData& vl, suns::Telemetry::LightData& ir) override;
+    virtual void als_measure(uint8_t gain, uint8_t itime, suns::Telemetry::Status& als_status, suns::Telemetry::LightData& vl, suns::Telemetry::LightData& ir) override;
     virtual void temperatures_measure(suns::Telemetry::Temperatures& temperature_data) override;
     void watchdog_kick() override;
     void obc_interrupt_set() override;

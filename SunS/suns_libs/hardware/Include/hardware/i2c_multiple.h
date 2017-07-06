@@ -4,7 +4,7 @@
 #include <hal/hal>
 
 namespace SoftI2CMulti {
-enum class Action : uint8_t {
+enum class Action : std::uint8_t {
     START_WRITE = 0,
     START_READ = 1
 };
@@ -20,7 +20,7 @@ class SoftI2CMulti : hal::libs::PureStatic {
         _sda_d::init(hal::DigitalIO::Mode::INPUT);
     }
 
-    static uint8_t start(uint8_t address, const Action start_action) {
+    static std::uint8_t start(std::uint8_t address, const Action start_action) {
         _scl::init(hal::DigitalIO::Mode::INPUT);
         _delay_loop_1(hDelay);
         sda_pull_low();
@@ -38,7 +38,7 @@ class SoftI2CMulti : hal::libs::PureStatic {
         _delay_loop_1(hDelay);
     }
 
-    static uint8_t write(uint8_t data) {
+    static std::uint8_t write(std::uint8_t data) {
         for (int8_t i = 7; i >= 0; i--) {
             shift_bit(hal::libs::read_bit(data, i));
         }
@@ -61,8 +61,8 @@ class SoftI2CMulti : hal::libs::PureStatic {
         return result;
     }
 
-    static bool read(std::array<uint8_t, 4>& data, bool ack) {
-        std::array<uint8_t, 4> SDA_read_data = {0};
+    static bool read(std::array<std::uint8_t, 4>& data, bool ack) {
+        std::array<std::uint8_t, 4> SDA_read_data = {0};
         for (int8_t i = 7; i >= 0; i--) {
             _scl_low_high();
             write_bit_runtime(SDA_read_data[0], _sda_a::read(), i);
@@ -97,8 +97,8 @@ class SoftI2CMulti : hal::libs::PureStatic {
     }
 
  private:
-    static constexpr uint8_t qDelay{3};
-    static constexpr uint8_t hDelay{5};
+    static constexpr std::uint8_t qDelay{3};
+    static constexpr std::uint8_t hDelay{5};
 
     static void sda_pull_low() {
         _sda_a::reset();
@@ -144,8 +144,8 @@ class SoftI2CMulti : hal::libs::PureStatic {
         _delay_loop_1(hDelay);
     }
 
-    static uint8_t read_ack() {
-        uint8_t ack = 0;
+    static std::uint8_t read_ack() {
+        std::uint8_t ack = 0;
         hal::libs::write_bit<0>(ack, _sda_a::read());
         hal::libs::write_bit<1>(ack, _sda_b::read());
         hal::libs::write_bit<2>(ack, _sda_c::read());

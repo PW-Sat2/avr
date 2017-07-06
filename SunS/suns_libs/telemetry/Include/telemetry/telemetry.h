@@ -49,8 +49,14 @@ struct Telemetry {
         uint8_t itime;
     };
 
+    struct Status {
+        uint16_t ack;
+        uint16_t presence;
+        uint16_t adc_valid;
+    };
+
     uint8_t who_am_i;
-    uint32_t status;
+    details::Atomic<Status> als_status;
     details::Atomic<LightData> vl_data;
     details::Atomic<Temperatures> temperature_data;
     details::Atomic<LightData> ir_data;
@@ -60,7 +66,7 @@ struct Telemetry {
         std::memset(this, 0xFF, sizeof(suns::Telemetry));
     }
 };
-static_assert(sizeof(Telemetry) == 65,
+static_assert(sizeof(Telemetry) == 67,
               "Incorrect size of Telemetry structure (padding?)");
 static_assert(std::is_pod<Telemetry>::value, "POD");
 
