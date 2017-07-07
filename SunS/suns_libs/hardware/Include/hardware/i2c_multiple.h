@@ -31,7 +31,7 @@ class SoftI2CMulti : hal::libs::PureStatic {
 
     static void stop() {
         sda_pull_low();
-        _delay_loop_1(hDelay);
+        _delay_loop_1(qDelay);
         _scl::init(hal::DigitalIO::Mode::INPUT);
         _delay_loop_1(qDelay);
         sda_hi_z();
@@ -45,14 +45,16 @@ class SoftI2CMulti : hal::libs::PureStatic {
 
         _scl::reset();
         _scl::init(hal::DigitalIO::Mode::OUTPUT);
-        _delay_loop_1(qDelay);
-        sda_hi_z();
         _delay_loop_1(hDelay);
+        sda_hi_z();
+        _delay_loop_1(qDelay);
 
         _scl::init(hal::DigitalIO::Mode::INPUT);
-        _delay_loop_1(hDelay);
+        _delay_loop_1(qDelay);
 
         std::uint8_t result = read_ack();
+
+        _delay_loop_1(qDelay);
 
         _scl::reset();
         _scl::init(hal::DigitalIO::Mode::OUTPUT);
@@ -97,8 +99,8 @@ class SoftI2CMulti : hal::libs::PureStatic {
     }
 
  private:
-    static constexpr std::uint8_t qDelay{3};
-    static constexpr std::uint8_t hDelay{5};
+    static constexpr std::uint8_t qDelay{2};
+    static constexpr std::uint8_t hDelay{3};
 
     static void sda_pull_low() {
         _sda_a::reset();
@@ -139,7 +141,7 @@ class SoftI2CMulti : hal::libs::PureStatic {
             sda_pull_low();
         }
 
-        _delay_loop_1(hDelay);
+        _delay_loop_1(qDelay);
         _scl::init(hal::DigitalIO::Mode::INPUT);
         _delay_loop_1(hDelay);
     }
