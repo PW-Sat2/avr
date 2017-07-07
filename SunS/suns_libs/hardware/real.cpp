@@ -2,6 +2,7 @@
 #include <hardware/i2c_multiple.h>
 #include <hardware/als.h>
 #include <hal/hal>
+#include "logger.h"
 
 using namespace hal;
 using namespace devices;

@@ -14,4 +14,5 @@ target_include_directories(hardware PUBLIC Include)
 target_link_libraries(hardware
     hal
     telemetry
+    logger
 )
