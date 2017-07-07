@@ -67,6 +67,23 @@ using i2c = SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, als_time
 using als = BH1730FVCMulti::BH1730FVCMulti<i2c>;
 }  // namespace third
 
+void validate_and_correct_params(std::uint8_t& gain, std::uint8_t& itime) {
+    constexpr std::uint8_t default_gain = 0;
+    constexpr std::uint8_t default_itime = 10;
+    constexpr std::uint8_t max_gain = 3;
+    constexpr std::uint8_t min_itime = 1;
+
+    if (gain > max_gain) {
+        gain = default_gain;
+        LOG_WARNING("[params] Setting default gain = 0");
+    }
+
+    if (itime < min_itime) {
+        itime = default_itime;
+        LOG_WARNING("[params] Setting default itime = 10");
+    }
+}
+
 namespace all {
 void init() {
     first::i2c::init();
@@ -86,7 +103,6 @@ void check_part_id(std::uint16_t& id_correctness, T& ids, const std::uint8_t off
             set_bit(id_correctness, i + offset);
         }
     }
-    printf("%u\n", id_correctness);
 }
 
 void part_id(suns::Telemetry::Status& status) {
@@ -95,15 +111,13 @@ void part_id(suns::Telemetry::Status& status) {
     std::uint16_t ack_status = first::als::read_part_id(ids);
     status.ack |= ack_status;
     check_part_id(status.presence, ids, 0);
-    
+
     ack_status = second::als::read_part_id(ids);
-    ack_status <<= 4;
-    status.ack |= ack_status;
+    status.ack |= (ack_status << 4);
     check_part_id(status.presence, ids, 4);
 
     ack_status = third::als::read_part_id(ids);
-    ack_status <<= 8;
-    status.ack |= ack_status;
+    status.ack |= (ack_status << 8);
     check_part_id(status.presence, ids, 8);
 }
 
@@ -112,12 +126,10 @@ void set_itime(suns::Telemetry::Status& status, std::uint8_t itime) {
     status.ack |= ack_status;
 
     ack_status = second::als::set_integration_time(itime);
-    ack_status <<= 4;
-    status.ack |= ack_status;
+    status.ack |= (ack_status << 4);
 
     ack_status = third::als::set_integration_time(itime);
-    ack_status <<= 8;
-    status.ack |= ack_status;
+    status.ack |= (ack_status << 8);
 }
 
 void set_gain(suns::Telemetry::Status& status, BH1730FVCMulti::Gain gain) {
@@ -125,12 +137,10 @@ void set_gain(suns::Telemetry::Status& status, BH1730FVCMulti::Gain gain) {
     status.ack |= ack_status;
 
     ack_status = second::als::set_gain(gain);
-    ack_status <<= 4;
-    status.ack |= ack_status;
+    status.ack |= (ack_status << 4);
 
     ack_status = third::als::set_gain(gain);
-    ack_status <<= 8;
-    status.ack |= ack_status;
+    status.ack |= (ack_status << 8);
 }
 
 void trigger(suns::Telemetry::Status& status) {
@@ -138,24 +148,33 @@ void trigger(suns::Telemetry::Status& status) {
     status.ack |= ack_status;
 
     ack_status = second::als::trigger();
-    ack_status <<= 4;
-    status.ack |= ack_status;
+    status.ack |= (ack_status << 4);
 
     ack_status = third::als::trigger();
-    ack_status <<= 8;
-    status.ack |= ack_status;
+    status.ack |= (ack_status << 8);
+}
+
+void wait_expected_time(const std::uint8_t itime) {
+    volatile std::uint8_t als_adc_conversion_wait = 0;
+    constexpr std::uint8_t adc_internal_calculation_time = 10;
+
+    _delay_ms(adc_internal_calculation_time);
+
+    while (als_adc_conversion_wait < itime) {
+        _delay_us(2700);
+        als_adc_conversion_wait++;
+    }   
 }
 
 void wait_for_als(suns::Telemetry::Status& status, const std::uint8_t itime) {
     constexpr std::uint8_t adc_valid = 15;
     constexpr std::uint8_t adc_one_cycle_time = 3;
-    constexpr std::uint8_t adc_internal_calculation_time = 10;
-    volatile std::uint8_t als_timeout_cnt = 0;
+    volatile std::uint16_t als_timeout_cnt = 0;
 
     std::uint16_t ack_status_1 = 0, ack_status_2 = 0, ack_status_3 = 0;
     std::uint8_t adc_state_1 = 0, adc_state_2 = 0, adc_state_3 = 0;
 
-    _delay_ms(adc_internal_calculation_time);
+    wait_expected_time(itime);
 
     do {
         ack_status_1 |= first::als::adc_valid(adc_state_1);
@@ -170,16 +189,12 @@ void wait_for_als(suns::Telemetry::Status& status, const std::uint8_t itime) {
     } while (als_timeout_cnt < itime);
 
     status.adc_valid = adc_state_1;
-    adc_state_2 <<= 4;
-    status.adc_valid = adc_state_2;
-    adc_state_3 <<= 8;
-    status.adc_valid = adc_state_3;
+    status.adc_valid |= (adc_state_2 << 4);
+    status.adc_valid |= (adc_state_3 << 8);
 
     status.ack |= ack_status_1;
-    ack_status_2 <<= 4;
-    status.ack |= ack_status_2;
-    ack_status_3 <<= 8;
-    status.ack |= ack_status_3;
+    status.ack |= (ack_status_2 << 4); 
+    status.ack |= (ack_status_3 << 8);
 }
 
 void read_light(suns::Telemetry::Status& status, suns::Telemetry::LightData& vl, suns::Telemetry::LightData& ir) {
@@ -187,12 +202,10 @@ void read_light(suns::Telemetry::Status& status, suns::Telemetry::LightData& vl,
     status.ack |= ack_status;
 
     ack_status = second::als::read_ambient_light(vl.als_2, ir.als_2);
-    ack_status <<= 4;
-    status.ack |= ack_status;
+    status.ack |= (ack_status << 4);
 
     ack_status = third::als::read_ambient_light(vl.als_3, ir.als_3);
-    ack_status <<= 8;
-    status.ack |= ack_status;
+    status.ack |= (ack_status << 8);
 }
 
 }  // namespace all
@@ -209,6 +222,8 @@ void suns::hardware::RealHardware::init() {
 
 void suns::hardware::RealHardware::als_measure(std::uint8_t gain, std::uint8_t itime, suns::Telemetry::Status& als_status, suns::Telemetry::LightData& vl, suns::Telemetry::LightData& ir) {
     als::all::init();
+    als::validate_and_correct_params(gain, itime);
+
     als::all::part_id(als_status);
 
     als::all::set_itime(als_status, itime);

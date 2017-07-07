@@ -16,7 +16,7 @@ class Measure : public Command<0x80, 2> {
 
         suns::Telemetry::LightData vl, ir;
         suns::Telemetry::Temperatures temperature;
-        suns::Telemetry::Status als_status;
+        suns::Telemetry::Status als_status = {0, 0, 0};
 
         LOG_INFO("[start] measure temperature");
         hardware.temperatures_measure(temperature);
