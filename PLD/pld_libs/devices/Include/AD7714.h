@@ -3,6 +3,7 @@
 
 #include <hal/hal>
 
+namespace pld {
 namespace devices {
 namespace AD7714 {
 
@@ -198,5 +199,6 @@ Channels AD7714<SPI, pin_DRDY>::actual_channel;
 
 }  // namespace AD7714
 }  // namespace devices
+}  // namespace pld
 
 #endif  // PLD_PLD_LIBS_DEVICES_INCLUDE_AD7714_H_

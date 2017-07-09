@@ -3,7 +3,7 @@
 
 using namespace hal;
 using namespace hal::libs;
-using namespace ::devices;
+using namespace pld::devices;
 
 struct pinIO {
     static bool was_initialised, value;
@@ -65,7 +65,7 @@ std::array<uint8_t, 20> spi::reads_buffer;
 hal::libs::FIFO_data<uint8_t, 20> spi::write_buffer;
 uint8_t spi::ptr = 0;
 
-using ad7714 = ::devices::AD7714::AD7714<spi, pinIO>;
+using ad7714 = pld::devices::AD7714::AD7714<spi, pinIO>;
 
 void test_AD7714_init() {
     pinIO::was_initialised = false;
