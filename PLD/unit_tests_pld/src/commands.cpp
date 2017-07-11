@@ -64,7 +64,7 @@ class MockHW : public pld::hardware::Interface {
         }
     }
 
-    void watchdog_kick() override {
+    void external_watchdog_kick() override {
         TEST_FAIL_MESSAGE("watchdog kicked");
     }
 

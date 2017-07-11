@@ -48,9 +48,9 @@ struct Interface {
     virtual pld::Telemetry::Radfet radfet_read() = 0;
     virtual void radfet_off()                    = 0;
 
-    virtual void watchdog_kick()       = 0;
-    virtual void obc_interrupt_set()   = 0;
-    virtual void obc_interrupt_reset() = 0;
+    virtual void external_watchdog_kick() = 0;
+    virtual void obc_interrupt_set()      = 0;
+    virtual void obc_interrupt_reset()    = 0;
 };
 
 using HardwareProvider = Interface*;

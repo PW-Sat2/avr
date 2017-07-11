@@ -1,4 +1,5 @@
 #include <hardware/real.h>
+#include <logger.h>
 #include <hal/hal>
 
 using namespace hal;
@@ -148,8 +149,7 @@ pld::Telemetry::Radfet pld::hardware::RealHardware::radfet_read() {
 void pld::hardware::RealHardware::radfet_off() {
 }
 
-void pld::hardware::RealHardware::watchdog_kick() {
-    hal::Watchdog::kick();
+void pld::hardware::RealHardware::external_watchdog_kick() {
     tps3813::kick();
 }
 

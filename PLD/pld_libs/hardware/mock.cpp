@@ -1,11 +1,15 @@
 #include "hardware/mock.h"
 #include <chrono>
+#include "logger.h"
 
 namespace pld {
 namespace hardware {
 
 using namespace mock;
 using namespace std::chrono_literals;
+
+using watchdog_pin = hal::DigitalIO::GPIO<44>;
+using tps3813      = hal::devices::TPS3813<watchdog_pin, 10>;
 
 std::array<std::uint16_t, 20> mock::adc_channels;
 using obc_int_pin = hal::DigitalIO::GPIO<33>;
@@ -31,14 +35,26 @@ void Mock::radfet_on() {
     hal::sleep_for(100ms);
 }
 
+void read_dummy_radfet_channel() {
+    hal::sleep_for(6s);
+}
+
 Telemetry::Radfet Mock::radfet_read() {
     Telemetry::Radfet rf;
     rf.temperature = 0xBAAAAD;
     rf.vth         = {0xDEAD78, 0xBEEFED, 0x1CF00D};
-    for (uint8_t i = 0; i < 4; ++i) {
-        hal::sleep_for(6s);
-        this->watchdog_kick();
-    }
+
+    read_dummy_radfet_channel();
+    this->external_watchdog_kick();
+
+    read_dummy_radfet_channel();
+    this->external_watchdog_kick();
+
+    read_dummy_radfet_channel();
+    this->external_watchdog_kick();
+
+    read_dummy_radfet_channel();
+
     return rf;
 }
 
@@ -46,8 +62,10 @@ void Mock::radfet_off() {
     hal::sleep_for(100ms);
 }
 
-void Mock::watchdog_kick() {
-    hal::Watchdog::kick();
+
+void Mock::external_watchdog_kick() {
+    tps3813::kick();
+    LOG_INFO("WDT");
 }
 
 void Mock::obc_interrupt_set() {

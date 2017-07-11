@@ -15,7 +15,7 @@ struct RealHardware : public Interface {
     virtual void radfet_on() override;
     virtual pld::Telemetry::Radfet radfet_read() override;
     virtual void radfet_off() override;
-    virtual void watchdog_kick() override;
+    virtual void external_watchdog_kick() override;
     virtual void obc_interrupt_set() override;
     virtual void obc_interrupt_reset() override;
 };

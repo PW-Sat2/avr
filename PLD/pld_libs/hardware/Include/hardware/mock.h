@@ -14,7 +14,7 @@ struct Mock : public Interface {
     void radfet_on() override;
     pld::Telemetry::Radfet radfet_read() override;
     void radfet_off() override;
-    void watchdog_kick() override;
+    void external_watchdog_kick() override;
     void obc_interrupt_set() override;
     void obc_interrupt_reset() override;
 };

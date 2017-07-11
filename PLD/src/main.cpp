@@ -19,6 +19,7 @@
 
 using namespace hal;
 using namespace hal::libs;
+using hal::mcu::Timer1;
 
 pld::hardware::Mock mock_hardware;
 pld::hardware::RealHardware real_hardware;
@@ -55,8 +56,13 @@ ISR(TWI_vect) {
     Obc::process_interrupt();
 }
 
+static bool external_watchdog_should_be_kicked = false;
+ISR(TIMER1_OVF_vect) {
+    external_watchdog_should_be_kicked = true;
+}
+
 int main() {
-    hal::Watchdog::enable(hal::Watchdog::Period::p500ms);
+    hal::Watchdog::disable();
 
     Serial1.init(38400);
     Serial1.redirect_stdio();
@@ -74,14 +80,23 @@ int main() {
     telemetry.who_am_i = 0x53;
 
     Obc::init(&telemetry);
+
+    // 524 ms overflow interrupt
+    Timer1::init(Timer1::Prescaler::DIV_64, Timer1::Mode::Normal);
+    Timer1::enable_overflow_interrupt();
+
     sei();
     LOG_INFO("PLD Initialised.");
 
 
     while (1) {
         dispatcher.dispatch();
-        hw->watchdog_kick();
         hw->obc_interrupt_reset();
+
+        if (external_watchdog_should_be_kicked) {
+            external_watchdog_should_be_kicked = false;
+            hw->external_watchdog_kick();
+        }
 
         if (pld::debug::mock()) {
             hw = &mock_hardware;
