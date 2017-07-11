@@ -65,35 +65,24 @@ class AD7714 : hal::libs::PureStatic {
     }
 
     /*!
-     * This method should be invoked when channel is changed.
-     * It sets filter and performs calibration automatically.
+     * Performs readout operation from ADC:
+     *   - change channel
+     *   - set up filter
+     *   - perform self calibration
+     *   - waits for conversion finish
+     *   - reads data from DATA register
      * @param channel Channel to read from
-     * @param gain Gain to be set on this channel
-     */
-    static void change_channel(Channels channel, Gain gain) {
-        actual_channel = channel;
-        set_filter();
-        start_calibration(gain);
-    }
-
-    /*!
-     * Checks if new data is available.
-     * After read this flag will become false, after next conversion finishes it
-     * will become true again.
-     * @return True if new data is ready to be read.
-     */
-    static bool data_ready() {
-        return !pin_DRDY::read();
-    }
-
-    /*!
-     * Reads data without waiting.
+     * @param gain Gain to be set on this channel. Default value - Gain x1.
      * @return Data read from the DATA register.
      */
-    static uint24_t read_data_no_wait() {
+    static uint24_t read_data(Channels channel, Gain gain = Gain::GAIN_1) {
+        change_channel(channel, gain);
+
+        while (!data_ready()) {
+        }
+
         std::array<std::uint8_t, 3> data;
         read_register(Registers::DATA_REG, data);
-
         return (1ul * data[0] << 16ul) | (1ul * data[1] << 8) | (data[2]);
     }
 
@@ -148,6 +137,16 @@ class AD7714 : hal::libs::PureStatic {
     static_assert((filter >= 19) && (filter <= 4000),
                   "Allowed filter value is 19 - 4000");
 
+
+    static void change_channel(Channels channel, Gain gain) {
+        actual_channel = channel;
+        set_filter();
+        start_calibration(gain);
+    }
+
+    static bool data_ready() {
+        return !pin_DRDY::read();
+    }
 
     static void set_filter() {
         constexpr auto filter_high_register = num(polarity) |      //
