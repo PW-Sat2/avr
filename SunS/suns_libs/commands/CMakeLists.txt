@@ -1,7 +1,7 @@
-set(NAME telecommands)
+set(NAME commands)
 
 add_library(${NAME} STATIC
-    Include/telecommands/measure.h
+    Include/commands/measure.h
 )
 
 target_include_directories(${NAME} PUBLIC Include)

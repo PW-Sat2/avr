@@ -2,7 +2,7 @@ add_compile_options(-Wno-error)
 
 add_hal_executable(unit_tests_suns
     main.cpp
-    src/telecommands.cpp
+    src/commands.cpp
 )
 
 add_custom_target(unit_tests_suns.run
@@ -18,6 +18,6 @@ target_link_libraries(unit_tests_suns
     terminal
     ObcInterface
     hardware
-    telecommands
+    commands
     telemetry
 )

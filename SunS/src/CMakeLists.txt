@@ -8,7 +8,7 @@ add_hal_executable(SunS
 
 target_link_libraries(SunS
     terminal
-    telecommands
+    commands
     telemetry
     ObcInterface
     logger

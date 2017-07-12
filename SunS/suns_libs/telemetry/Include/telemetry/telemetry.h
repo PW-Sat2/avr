@@ -59,8 +59,8 @@ struct Telemetry {
     details::Atomic<Status> als_status;
     details::Atomic<LightData> vl_data;
     details::Atomic<Temperatures> temperature_data;
-    details::Atomic<LightData> ir_data;
     details::Atomic<Params> parameters;
+    details::Atomic<LightData> ir_data;
 
     void init() {
         std::memset(this, 0xFF, sizeof(suns::Telemetry));

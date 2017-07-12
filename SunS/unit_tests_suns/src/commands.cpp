@@ -4,7 +4,7 @@
 #include "hardware/interface.h"
 #include "telemetry/telemetry.h"
 
-#include "telecommands/measure.h"
+#include "commands/measure.h"
 
 using namespace std;
 using namespace hal;
@@ -18,8 +18,12 @@ class MockHW : public suns::hardware::Interface {
         TEST_FAIL_MESSAGE("init");
     }
 
-    suns::Telemetry::ALS als_measure(uint8_t gain, uint8_t itime) override {
+    void als_measure(std::uint8_t gain, std::uint8_t itime, suns::Telemetry::Status& als_status, suns::Telemetry::LightData& vl, suns::Telemetry::LightData& ir) override {
         TEST_FAIL_MESSAGE("als measure");
+    }
+
+    void temperatures_measure(suns::Telemetry::Temperatures& temperature_data) override {
+        TEST_FAIL_MESSAGE("temperature measure");
     }
 
     void watchdog_kick() override {
@@ -41,7 +45,7 @@ suns::hardware::HardwareProvider hw_ptr;
 
 using namespace suns::hardware;
 
-void test_telecommands() {
+void test_commands() {
     UnityBegin("");
     UnityEnd();
 }

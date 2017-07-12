@@ -11,7 +11,7 @@
 #include "ObcInterface/ObcInterface.h"
 
 #include "debug/commands.h"
-#include "telecommands/measure.h"
+#include "commands/measure.h"
 
 using namespace hal;
 using namespace hal::libs;
@@ -31,7 +31,7 @@ struct Executor {
 };
 
 CommandDispatcher<Executor,
-                  suns::telecommands::Measure>
+                  suns::commands::Measure>
     dispatcher;
 
 void CommandCallback(gsl::span<const uint8_t> _c) {
@@ -52,7 +52,7 @@ int main() {
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
     Serial0.enable_rx_interrupt();
-    LOG_INFO("SunS Start.");
+    LOG_WARNING("SunS Start.");
 
     real_hardware.init();
     mock_hardware.init();
@@ -66,7 +66,7 @@ int main() {
 
     Obc::init(&telemetry);
     sei();
-    LOG_INFO("SunS Initialised.");
+    LOG_WARNING("SunS Initialised.");
 
 
     while (1) {

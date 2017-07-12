@@ -7,7 +7,7 @@ set(AVRDUDE_TOOL arduino CACHE STRING "")
 set(AVRDUDE_OPTIONS -P -b19200 CACHE STRING "")
 set(CMAKE_TOOLCHAIN_FILE "${HAL_PATH}/toolchain.cmake")
 
-add_definitions(-DLOG_LEVEL=LOG_LEVEL_ALL)
+add_definitions(-DLOG_LEVEL=LOG_LEVEL_WARNING)
 
 project(suns_libs)
 
