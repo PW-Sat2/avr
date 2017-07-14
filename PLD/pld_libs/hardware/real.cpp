@@ -11,18 +11,18 @@ using A2 = DigitalIO::GPIO<41>;
 using EN = DigitalIO::GPIO<43>;
 }  // namespace Mux
 
-namespace ADCx {
+namespace adc128_interface {
 using cs = DigitalIO::GPIO<9>;
 
 using spi = SPI::Hardware<cs,
-                          SPI::HardwareClockDivisor::SPIHard_DIV_4,
-                          SPI::Polarity::idle_high,
+                          SPI::HardwareClockDivisor::SPIHard_DIV_16,
+                          SPI::Polarity::idle_low,
                           SPI::Phase::trailing_sample,
                           SPI::DataOrder::MSB_first>;
-}  // namespace ADCx
+}  // namespace adc128_interface
 
 using adg708 = ADG708::ADG708<Mux::A0, Mux::A1, Mux::A2, Mux::EN>;
-using adc128 = devices::ADC128::ADC128<ADCx::spi>;
+using adc128 = devices::ADC128::ADC128<adc128_interface::spi>;
 
 using watchdog_pin = hal::DigitalIO::GPIO<44>;
 using tps3813      = hal::devices::TPS3813<watchdog_pin, 10>;
@@ -91,7 +91,7 @@ constexpr static auto channel_to_mux_channel(pld::hardware::AnalogChannel channe
 }
 
 void pld::hardware::RealHardware::init() {
-    ADCx::spi::init();
+    adc128_interface::spi::init();
     adg708::init();
 
     watchdog_pin::init(DigitalIO::Mode::OUTPUT);
