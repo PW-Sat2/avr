@@ -117,12 +117,16 @@ void pld::hardware::RealHardware::init() {
 
 void pld::hardware::RealHardware::read_adc(
     std::initializer_list<ChannelDescriptor> channels) {
+    constexpr std::uint8_t settling_time = 10;
     auto writer = channels.begin();
 
+    adg708::select(channel_to_mux_channel(writer->channel));
+    _delay_ms(settling_time);
     adc128::read_and_change_channel(channel_to_adc_input(writer->channel));
 
     while (writer != channels.end() - 1) {
         adg708::select(channel_to_mux_channel(writer->channel));
+        _delay_ms(settling_time);
         *writer->data = adc128::read_and_change_channel(
             channel_to_adc_input((writer + 1)->channel));
         writer++;
@@ -130,6 +134,7 @@ void pld::hardware::RealHardware::read_adc(
 
     auto last = channels.end() - 1;
     adg708::select(channel_to_mux_channel(last->channel));
+    _delay_ms(settling_time);
     *last->data =
         adc128::read_and_change_channel(channel_to_adc_input(last->channel));
 }
