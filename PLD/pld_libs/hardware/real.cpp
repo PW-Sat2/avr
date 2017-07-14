@@ -33,26 +33,29 @@ using interrupt = hal::DigitalIO::GPIO<10>;
 using ADCChannel = devices::ADC128::Channel;
 
 constexpr static ADCChannel channel_to_adc_input_[] = {
-    ADCChannel::IN0,  //    SunSRef_V0,
-    ADCChannel::IN1,  //    SunSRef_V1,
-    ADCChannel::IN2,  //    SunSRef_V2,
-    ADCChannel::IN3,  //    SunSRef_V3,
-    ADCChannel::IN4,  //    SunSRef_V4,
-    ADCChannel::IN5,  //    Photodiode_A,
-    ADCChannel::IN5,  //    Photodiode_B,
-    ADCChannel::IN5,  //    Photodiode_C,
-    ADCChannel::IN5,  //    Photodiode_D,
-    ADCChannel::IN5,  //    TemperatureSupply,
-    ADCChannel::IN5,  //    HouseKeeping_3V3d,
-    ADCChannel::IN5,  //    HouseKeeping_3V3_OBC,
-    ADCChannel::IN6,  //    TemperatureSail,
-    ADCChannel::IN6,  //    TemperatureSADS,
-    ADCChannel::IN6,  //    TemperatureCamWing,
-    ADCChannel::IN6,  //    TemperatureCamNadir,
-    ADCChannel::IN6,  //    TemperatureXn,
-    ADCChannel::IN6,  //    TemperatureXp,
-    ADCChannel::IN6,  //    TemperatureYn,
-    ADCChannel::IN6   //    TemperatureYp,
+    ADCChannel::IN0,  //    SunSRef_V1
+    ADCChannel::IN2,  //    SunSRef_V2
+    ADCChannel::IN4,  //    SunSRef_V3
+    ADCChannel::IN3,  //    SunSRef_V4
+    ADCChannel::IN1,  //    SunSRef_V5
+
+    ADCChannel::IN5,  //    TemperatureSupply
+    ADCChannel::IN6,  //    TemperatureXp
+    ADCChannel::IN6,  //    TemperatureXn
+    ADCChannel::IN6,  //    TemperatureYp
+    ADCChannel::IN6,  //    TemperatureYn
+    ADCChannel::IN6,  //    TemperatureSADS
+    ADCChannel::IN6,  //    TemperatureSail
+    ADCChannel::IN6,  //    TemperatureCamNadir
+    ADCChannel::IN6,  //    TemperatureCamWing
+
+    ADCChannel::IN5,  //    PhotodiodeXp
+    ADCChannel::IN5,  //    PhotodiodeXn
+    ADCChannel::IN5,  //    PhotodiodeYp
+    ADCChannel::IN5,  //    PhotodiodeYn
+
+    ADCChannel::IN5,  //    HouseKeeping_3V3d
+    ADCChannel::IN5   //    HouseKeeping_3V3_OBC
 };
 
 constexpr static auto channel_to_adc_input(pld::hardware::AnalogChannel channel) {
@@ -62,29 +65,35 @@ constexpr static auto channel_to_adc_input(pld::hardware::AnalogChannel channel)
 using MuxChannel = ADG708::Channel;
 
 constexpr static MuxChannel channel_to_mux_channel_[] = {
-    MuxChannel::S1,  //    SunSRef_V0,
-    MuxChannel::S1,  //    SunSRef_V1,
-    MuxChannel::S1,  //    SunSRef_V2,
-    MuxChannel::S1,  //    SunSRef_V3,
-    MuxChannel::S1,  //    SunSRef_V4,
+    MuxChannel::S1,  //    SunSRef_V1
+    MuxChannel::S1,  //    SunSRef_V2
+    MuxChannel::S1,  //    SunSRef_V3
+    MuxChannel::S1,  //    SunSRef_V4
+    MuxChannel::S1,  //    SunSRef_V5
 
-    MuxChannel::S5,  //    Photodiode_A,
-    MuxChannel::S4,  //    Photodiode_B,
-    MuxChannel::S8,  //    Photodiode_C,
-    MuxChannel::S1,  //    Photodiode_D,
-    MuxChannel::S6,  //    TemperatureSupply,
-    MuxChannel::S3,  //    HouseKeeping_3V3d,
-    MuxChannel::S2,  //    HouseKeeping_3V3_OBC,
+    MuxChannel::S6,  //    TemperatureSupply
+    MuxChannel::S6,  //    TemperatureXp
+    MuxChannel::S3,  //    TemperatureXn
+    MuxChannel::S4,  //    TemperatureYp
+    MuxChannel::S7,  //    TemperatureYn
+    MuxChannel::S8,  //    TemperatureSADS
+    MuxChannel::S1,  //    TemperatureSail
+    MuxChannel::S5,  //    TemperatureCamNadir
+    MuxChannel::S2,  //    TemperatureCamWing
 
-    MuxChannel::S1,  //    TemperatureSail,
-    MuxChannel::S8,  //    TemperatureSADS,
-    MuxChannel::S2,  //    TemperatureCamWing,
-    MuxChannel::S5,  //    TemperatureCamNadir,
-    MuxChannel::S3,  //    TemperatureXn,
-    MuxChannel::S6,  //    TemperatureXp,
-    MuxChannel::S7,  //    TemperatureYn,
-    MuxChannel::S4   //    TemperatureYp,
+    MuxChannel::S4,  //    PhotodiodeXp
+    MuxChannel::S5,  //    PhotodiodeXn
+    MuxChannel::S8,  //    PhotodiodeYp
+    MuxChannel::S1,  //    PhotodiodeYn
+
+    MuxChannel::S3,  //    HouseKeeping_3V3d
+    MuxChannel::S2   //    HouseKeeping_3V3_OBC
 };
+
+static_assert(
+    sizeof(channel_to_mux_channel_) ==
+        static_cast<size_t>(pld::hardware::AnalogChannel::Dummy),
+    "Incorrect size of channel_to_mux_channel array or AnalogChannel enum");
 
 constexpr static auto channel_to_mux_channel(pld::hardware::AnalogChannel channel) {
     return channel_to_mux_channel_[static_cast<int>(channel)];
