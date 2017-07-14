@@ -44,7 +44,9 @@ struct Interface {
     };
     virtual void read_adc(std::initializer_list<ChannelDescriptor> channels) = 0;
 
-    virtual pld::Telemetry::Radfet read_radfet() = 0;
+    virtual void radfet_on()                     = 0;
+    virtual pld::Telemetry::Radfet radfet_read() = 0;
+    virtual void radfet_off()                    = 0;
 
     virtual void watchdog_kick()       = 0;
     virtual void obc_interrupt_set()   = 0;

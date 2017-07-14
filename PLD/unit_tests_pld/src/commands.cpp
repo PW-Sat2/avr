@@ -29,8 +29,14 @@ class MockHW : public pld::hardware::Interface {
         }
     }
 
-    pld::Telemetry::Radfet read_radfet() override {
+    void radfet_on() override {
+    }
+
+    pld::Telemetry::Radfet radfet_read() override {
         return pld::Telemetry::Radfet();
+    }
+
+    void radfet_off() override {
     }
 
     void watchdog_kick() override {

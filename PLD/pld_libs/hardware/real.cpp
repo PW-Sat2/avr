@@ -138,8 +138,14 @@ void pld::hardware::RealHardware::read_adc(
     adg708::disable();
 }
 
-pld::Telemetry::Radfet pld::hardware::RealHardware::read_radfet() {
+void pld::hardware::RealHardware::radfet_on() {
+}
+
+pld::Telemetry::Radfet pld::hardware::RealHardware::radfet_read() {
     return pld::Telemetry::Radfet();
+}
+
+void pld::hardware::RealHardware::radfet_off() {
 }
 
 void pld::hardware::RealHardware::watchdog_kick() {

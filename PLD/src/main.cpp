@@ -36,7 +36,9 @@ struct Executor {
 
 CommandDispatcher<Executor,
                   pld::commands::SunSRef,
-                  pld::commands::RadFET,
+                  pld::commands::RadFET_On,
+                  pld::commands::RadFET_Off,
+                  pld::commands::RadFET_Measure,
                   pld::commands::PT1000,
                   pld::commands::Photodiodes,
                   pld::commands::HouseKeeping>

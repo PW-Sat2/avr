@@ -58,7 +58,15 @@ struct Telemetry {
         std::uint16_t obc_3v3d;
     };
 
+    enum class RadfetState : std::uint8_t {
+        TURNED_ON            = 1,
+        TURNED_OFF           = 2,
+        MEASUREMENT_EXECUTED = 3,
+        ADC_TIMEOUT          = 4,
+    };
+
     struct Radfet {
+        RadfetState status;
         std::uint32_t temperature;
         std::array<std::uint32_t, 3> vth;
     };
@@ -74,7 +82,7 @@ struct Telemetry {
         std::memset(this, 0xFF, sizeof(pld::Telemetry));
     }
 };
-static_assert(sizeof(Telemetry) == 57,
+static_assert(sizeof(Telemetry) == 58,
               "Incorrect size of Telemetry structure (padding?)");
 static_assert(std::is_pod<Telemetry>::value, "POD");
 

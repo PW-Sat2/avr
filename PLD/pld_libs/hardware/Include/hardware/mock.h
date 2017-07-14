@@ -11,7 +11,9 @@ struct Mock : public Interface {
     virtual void init() override;
     virtual void
     read_adc(std::initializer_list<ChannelDescriptor> channels) override;
-    Telemetry::Radfet read_radfet() override;
+    void radfet_on() override;
+    pld::Telemetry::Radfet radfet_read() override;
+    void radfet_off() override;
     void watchdog_kick() override;
     void obc_interrupt_set() override;
     void obc_interrupt_reset() override;

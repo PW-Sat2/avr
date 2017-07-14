@@ -12,7 +12,9 @@ struct RealHardware : public Interface {
     virtual void init() override;
     virtual void
     read_adc(std::initializer_list<ChannelDescriptor> channels) override;
-    virtual pld::Telemetry::Radfet read_radfet() override;
+    virtual void radfet_on() override;
+    virtual pld::Telemetry::Radfet radfet_read() override;
+    virtual void radfet_off() override;
     virtual void watchdog_kick() override;
     virtual void obc_interrupt_set() override;
     virtual void obc_interrupt_reset() override;
