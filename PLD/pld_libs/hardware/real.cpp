@@ -15,8 +15,8 @@ namespace ADCx {
 using cs = DigitalIO::GPIO<9>;
 
 using spi = SPI::Hardware<cs,
-                          SPI::HardwareClockDivisor::SPIHard_DIV_4,
-                          SPI::Polarity::idle_high,
+                          SPI::HardwareClockDivisor::SPIHard_DIV_16,
+                          SPI::Polarity::idle_low,
                           SPI::Phase::trailing_sample,
                           SPI::DataOrder::MSB_first>;
 }  // namespace ADCx
