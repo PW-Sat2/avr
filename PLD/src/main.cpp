@@ -56,10 +56,10 @@ ISR(TWI_vect) {
 int main() {
     hal::Watchdog::enable(hal::Watchdog::Period::p500ms);
 
-    Serial0.init(38400);
-    Serial0.redirect_stdio();
-    Serial0.redirect_stderr();
-    Serial0.enable_rx_interrupt();
+    Serial1.init(38400);
+    Serial1.redirect_stdio();
+    Serial1.redirect_stderr();
+    Serial1.enable_rx_interrupt();
 
     real_hardware.init();
     mock_hardware.init();

@@ -39,8 +39,8 @@ void set_mock(std::uint8_t argc, char* argv[]) {
 
 Terminal terminal;
 
-ISR(USART0_RX_vect) {
-    char now = UDR0;
+ISR(USART1_RX_vect) {
+    char now = UDR1;
 
     static char buf[20];
     static hal::libs::FIFO<char> fifo{buf, 20};
