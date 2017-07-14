@@ -91,10 +91,13 @@ constexpr static auto channel_to_mux_channel(pld::hardware::AnalogChannel channe
 }
 
 void pld::hardware::RealHardware::init() {
+    interrupt::reset();
+    interrupt::init(DigitalIO::Mode::OUTPUT);
+
     adc128_interface::spi::init();
+
     adg708::init();
 
-    watchdog_pin::init(DigitalIO::Mode::OUTPUT);
     watchdog_pin::init(DigitalIO::Mode::OUTPUT);
 }
 
