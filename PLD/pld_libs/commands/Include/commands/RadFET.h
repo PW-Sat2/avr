@@ -13,11 +13,10 @@ class RadFET_On : public Command<0x84, 0> {
                 hardware::Interface& hardware,
                 gsl::span<const std::uint8_t>) {
         pld::Telemetry::Radfet data;
-        LOG_INFO("[START] RadFET_On");
+        LOG_INFO("Command RadFET_On");
         hardware.radfet_on();
         data.status      = pld::Telemetry::RadfetState::TURNED_ON;
         telemetry.radfet = data;
-        LOG_INFO("[END] RadFET_On");
     }
 };
 
@@ -26,9 +25,9 @@ class RadFET_Measure : public Command<0x85, 0> {
     void invoke(Telemetry& telemetry,
                 hardware::Interface& hardware,
                 gsl::span<const std::uint8_t>) {
-        LOG_INFO("[START] RadFET_Measure");
+        LOG_INFO("Command RadFET_Measure START");
         telemetry.radfet = hardware.radfet_read();
-        LOG_INFO("[END] RadFET_Measure");
+        LOG_INFO("Command RadFET_Measure FINISHED");
     }
 };
 
@@ -38,11 +37,10 @@ class RadFET_Off : public Command<0x86, 0> {
                 hardware::Interface& hardware,
                 gsl::span<const std::uint8_t>) {
         pld::Telemetry::Radfet data;
-        LOG_INFO("[START] RadFET_Off");
+        LOG_INFO("Command RadFET_Off");
         hardware.radfet_off();
         data.status      = pld::Telemetry::RadfetState::TURNED_OFF;
         telemetry.radfet = data;
-        LOG_INFO("[END] RadFET_Off");
     }
 };
 }  // namespace commands
