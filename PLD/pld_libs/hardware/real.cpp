@@ -58,6 +58,11 @@ constexpr static ADCChannel channel_to_adc_input_[] = {
     ADCChannel::IN5   //    HouseKeeping_3V3_OBC
 };
 
+static_assert(
+    sizeof(channel_to_adc_input_) / sizeof(ADCChannel) ==
+        static_cast<size_t>(pld::hardware::AnalogChannel::LengthOfEnum),
+    "Incorrect size of channel_to_adc_input_ array or AnalogChannel enum");
+
 constexpr static auto channel_to_adc_input(pld::hardware::AnalogChannel channel) {
     return channel_to_adc_input_[static_cast<int>(channel)];
 }
@@ -91,9 +96,9 @@ constexpr static MuxChannel channel_to_mux_channel_[] = {
 };
 
 static_assert(
-    sizeof(channel_to_mux_channel_) ==
-        static_cast<size_t>(pld::hardware::AnalogChannel::Dummy),
-    "Incorrect size of channel_to_mux_channel array or AnalogChannel enum");
+    sizeof(channel_to_mux_channel_) / sizeof(MuxChannel) ==
+        static_cast<size_t>(pld::hardware::AnalogChannel::LengthOfEnum),
+    "Incorrect size of channel_to_mux_channel_ array or AnalogChannel enum");
 
 constexpr static auto channel_to_mux_channel(pld::hardware::AnalogChannel channel) {
     return channel_to_mux_channel_[static_cast<int>(channel)];

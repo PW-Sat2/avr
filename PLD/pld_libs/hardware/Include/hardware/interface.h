@@ -33,7 +33,7 @@ enum class AnalogChannel : std::uint8_t {
     HouseKeeping_3V3d    = 18,
     HouseKeeping_3V3_OBC = 19,
 
-    Dummy = 20,
+    LengthOfEnum = 20,
 };
 
 struct Interface {
