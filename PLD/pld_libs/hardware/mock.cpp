@@ -4,6 +4,7 @@ namespace pld {
 namespace hardware {
 
 using namespace mock;
+using namespace std::chrono_literals;
 
 std::array<std::uint16_t, 20> mock::adc_channels;
 using obc_int_pin = hal::DigitalIO::GPIO<33>;
@@ -21,14 +22,14 @@ void Mock::read_adc(std::initializer_list<ChannelDescriptor> channels) {
 
         *ch.data = adc_channels[channel_];
 
-        _delay_ms(10);
+        hal::sleep_for(10ms);
     }
 }
 
 Telemetry::Radfet Mock::read_radfet() {
     Telemetry::Radfet rf;
     for (uint8_t i = 0; i < 10; ++i) {
-        _delay_ms(200);
+        hal::sleep_for(200ms);
         this->watchdog_kick();
     }
     return rf;

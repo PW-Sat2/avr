@@ -3,6 +3,7 @@
 
 using namespace hal;
 using namespace devices;
+using namespace std::chrono_literals;
 
 namespace Mux {
 using A0 = DigitalIO::GPIO<42>;
@@ -117,8 +118,7 @@ void pld::hardware::RealHardware::init() {
 
 void pld::hardware::RealHardware::read_adc(
     std::initializer_list<ChannelDescriptor> channels) {
-    constexpr std::uint8_t settling_time = 10;
-    auto writer                          = channels.begin();
+    auto writer = channels.begin();
 
     adg708::select(channel_to_mux_channel(writer->channel));
     _delay_ms(settling_time);
@@ -126,7 +126,7 @@ void pld::hardware::RealHardware::read_adc(
 
     while (writer != channels.end() - 1) {
         adg708::select(channel_to_mux_channel(writer->channel));
-        _delay_ms(settling_time);
+        hal::sleep_for(10ms);
         *writer->data = adc128::read_and_change_channel(
             channel_to_adc_input((writer + 1)->channel));
         writer++;
@@ -134,7 +134,7 @@ void pld::hardware::RealHardware::read_adc(
 
     auto last = channels.end() - 1;
     adg708::select(channel_to_mux_channel(last->channel));
-    _delay_ms(settling_time);
+    hal::sleep_for(10ms);
     *last->data =
         adc128::read_and_change_channel(channel_to_adc_input(last->channel));
 }
