@@ -119,7 +119,7 @@ void pld::hardware::RealHardware::init() {
 void pld::hardware::RealHardware::read_adc(
     std::initializer_list<ChannelDescriptor> channels) {
     auto writer = channels.begin();
-
+    adg708::enable();
     adc128::read_and_change_channel(channel_to_adc_input(writer->channel));
 
     while (writer != channels.end() - 1) {
@@ -135,6 +135,7 @@ void pld::hardware::RealHardware::read_adc(
     hal::sleep_for(10ms);
     *last->data =
         adc128::read_and_change_channel(channel_to_adc_input(last->channel));
+    adg708::disable();
 }
 
 pld::Telemetry::Radfet pld::hardware::RealHardware::read_radfet() {
