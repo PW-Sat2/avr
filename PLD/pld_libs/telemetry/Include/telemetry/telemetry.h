@@ -62,7 +62,7 @@ struct Telemetry {
         TURNED_ON            = 1,
         TURNED_OFF           = 2,
         MEASUREMENT_EXECUTED = 3,
-        ADC_TIMEOUT          = 4,
+        MEASUREMENT_TIMEOUT  = 4,
     };
 
     struct Radfet {
