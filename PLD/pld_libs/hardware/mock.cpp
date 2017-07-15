@@ -36,6 +36,7 @@ Telemetry::Radfet Mock::radfet_read() {
         hal::sleep_for(200ms);
         this->watchdog_kick();
     }
+    rf.status = Telemetry::RadfetState::MEASUREMENT_EXECUTED;
     return rf;
 }
 

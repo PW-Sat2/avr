@@ -7,6 +7,7 @@
 #include "commands/HouseKeeping.h"
 #include "commands/PT1000.h"
 #include "commands/Photodiodes.h"
+#include "commands/RadFET.h"
 #include "commands/SunSref.h"
 
 using namespace std;
@@ -32,8 +33,10 @@ class MockHW : public pld::hardware::Interface {
     void radfet_on() override {
     }
 
+    pld::Telemetry::Radfet radfet_data;
+
     pld::Telemetry::Radfet radfet_read() override {
-        return pld::Telemetry::Radfet();
+        return radfet_data;
     }
 
     void radfet_off() override {
@@ -187,6 +190,40 @@ void test_commands_Temperatures() {
     TEST_ASSERT_EQUAL_UINT16(40009, readed.Yn);
 }
 
+void test_commands_radfet_on() {
+    memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
+
+    pld::commands::RadFET_On().invoke(telemetry, hw, {});
+    pld::Telemetry::Radfet readed = telemetry.radfet;
+    TEST_ASSERT_EQUAL_UINT8(pld::Telemetry::RadfetState::TURNED_ON, readed.status);
+}
+
+void test_commands_radfet_measure() {
+    memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
+    pld::Telemetry::Radfet temporary;
+
+    temporary.status = pld::Telemetry::RadfetState::MEASUREMENT_EXECUTED;
+    hw.radfet_data   = temporary;
+    pld::commands::RadFET_Measure().invoke(telemetry, hw, {});
+    temporary = telemetry.radfet;
+    TEST_ASSERT_EQUAL_UINT8(pld::Telemetry::RadfetState::MEASUREMENT_EXECUTED,
+                            temporary.status);
+
+    temporary.status = pld::Telemetry::RadfetState::MEASUREMENT_TIMEOUT;
+    hw.radfet_data   = temporary;
+    pld::commands::RadFET_Measure().invoke(telemetry, hw, {});
+    temporary = telemetry.radfet;
+    TEST_ASSERT_EQUAL_UINT8(pld::Telemetry::RadfetState::MEASUREMENT_TIMEOUT,
+                            temporary.status);
+}
+
+void test_commands_radfet_off() {
+    memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
+
+    pld::commands::RadFET_Off().invoke(telemetry, hw, {});
+    pld::Telemetry::Radfet readed = telemetry.radfet;
+    TEST_ASSERT_EQUAL_UINT8(pld::Telemetry::RadfetState::TURNED_OFF, readed.status);
+}
 
 void test_commands() {
     UnityBegin("");
@@ -194,5 +231,9 @@ void test_commands() {
     RUN_TEST(test_commands_Photodiodes);
     RUN_TEST(test_commands_SunSRef);
     RUN_TEST(test_commands_Temperatures);
+    RUN_TEST(test_commands_radfet_on);
+    RUN_TEST(test_commands_radfet_measure);
+    RUN_TEST(test_commands_radfet_off);
+
     UnityEnd();
 }
