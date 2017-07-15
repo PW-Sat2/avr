@@ -120,8 +120,6 @@ void pld::hardware::RealHardware::read_adc(
     std::initializer_list<ChannelDescriptor> channels) {
     auto writer = channels.begin();
 
-    adg708::select(channel_to_mux_channel(writer->channel));
-    _delay_ms(settling_time);
     adc128::read_and_change_channel(channel_to_adc_input(writer->channel));
 
     while (writer != channels.end() - 1) {
