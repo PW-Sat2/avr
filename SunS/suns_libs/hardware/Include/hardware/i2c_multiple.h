@@ -4,10 +4,7 @@
 #include <hal/hal>
 
 namespace SoftI2CMulti {
-enum class Action : std::uint8_t {
-    START_WRITE = 0,
-    START_READ = 1
-};
+enum class Action : std::uint8_t { START_WRITE = 0, START_READ = 1 };
 
 template<typename _scl, typename _sda_a, typename _sda_b, typename _sda_c, typename _sda_d, uint32_t _timeout>
 class SoftI2CMulti : hal::libs::PureStatic {
@@ -162,8 +159,7 @@ class SoftI2CMulti : hal::libs::PureStatic {
         _scl::init(hal::DigitalIO::Mode::INPUT);
         _delay_loop_1(hDelay);
     }
-
 };
-} // namespace SoftI2CMulti
+}  // namespace SoftI2CMulti
 
 #endif  // SUNS_SUNS_LIBS_HARDWARE_INCLUDE_HARDWARE_I2C_MULTIPLE_H_

@@ -18,11 +18,16 @@ class MockHW : public suns::hardware::Interface {
         TEST_FAIL_MESSAGE("init");
     }
 
-    void als_measure(std::uint8_t gain, std::uint8_t itime, suns::Telemetry::Status& als_status, suns::Telemetry::LightData& vl, suns::Telemetry::LightData& ir) override {
+    void als_measure(std::uint8_t gain,
+                     std::uint8_t itime,
+                     suns::Telemetry::Status& als_status,
+                     suns::Telemetry::LightData& vl,
+                     suns::Telemetry::LightData& ir) override {
         TEST_FAIL_MESSAGE("als measure");
     }
 
-    void temperatures_measure(suns::Telemetry::Temperatures& temperature_data) override {
+    void
+    temperatures_measure(suns::Telemetry::Temperatures& temperature_data) override {
         TEST_FAIL_MESSAGE("temperature measure");
     }
 

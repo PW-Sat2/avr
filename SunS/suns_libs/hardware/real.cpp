@@ -1,14 +1,14 @@
-#include <hardware/real.h>
-#include <hardware/i2c_multiple.h>
 #include <hardware/als.h>
+#include <hardware/i2c_multiple.h>
+#include <hardware/real.h>
 #include <hal/hal>
 #include "logger.h"
 
 using namespace hal;
 using namespace devices;
 using namespace libs;
-using hal::Analog::InternalADC;
 using hal::Analog::AnalogGPIO;
+using hal::Analog::InternalADC;
 
 using interrupt = hal::DigitalIO::GPIO<42>;
 
@@ -32,46 +32,49 @@ void init() {
 }  // namespace analog_pins
 
 namespace als {
-constexpr std::uint32_t als_timeout = 1600; //16000
+constexpr std::uint32_t als_timeout = 1600;  // 16000
 
 namespace first {
-using sda_a  = hal::DigitalIO::GPIO<16>;
-using sda_b  = hal::DigitalIO::GPIO<11>;
-using sda_c  = hal::DigitalIO::GPIO<40>;
-using sda_d  = hal::DigitalIO::GPIO<30>;
-using scl  = hal::DigitalIO::GPIO<3>;
+using sda_a = hal::DigitalIO::GPIO<16>;
+using sda_b = hal::DigitalIO::GPIO<11>;
+using sda_c = hal::DigitalIO::GPIO<40>;
+using sda_d = hal::DigitalIO::GPIO<30>;
+using scl   = hal::DigitalIO::GPIO<3>;
 
-using i2c = SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, als_timeout>;
+using i2c =
+    SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, als_timeout>;
 using als = BH1730FVCMulti::BH1730FVCMulti<i2c>;
 }  // namespace first
 
 namespace second {
-using sda_a  = hal::DigitalIO::GPIO<15>;
-using sda_b  = hal::DigitalIO::GPIO<2>;
-using sda_c  = hal::DigitalIO::GPIO<43>;
-using sda_d  = hal::DigitalIO::GPIO<31>;
-using scl  = hal::DigitalIO::GPIO<41>;
+using sda_a = hal::DigitalIO::GPIO<15>;
+using sda_b = hal::DigitalIO::GPIO<2>;
+using sda_c = hal::DigitalIO::GPIO<43>;
+using sda_d = hal::DigitalIO::GPIO<31>;
+using scl   = hal::DigitalIO::GPIO<41>;
 
-using i2c = SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, als_timeout>;
+using i2c =
+    SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, als_timeout>;
 using als = BH1730FVCMulti::BH1730FVCMulti<i2c>;
 }  // namespace second
 
 namespace third {
-using sda_a  = hal::DigitalIO::GPIO<14>;
-using sda_b  = hal::DigitalIO::GPIO<1>;
-using sda_c  = hal::DigitalIO::GPIO<44>;
-using sda_d  = hal::DigitalIO::GPIO<32>;
-using scl  = hal::DigitalIO::GPIO<13>;
+using sda_a = hal::DigitalIO::GPIO<14>;
+using sda_b = hal::DigitalIO::GPIO<1>;
+using sda_c = hal::DigitalIO::GPIO<44>;
+using sda_d = hal::DigitalIO::GPIO<32>;
+using scl   = hal::DigitalIO::GPIO<13>;
 
-using i2c = SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, als_timeout>;
+using i2c =
+    SoftI2CMulti::SoftI2CMulti<scl, sda_a, sda_b, sda_c, sda_d, als_timeout>;
 using als = BH1730FVCMulti::BH1730FVCMulti<i2c>;
 }  // namespace third
 
 void validate_and_correct_params(std::uint8_t& gain, std::uint8_t& itime) {
-    constexpr std::uint8_t default_gain = 0;
+    constexpr std::uint8_t default_gain  = 0;
     constexpr std::uint8_t default_itime = 10;
-    constexpr std::uint8_t max_gain = 3;
-    constexpr std::uint8_t min_itime = 1;
+    constexpr std::uint8_t max_gain      = 3;
+    constexpr std::uint8_t min_itime     = 1;
 
     if (gain > max_gain) {
         gain = default_gain;
@@ -155,7 +158,7 @@ void trigger(suns::Telemetry::Status& status) {
 }
 
 void wait_expected_time(const std::uint8_t itime) {
-    volatile std::uint8_t als_adc_conversion_wait = 0;
+    volatile std::uint8_t als_adc_conversion_wait        = 0;
     constexpr std::uint8_t adc_internal_calculation_time = 10;
 
     _delay_ms(adc_internal_calculation_time);
@@ -163,13 +166,13 @@ void wait_expected_time(const std::uint8_t itime) {
     while (als_adc_conversion_wait < itime) {
         _delay_us(2700);
         als_adc_conversion_wait++;
-    }   
+    }
 }
 
 void wait_for_als(suns::Telemetry::Status& status, const std::uint8_t itime) {
-    constexpr std::uint8_t adc_valid = 15;
+    constexpr std::uint8_t adc_valid          = 15;
     constexpr std::uint8_t adc_one_cycle_time = 3;
-    volatile std::uint16_t als_timeout_cnt = 0;
+    volatile std::uint16_t als_timeout_cnt    = 0;
 
     std::uint16_t ack_status_1 = 0, ack_status_2 = 0, ack_status_3 = 0;
     std::uint8_t adc_state_1 = 0, adc_state_2 = 0, adc_state_3 = 0;
@@ -193,11 +196,13 @@ void wait_for_als(suns::Telemetry::Status& status, const std::uint8_t itime) {
     status.adc_valid |= (adc_state_3 << 8);
 
     status.ack |= ack_status_1;
-    status.ack |= (ack_status_2 << 4); 
+    status.ack |= (ack_status_2 << 4);
     status.ack |= (ack_status_3 << 8);
 }
 
-void read_light(suns::Telemetry::Status& status, suns::Telemetry::LightData& vl, suns::Telemetry::LightData& ir) {
+void read_light(suns::Telemetry::Status& status,
+                suns::Telemetry::LightData& vl,
+                suns::Telemetry::LightData& ir) {
     std::uint16_t ack_status = first::als::read_ambient_light(vl.als_1, ir.als_1);
     status.ack |= ack_status;
 
@@ -209,7 +214,7 @@ void read_light(suns::Telemetry::Status& status, suns::Telemetry::LightData& vl,
 }
 
 }  // namespace all
-}  // namepsace als
+}  // namespace als
 
 
 void suns::hardware::RealHardware::init() {
@@ -220,7 +225,11 @@ void suns::hardware::RealHardware::init() {
     _delay_ms(10);
 }
 
-void suns::hardware::RealHardware::als_measure(std::uint8_t gain, std::uint8_t itime, suns::Telemetry::Status& als_status, suns::Telemetry::LightData& vl, suns::Telemetry::LightData& ir) {
+void suns::hardware::RealHardware::als_measure(std::uint8_t gain,
+                                               std::uint8_t itime,
+                                               suns::Telemetry::Status& als_status,
+                                               suns::Telemetry::LightData& vl,
+                                               suns::Telemetry::LightData& ir) {
     als::all::init();
     als::validate_and_correct_params(gain, itime);
 
@@ -233,12 +242,13 @@ void suns::hardware::RealHardware::als_measure(std::uint8_t gain, std::uint8_t i
     als::all::read_light(als_status, vl, ir);
 }
 
-void suns::hardware::RealHardware::temperatures_measure(suns::Telemetry::Temperatures& temperature_data) {
+void suns::hardware::RealHardware::temperatures_measure(
+    suns::Telemetry::Temperatures& temperature_data) {
     temperature_data.structure = AnalogGPIO<InternalADC::Input::ADC4>::read();
-    temperature_data.panel_a = AnalogGPIO<InternalADC::Input::ADC2>::read();
-    temperature_data.panel_b = AnalogGPIO<InternalADC::Input::ADC1>::read();
-    temperature_data.panel_c = AnalogGPIO<InternalADC::Input::ADC0>::read();
-    temperature_data.panel_d = AnalogGPIO<InternalADC::Input::ADC3>::read();
+    temperature_data.panel_a   = AnalogGPIO<InternalADC::Input::ADC2>::read();
+    temperature_data.panel_b   = AnalogGPIO<InternalADC::Input::ADC1>::read();
+    temperature_data.panel_c   = AnalogGPIO<InternalADC::Input::ADC0>::read();
+    temperature_data.panel_d   = AnalogGPIO<InternalADC::Input::ADC3>::read();
 }
 
 void suns::hardware::RealHardware::watchdog_kick() {

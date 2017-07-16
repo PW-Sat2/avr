@@ -10,8 +10,8 @@
 #include "ObcInterface/CommandDispatcher.h"
 #include "ObcInterface/ObcInterface.h"
 
-#include "debug/commands.h"
 #include "commands/measure.h"
+#include "debug/commands.h"
 
 using namespace hal;
 using namespace hal::libs;
@@ -30,9 +30,7 @@ struct Executor {
     }
 };
 
-CommandDispatcher<Executor,
-                  suns::commands::Measure>
-    dispatcher;
+CommandDispatcher<Executor, suns::commands::Measure> dispatcher;
 
 void CommandCallback(gsl::span<const uint8_t> _c) {
     dispatcher.parse(_c);
