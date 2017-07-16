@@ -210,7 +210,7 @@ void test_radfet_on_invoke() {
 
 void test_commands_radfet_measure_success() {
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
-    pld::Telemetry::Radfet temporary;
+    pld::Telemetry::Radfet temporary = telemetry.radfet;
 
     temporary.status = pld::Telemetry::RadfetState::MEASUREMENT_EXECUTED;
     hw.radfet_data   = temporary;
@@ -222,7 +222,7 @@ void test_commands_radfet_measure_success() {
 
 void test_commands_radfet_measure_timeout() {
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
-    pld::Telemetry::Radfet temporary;
+    pld::Telemetry::Radfet temporary = telemetry.radfet;
 
     temporary.status = pld::Telemetry::RadfetState::MEASUREMENT_TIMEOUT;
     hw.radfet_data   = temporary;
