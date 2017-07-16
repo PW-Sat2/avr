@@ -49,7 +49,7 @@ int main() {
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
     Serial0.enable_rx_interrupt();
-    LOG_WARNING("SunS Start.");
+    LOG_INFO("SunS Start.");
 
     real_hardware.init();
     mock_hardware.init();
@@ -63,7 +63,7 @@ int main() {
 
     Obc::init(&telemetry);
     sei();
-    LOG_WARNING("SunS Initialised.");
+    LOG_INFO("SunS Initialised.");
 
 
     while (1) {
