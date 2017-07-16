@@ -30,7 +30,10 @@ class MockHW : public pld::hardware::Interface {
         }
     }
 
+    bool invoked;
+
     void radfet_on() override {
+        invoked = true;
     }
 
     pld::Telemetry::Radfet radfet_data;
@@ -40,6 +43,7 @@ class MockHW : public pld::hardware::Interface {
     }
 
     void radfet_off() override {
+        invoked = true;
     }
 
     void watchdog_kick() override {
@@ -198,7 +202,13 @@ void test_commands_radfet_on() {
     TEST_ASSERT_EQUAL_UINT8(pld::Telemetry::RadfetState::TURNED_ON, readed.status);
 }
 
-void test_commands_radfet_measure() {
+void test_radfet_on_invoke() {
+    hw.invoked = false;
+    pld::commands::RadFET_On().invoke(telemetry, hw, {});
+    TEST_ASSERT_EQUAL_UINT8(true, hw.invoked);
+}
+
+void test_commands_radfet_measure_success() {
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
     pld::Telemetry::Radfet temporary;
 
@@ -208,6 +218,11 @@ void test_commands_radfet_measure() {
     temporary = telemetry.radfet;
     TEST_ASSERT_EQUAL_UINT8(pld::Telemetry::RadfetState::MEASUREMENT_EXECUTED,
                             temporary.status);
+}
+
+void test_commands_radfet_measure_timeout() {
+    memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
+    pld::Telemetry::Radfet temporary;
 
     temporary.status = pld::Telemetry::RadfetState::MEASUREMENT_TIMEOUT;
     hw.radfet_data   = temporary;
@@ -225,6 +240,12 @@ void test_commands_radfet_off() {
     TEST_ASSERT_EQUAL_UINT8(pld::Telemetry::RadfetState::TURNED_OFF, readed.status);
 }
 
+void test_radfet_off_invoke() {
+    hw.invoked = false;
+    pld::commands::RadFET_Off().invoke(telemetry, hw, {});
+    TEST_ASSERT_EQUAL_UINT8(true, hw.invoked);
+}
+
 void test_commands() {
     UnityBegin("");
     RUN_TEST(test_commands_HouseKeeping);
@@ -232,8 +253,11 @@ void test_commands() {
     RUN_TEST(test_commands_SunSRef);
     RUN_TEST(test_commands_Temperatures);
     RUN_TEST(test_commands_radfet_on);
-    RUN_TEST(test_commands_radfet_measure);
+    RUN_TEST(test_radfet_on_invoke);
+    RUN_TEST(test_commands_radfet_measure_success);
+    RUN_TEST(test_commands_radfet_measure_timeout);
     RUN_TEST(test_commands_radfet_off);
+    RUN_TEST(test_radfet_off_invoke);
 
     UnityEnd();
 }
