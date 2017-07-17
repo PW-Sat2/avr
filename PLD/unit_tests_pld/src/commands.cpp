@@ -58,7 +58,7 @@ class MockHW : public pld::hardware::Interface {
     }
 };
 
-pld::Telemetry telemetry;
+pld::Telemetry telemetry, empty_telemetry;
 MockHW hw;
 pld::hardware::HardwareProvider hw_ptr;
 
@@ -193,12 +193,18 @@ void test_commands_Temperatures() {
     TEST_ASSERT_EQUAL_UINT16(40009, readed.Yn);
 }
 
-void test_commands_radfet_on() {
+void test_commands_radfet_on_status() {
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
 
     pld::commands::RadFET_On().invoke(telemetry, hw, {});
     pld::Telemetry::Radfet readed = telemetry.radfet;
     TEST_ASSERT_EQUAL_UINT8(pld::Telemetry::RadfetState::TURNED_ON, readed.status);
+
+    memset(&empty_telemetry, 0xFF, sizeof(pld::Telemetry));
+    memset(&readed.status, 0xFF, sizeof(pld::Telemetry::RadfetState));
+    telemetry.radfet = readed;
+    TEST_ASSERT_EQUAL_INT(
+        0, memcmp(&telemetry, &empty_telemetry, sizeof(pld::Telemetry)));
 }
 
 void test_radfet_on_invoke() {
@@ -213,12 +219,18 @@ void test_commands_radfet_measure_invoke() {
     TEST_ASSERT_EQUAL_UINT8(true, hw.invoked);
 }
 
-void test_commands_radfet_off() {
+void test_commands_radfet_off_status() {
     memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
 
     pld::commands::RadFET_Off().invoke(telemetry, hw, {});
     pld::Telemetry::Radfet readed = telemetry.radfet;
     TEST_ASSERT_EQUAL_UINT8(pld::Telemetry::RadfetState::TURNED_OFF, readed.status);
+
+    memset(&empty_telemetry, 0xFF, sizeof(pld::Telemetry));
+    memset(&readed.status, 0xFF, sizeof(pld::Telemetry::RadfetState));
+    telemetry.radfet = readed;
+    TEST_ASSERT_EQUAL_INT(
+        0, memcmp(&telemetry, &empty_telemetry, sizeof(pld::Telemetry)));
 }
 
 void test_radfet_off_invoke() {
@@ -233,9 +245,9 @@ void test_commands() {
     RUN_TEST(test_commands_Photodiodes);
     RUN_TEST(test_commands_SunSRef);
     RUN_TEST(test_commands_Temperatures);
-    RUN_TEST(test_commands_radfet_on);
+    RUN_TEST(test_commands_radfet_on_status);
     RUN_TEST(test_radfet_on_invoke);
-    RUN_TEST(test_commands_radfet_off);
+    RUN_TEST(test_commands_radfet_off_status);
     RUN_TEST(test_radfet_off_invoke);
 
     UnityEnd();
