@@ -143,8 +143,9 @@ void pld::hardware::RealHardware::read_adc(
 void pld::hardware::RealHardware::radfet_on() {
 }
 
-pld::Telemetry::Radfet pld::hardware::RealHardware::radfet_read() {
-    return pld::Telemetry::Radfet();
+pld::hardware::Interface::RadfetMeasurement
+pld::hardware::RealHardware::radfet_read() {
+    return RadfetMeasurement();
 }
 
 void pld::hardware::RealHardware::radfet_off() {

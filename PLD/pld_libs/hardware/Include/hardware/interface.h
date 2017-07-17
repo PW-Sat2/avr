@@ -37,20 +37,38 @@ enum class AnalogChannel : std::uint8_t {
 };
 
 struct Interface {
-    virtual void init() = 0;
     struct ChannelDescriptor {
         AnalogChannel channel;
         uint16_t* data;
     };
+
+    struct RadfetMeasurement {
+        bool timeout_vth1;
+        bool timeout_vth2;
+        bool timeout_vth3;
+        bool timeout_temperature;
+        pld::Telemetry::Radfet::Measurement measurement;
+
+        RadfetMeasurement()
+            : timeout_vth1{false},
+              timeout_vth2{false},
+              timeout_vth3{false},
+              timeout_temperature{false} {
+        }
+    };
+
+    virtual void init() = 0;
+
     virtual void read_adc(std::initializer_list<ChannelDescriptor> channels) = 0;
 
-    virtual void radfet_on()                     = 0;
-    virtual pld::Telemetry::Radfet radfet_read() = 0;
-    virtual void radfet_off()                    = 0;
+    virtual void radfet_on()                = 0;
+    virtual RadfetMeasurement radfet_read() = 0;
+    virtual void radfet_off()               = 0;
 
     virtual void external_watchdog_kick() = 0;
-    virtual void obc_interrupt_set()      = 0;
-    virtual void obc_interrupt_reset()    = 0;
+
+    virtual void obc_interrupt_set()   = 0;
+    virtual void obc_interrupt_reset() = 0;
 };
 
 using HardwareProvider = Interface*;

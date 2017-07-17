@@ -9,15 +9,18 @@ namespace pld {
 namespace hardware {
 
 struct RealHardware : public Interface {
-    virtual void init() override;
-    virtual void
-    read_adc(std::initializer_list<ChannelDescriptor> channels) override;
-    virtual void radfet_on() override;
-    virtual pld::Telemetry::Radfet radfet_read() override;
-    virtual void radfet_off() override;
-    virtual void external_watchdog_kick() override;
-    virtual void obc_interrupt_set() override;
-    virtual void obc_interrupt_reset() override;
+    void init() override;
+
+    void read_adc(std::initializer_list<ChannelDescriptor> channels) override;
+
+    void radfet_on() override;
+    RadfetMeasurement radfet_read() override;
+    void radfet_off() override;
+
+    void external_watchdog_kick() override;
+
+    void obc_interrupt_set() override;
+    void obc_interrupt_reset() override;
 };
 
 }  // namespace hardware

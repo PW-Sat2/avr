@@ -3,8 +3,11 @@
 
 #include <util/atomic.h>
 #include <array>
+#include <bitset>
 #include <cstdint>
 #include <cstring>
+#include <hal/hal>
+
 
 namespace pld {
 namespace details {
@@ -66,8 +69,41 @@ struct Telemetry {
     };
 
     struct Radfet {
-        std::uint32_t temperature;
-        std::array<std::uint32_t, 3> vth;
+        struct Status {
+            enum class Fields {
+                On                 = 0,
+                TimeoutVth1        = 1,
+                TimeoutVth2        = 2,
+                TimeoutVth3        = 3,
+                TimeoutTemperature = 4,
+                MeasurementDone    = 5,
+                LCL_3V3_error      = 6,
+                LCL_5V_error       = 7,
+
+                Length
+            };
+
+
+            void set_status(Fields field, bool value) {
+                std::bitset<num(Fields::Length)> bitset{this->status};
+
+                bitset[num(field)] = value;
+
+                status = bitset.to_ulong();
+            }
+
+         private:
+            std::uint8_t status;
+        };
+
+
+        struct Measurement {
+            std::uint32_t temperature;
+            std::array<std::uint32_t, 3> vth;
+        };
+
+        Status status;
+        details::Atomic<Measurement> measurement;
     };
 
     uint8_t who_am_i;
@@ -75,13 +111,13 @@ struct Telemetry {
     details::Atomic<Temperatures> temperatures;
     details::Atomic<Photodiodes> photodiodes;
     details::Atomic<Housekeeping> housekeeping;
-    details::Atomic<Radfet> radfet;
+    Radfet radfet;
 
     void init() {
         std::memset(this, 0xFF, sizeof(pld::Telemetry));
     }
 };
-static_assert(sizeof(Telemetry) == 57,
+static_assert(sizeof(Telemetry) == 58,
               "Incorrect size of Telemetry structure (padding?)");
 static_assert(std::is_pod<Telemetry>::value, "POD");
 

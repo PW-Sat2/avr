@@ -8,30 +8,50 @@ namespace pld {
 namespace commands {
 
 struct RadFET_On : public Command<0x84, 0> {
-    void invoke(Telemetry&,
+    void invoke(Telemetry& telemetry,
                 hardware::Interface& hardware,
                 gsl::span<const std::uint8_t>) {
         LOG_INFO("RadFET_On");
         hardware.radfet_on();
+
+        telemetry.radfet.status.set_status(
+            Telemetry::Radfet::Status::Fields::On, true);
     }
 };
 
 struct RadFET_Measure : public Command<0x85, 0> {
+    using Fields = Telemetry::Radfet::Status::Fields;
+
     void invoke(Telemetry& telemetry,
                 hardware::Interface& hardware,
                 gsl::span<const std::uint8_t>) {
         LOG_INFO("RadFET_Measure START");
-        telemetry.radfet = hardware.radfet_read();
+
+
+        auto tm = hardware.radfet_read();
+        telemetry.radfet.status.set_status(Fields::TimeoutVth1, tm.timeout_vth1);
+        telemetry.radfet.status.set_status(Fields::TimeoutVth2, tm.timeout_vth2);
+        telemetry.radfet.status.set_status(Fields::TimeoutVth3, tm.timeout_vth3);
+        telemetry.radfet.status.set_status(Fields::TimeoutTemperature,
+                                           tm.timeout_temperature);
+
+        telemetry.radfet.status.set_status(Fields::MeasurementDone, true);
+
+        telemetry.radfet.measurement = tm.measurement;
+
         LOG_INFO("RadFET_Measure FINISHED");
     }
 };
 
 struct RadFET_Off : public Command<0x86, 0> {
-    void invoke(Telemetry&,
+    void invoke(Telemetry& telemetry,
                 hardware::Interface& hardware,
                 gsl::span<const std::uint8_t>) {
         LOG_INFO("RadFET_Off");
         hardware.radfet_off();
+
+        telemetry.radfet.status.set_status(
+            Telemetry::Radfet::Status::Fields::On, false);
     }
 };
 

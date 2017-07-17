@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <hal/hal>
-#include <algorithm>
 #include "unity.h"
 
 #include "hardware/interface.h"
@@ -23,6 +22,7 @@ class MockHW : public pld::hardware::Interface {
  public:
     MockHW() {
         radfet_called_method = RadfetCallType::None;
+        radfet_telemetry     = {};
     }
     void init() override {
         TEST_FAIL_MESSAGE("init");
@@ -44,7 +44,7 @@ class MockHW : public pld::hardware::Interface {
     };
 
     RadfetCallType radfet_called_method;
-    pld::Telemetry::Radfet radfet_telemetry;
+    RadfetMeasurement radfet_telemetry;
 
     void radfet_on() override {
         if (radfet_called_method == RadfetCallType::None) {
@@ -52,9 +52,7 @@ class MockHW : public pld::hardware::Interface {
         }
     }
 
-    pld::Telemetry::Radfet readed_tm;
-
-    pld::Telemetry::Radfet radfet_read() override {
+    RadfetMeasurement radfet_read() override {
         if (radfet_called_method == RadfetCallType::None) {
             radfet_called_method = RadfetCallType::Read;
         }
@@ -82,7 +80,6 @@ class MockHW : public pld::hardware::Interface {
 
 pld::Telemetry telemetry;
 MockHW hw;
-pld::hardware::HardwareProvider hw_ptr;
 
 void set_adc_mock(pld::hardware::AnalogChannel channel, uint16_t value) {
     adc_mock_data[static_cast<uint8_t>(channel)] = value;
@@ -112,15 +109,29 @@ void check_telemetry_empty() {
         view.begin(), view.end(), [](uint8_t i) { return i == 0xFF; }));
 }
 
-bool operator==(const pld::Telemetry::Radfet& rhs,
-                const pld::Telemetry::Radfet& lhs) {
-    return memcmp(&rhs, &lhs, sizeof(pld::Telemetry::Radfet)) == 0;
+bool operator==(const pld::Telemetry::Radfet::Measurement& rhs,
+                const pld::Telemetry::Radfet::Measurement& lhs) {
+    return memcmp(&rhs, &lhs, sizeof(pld::Telemetry::Radfet::Measurement)) == 0;
 }
 
 template<typename T>
 void reset_telemetry_field(T& t) {
     static_assert(std::is_pod<T>::value, "Structure has to be POD!");
     memset(&t, 0xFF, sizeof(T));
+}
+
+void set_radfet_status(uint8_t value) {
+    static_assert(std::is_pod<decltype(telemetry.radfet.status)>::value, "");
+    static_assert(sizeof(telemetry.radfet.status) == 1, "");
+
+    *reinterpret_cast<uint8_t*>(&telemetry.radfet.status) = value;
+}
+
+uint8_t get_radfet_status() {
+    static_assert(std::is_pod<decltype(telemetry.radfet.status)>::value, "");
+    static_assert(sizeof(telemetry.radfet.status) == 1, "");
+
+    return *reinterpret_cast<uint8_t*>(&telemetry.radfet.status);
 }
 
 using namespace pld::hardware;
@@ -248,7 +259,17 @@ void test_radfet_on_telemetry() {
 
     pld::commands::RadFET_On().invoke(telemetry, hw, {});
 
+    reset_telemetry_field(telemetry.radfet.status);
     check_telemetry_empty();
+}
+
+void test_radfet_on_status() {
+    telemetry.init();
+    set_radfet_status(0x00);
+
+    pld::commands::RadFET_On().invoke(telemetry, hw, {});
+
+    TEST_ASSERT_EQUAL(0b1, get_radfet_status());
 }
 
 void test_commands_radfet_measure_invoke() {
@@ -261,17 +282,68 @@ void test_commands_radfet_measure_invoke() {
 
 void test_commands_radfet_measure_telemetry() {
     telemetry.init();
-    hw                              = MockHW();
-    hw.radfet_telemetry.vth         = {0xB00BA5, 0xBEEFED, 0xBAAAAD};
-    hw.radfet_telemetry.temperature = 0xC0010F;
+    hw = MockHW();
+    Interface::RadfetMeasurement tm;
+    tm.measurement.vth         = {0xB00BA5, 0xBEEFED, 0xBAAAAD};
+    tm.measurement.temperature = 0xC0010F;
+    hw.radfet_telemetry        = tm;
 
     pld::commands::RadFET_Measure().invoke(telemetry, hw, {});
 
-    TEST_ASSERT_TRUE(hw.radfet_telemetry ==
-                     static_cast<pld::Telemetry::Radfet>(telemetry.radfet));
+    TEST_ASSERT_TRUE(hw.radfet_telemetry.measurement ==
+                     telemetry.radfet.measurement);
 
     reset_telemetry_field(telemetry.radfet);
     check_telemetry_empty();
+}
+
+void test_commands_radfet_measure_timeout() {
+    telemetry.init();
+    hw = MockHW();
+
+    pld::commands::RadFET_Measure().invoke(telemetry, hw, {});
+
+    reset_telemetry_field(telemetry.radfet);
+    check_telemetry_empty();
+}
+
+void test_commands_radfet_measure_status_ok() {
+    telemetry.init();
+    hw                  = MockHW();
+    hw.radfet_telemetry = Interface::RadfetMeasurement();
+    set_radfet_status(0);
+
+    pld::commands::RadFET_Measure().invoke(telemetry, hw, {});
+
+    TEST_ASSERT_EQUAL(0b100000, get_radfet_status());
+}
+
+void test_commands_radfet_measure_status_timeout() {
+    auto test = [](bool tmp, bool vth3, bool vth2, bool vth1, uint8_t expected) {
+        telemetry.init();
+        hw                  = MockHW();
+        hw.radfet_telemetry = Interface::RadfetMeasurement();
+        set_radfet_status(0);
+
+        hw.radfet_telemetry.timeout_vth1        = vth1;
+        hw.radfet_telemetry.timeout_vth2        = vth2;
+        hw.radfet_telemetry.timeout_vth3        = vth3;
+        hw.radfet_telemetry.timeout_temperature = tmp;
+
+        pld::commands::RadFET_Measure().invoke(telemetry, hw, {});
+
+        TEST_ASSERT_EQUAL(expected, get_radfet_status());
+    };
+
+    test(0, 0, 0, 0, 0b100000);
+    test(0, 0, 0, 1, 0b100010);
+    test(0, 0, 1, 0, 0b100100);
+    test(0, 1, 0, 0, 0b101000);
+    test(1, 0, 0, 0, 0b110000);
+    test(1, 0, 1, 0, 0b110100);
+    test(1, 1, 0, 1, 0b111010);
+    test(0, 1, 1, 1, 0b101110);
+    test(1, 1, 1, 1, 0b111110);
 }
 
 void test_radfet_off_invoke() {
@@ -288,7 +360,17 @@ void test_radfet_off_telemetry() {
 
     pld::commands::RadFET_Off().invoke(telemetry, hw, {});
 
+    reset_telemetry_field(telemetry.radfet.status);
     check_telemetry_empty();
+}
+
+void test_radfet_off_status() {
+    telemetry.init();
+    set_radfet_status(0xFF);
+
+    pld::commands::RadFET_Off().invoke(telemetry, hw, {});
+
+    TEST_ASSERT_EQUAL(0xFE, get_radfet_status());
 }
 
 void test_commands() {
@@ -300,12 +382,17 @@ void test_commands() {
 
     RUN_TEST(test_radfet_on_invoke);
     RUN_TEST(test_radfet_on_telemetry);
+    RUN_TEST(test_radfet_on_status);
 
     RUN_TEST(test_commands_radfet_measure_invoke);
     RUN_TEST(test_commands_radfet_measure_telemetry);
+    RUN_TEST(test_commands_radfet_measure_timeout);
+    RUN_TEST(test_commands_radfet_measure_status_ok);
+    RUN_TEST(test_commands_radfet_measure_status_timeout);
 
     RUN_TEST(test_radfet_off_invoke);
     RUN_TEST(test_radfet_off_telemetry);
+    RUN_TEST(test_radfet_off_status);
 
     UnityEnd();
 }

@@ -32,10 +32,10 @@ void Mock::radfet_on() {
     hal::sleep_for(100ms);
 }
 
-Telemetry::Radfet Mock::radfet_read() {
-    Telemetry::Radfet rf;
-    rf.temperature = 0xBAAAAD;
-    rf.vth         = {0xDEAD78, 0xBEEFED, 0x1CF00D};
+Interface::RadfetMeasurement Mock::radfet_read() {
+    RadfetMeasurement rf;
+    rf.measurement.temperature = 0xBAAAAD;
+    rf.measurement.vth         = {0xDEAD78, 0xBEEFED, 0x1CF00D};
 
     for (int i = 0; i < 4 * 100; ++i) {
         hal::sleep_for(60ms);
