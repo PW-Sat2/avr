@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <hal/hal>
+#include <algorithm>
 #include "unity.h"
 
 #include "hardware/interface.h"
@@ -50,6 +51,8 @@ class MockHW : public pld::hardware::Interface {
             radfet_called_method = RadfetCallType::On;
         }
     }
+
+    pld::Telemetry::Radfet readed_tm;
 
     pld::Telemetry::Radfet radfet_read() override {
         if (radfet_called_method == RadfetCallType::None) {
