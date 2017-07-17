@@ -1,4 +1,5 @@
 #include "hardware/mock.h"
+#include <chrono>
 
 namespace pld {
 namespace hardware {
@@ -27,21 +28,22 @@ void Mock::read_adc(std::initializer_list<ChannelDescriptor> channels) {
 }
 
 void Mock::radfet_on() {
-    _delay_ms(100);
+    hal::sleep_for(100ms);
 }
 
 Telemetry::Radfet Mock::radfet_read() {
     Telemetry::Radfet rf;
-    for (uint8_t i = 0; i < 10; ++i) {
-        hal::sleep_for(200ms);
+    rf.temperature = 0xBAAAAD;
+    rf.vth         = {0xDEAD78, 0xBEEFED, 0x1CF00D};
+    for (uint8_t i = 0; i < 4; ++i) {
+        hal::sleep_for(6s);
         this->watchdog_kick();
     }
-    rf.status = Telemetry::RadfetState::MEASUREMENT_EXECUTED;
     return rf;
 }
 
 void Mock::radfet_off() {
-    _delay_ms(100);
+    hal::sleep_for(100ms);
 }
 
 void Mock::watchdog_kick() {

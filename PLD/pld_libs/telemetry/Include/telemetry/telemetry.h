@@ -66,7 +66,6 @@ struct Telemetry {
     };
 
     struct Radfet {
-        RadfetState status;
         std::uint32_t temperature;
         std::array<std::uint32_t, 3> vth;
     };
@@ -82,7 +81,7 @@ struct Telemetry {
         std::memset(this, 0xFF, sizeof(pld::Telemetry));
     }
 };
-static_assert(sizeof(Telemetry) == 58,
+static_assert(sizeof(Telemetry) == 57,
               "Incorrect size of Telemetry structure (padding?)");
 static_assert(std::is_pod<Telemetry>::value, "POD");
 
