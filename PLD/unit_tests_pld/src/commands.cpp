@@ -36,10 +36,9 @@ class MockHW : public pld::hardware::Interface {
         invoked = true;
     }
 
-    pld::Telemetry::Radfet radfet_data;
-
     pld::Telemetry::Radfet radfet_read() override {
-        return radfet_data;
+        invoked = true;
+        return pld::Telemetry::Radfet();
     }
 
     void radfet_off() override {
@@ -208,28 +207,10 @@ void test_radfet_on_invoke() {
     TEST_ASSERT_EQUAL_UINT8(true, hw.invoked);
 }
 
-void test_commands_radfet_measure_success() {
-    memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
-    pld::Telemetry::Radfet temporary = telemetry.radfet;
-
-    temporary.status = pld::Telemetry::RadfetState::MEASUREMENT_EXECUTED;
-    hw.radfet_data   = temporary;
+void test_commands_radfet_measure_invoke() {
+    hw.invoked = false;
     pld::commands::RadFET_Measure().invoke(telemetry, hw, {});
-    temporary = telemetry.radfet;
-    TEST_ASSERT_EQUAL_UINT8(pld::Telemetry::RadfetState::MEASUREMENT_EXECUTED,
-                            temporary.status);
-}
-
-void test_commands_radfet_measure_timeout() {
-    memset(&telemetry, 0xFF, sizeof(pld::Telemetry));
-    pld::Telemetry::Radfet temporary = telemetry.radfet;
-
-    temporary.status = pld::Telemetry::RadfetState::MEASUREMENT_TIMEOUT;
-    hw.radfet_data   = temporary;
-    pld::commands::RadFET_Measure().invoke(telemetry, hw, {});
-    temporary = telemetry.radfet;
-    TEST_ASSERT_EQUAL_UINT8(pld::Telemetry::RadfetState::MEASUREMENT_TIMEOUT,
-                            temporary.status);
+    TEST_ASSERT_EQUAL_UINT8(true, hw.invoked);
 }
 
 void test_commands_radfet_off() {
@@ -254,8 +235,6 @@ void test_commands() {
     RUN_TEST(test_commands_Temperatures);
     RUN_TEST(test_commands_radfet_on);
     RUN_TEST(test_radfet_on_invoke);
-    RUN_TEST(test_commands_radfet_measure_success);
-    RUN_TEST(test_commands_radfet_measure_timeout);
     RUN_TEST(test_commands_radfet_off);
     RUN_TEST(test_radfet_off_invoke);
 
