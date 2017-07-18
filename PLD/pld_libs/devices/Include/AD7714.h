@@ -51,8 +51,9 @@ enum class Gain : std::uint8_t {
  * while(!ad7714::data_ready());
  * auto val = ad7714::read_data_no_wait();
  * \endcode
- * @tparam SPI
- * @tparam pin_DRDY
+ *
+ * @tparam SPI SPI interface to use
+ * @tparam pin_DRDY DigitalIO pin connected to DRDY pin on the ADC
  */
 template<typename SPI, typename pin_DRDY>
 class AD7714 : hal::libs::PureStatic {
@@ -65,25 +66,38 @@ class AD7714 : hal::libs::PureStatic {
     }
 
     /*!
-     * Performs readout operation from ADC:
+     * Sets up next read operation from ADC:
      *   - change channel
      *   - set up filter
      *   - perform self calibration
-     *   - waits for conversion finish
-     *   - reads data from DATA register
      * @param channel Channel to read from
      * @param gain Gain to be set on this channel. Default value - Gain x1.
+     */
+    static void setup_read(Channels channel, Gain gain = Gain::GAIN_1) {
+        actual_channel = channel;
+        set_filter();
+        start_calibration(gain);
+    }
+
+    /*!
+     * Checks if the device is ready for data readout.
+     * @return True, if device is ready. False otherwise.
+     */
+    static bool data_ready() {
+        return !pin_DRDY::read();
+    }
+
+    /*!
+     * Reads DATA register from ADC.
+     * Should be invoked when \refitem data_ready return true.
      * @return Data read from the DATA register.
      */
-    static uint24_t read_data(Channels channel, Gain gain = Gain::GAIN_1) {
-        change_channel(channel, gain);
-
-        while (!data_ready()) {
-        }
-
+    static uint24_t read_data_no_wait() {
         std::array<std::uint8_t, 3> data;
         read_register(Registers::DATA_REG, data);
-        return (1ul * data[0] << 16ul) | (1ul * data[1] << 8) | (data[2]);
+        uint24_t result =
+            (1ul * data[0] << 16ul) | (1ul * data[1] << 8) | (data[2]);
+        return result;
     }
 
 
@@ -137,16 +151,6 @@ class AD7714 : hal::libs::PureStatic {
     static_assert((filter >= 19) && (filter <= 4000),
                   "Allowed filter value is 19 - 4000");
 
-
-    static void change_channel(Channels channel, Gain gain) {
-        actual_channel = channel;
-        set_filter();
-        start_calibration(gain);
-    }
-
-    static bool data_ready() {
-        return !pin_DRDY::read();
-    }
 
     static void set_filter() {
         constexpr auto filter_high_register = num(polarity) |      //
