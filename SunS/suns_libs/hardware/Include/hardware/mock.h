@@ -1,5 +1,5 @@
-#ifndef PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_MOCK_H_
-#define PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_MOCK_H_
+#ifndef SUNS_SUNS_LIBS_HARDWARE_INCLUDE_HARDWARE_MOCK_H_
+#define SUNS_SUNS_LIBS_HARDWARE_INCLUDE_HARDWARE_MOCK_H_
 
 #include <hal/hal>
 #include "interface.h"
@@ -35,4 +35,4 @@ enum class MockEvent : uint8_t {
 }  // namespace hardware
 }  // namespace suns
 
-#endif  // PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_MOCK_H_
+#endif  // SUNS_SUNS_LIBS_HARDWARE_INCLUDE_HARDWARE_MOCK_H_

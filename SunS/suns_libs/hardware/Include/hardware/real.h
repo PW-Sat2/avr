@@ -1,5 +1,5 @@
-#ifndef PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_REAL_H_
-#define PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_REAL_H_
+#ifndef SUNS_SUNS_LIBS_HARDWARE_INCLUDE_HARDWARE_REAL_H_
+#define SUNS_SUNS_LIBS_HARDWARE_INCLUDE_HARDWARE_REAL_H_
 
 #include <initializer_list>
 #include "interface.h"
@@ -25,4 +25,4 @@ struct RealHardware : public Interface {
 }  // namespace hardware
 }  // namespace suns
 
-#endif  // PLD_PLD_LIBS_HARDWARE_INCLUDE_HARDWARE_REAL_H_
+#endif  // SUNS_SUNS_LIBS_HARDWARE_INCLUDE_HARDWARE_REAL_H_
