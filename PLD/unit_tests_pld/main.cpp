@@ -4,6 +4,7 @@ using hal::Serial0;
 
 void test_commands();
 void test_AD7714();
+void test_AD7714_driver();
 
 int main() {
     Serial0.init(38400);
@@ -12,6 +13,7 @@ int main() {
 
     test_commands();
     test_AD7714();
+    test_AD7714_driver();
 
     hal::libs::sim::stop_simulation();
 }
