@@ -8,9 +8,6 @@ namespace hardware {
 using namespace mock;
 using namespace std::chrono_literals;
 
-using watchdog_pin = hal::DigitalIO::GPIO<44>;
-using tps3813      = hal::devices::TPS3813<watchdog_pin, 10>;
-
 std::array<std::uint16_t, 20> mock::adc_channels;
 using obc_int_pin = hal::DigitalIO::GPIO<33>;
 using led1        = hal::DigitalIO::GPIO<36>;
@@ -54,7 +51,6 @@ void Mock::radfet_off() {
 
 
 void Mock::external_watchdog_kick() {
-    tps3813::kick();
     LOG_INFO("WDT");
 }
 
