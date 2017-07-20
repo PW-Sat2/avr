@@ -7,26 +7,18 @@ using namespace hal::libs;
 using namespace pld::devices;
 
 struct AD7714_mock {
-    enum class MockCall { None, Init, SetupRead, DataReady, Read, Duplicated };
-    static MockCall call;
-    static void called(MockCall caller) {
-        if (call == MockCall::None) {
-            call = caller;
-        } else if (call == caller) {
-            call = MockCall::Duplicated;
-        }
-    }
-
-
+    static bool init_called;
     static void init() {
-        called(MockCall::Init);
+        init_called = true;
     }
 
     static AD7714::Channels channel;
+    static AD7714::Gain gain;
 
-    static void
-    setup_read(AD7714::Channels ch, AD7714::Gain gain = AD7714::Gain::GAIN_1) {
-        channel = ch;
+    static void setup_read(AD7714::Channels channel_,
+                           AD7714::Gain gain_ = AD7714::Gain::GAIN_1) {
+        channel = channel_;
+        gain = gain_;
     }
 
     static uint16_t data_ready_counter;
@@ -44,17 +36,27 @@ struct AD7714_mock {
         return value;
     }
 };
-AD7714_mock::MockCall AD7714_mock::call;
+bool AD7714_mock::init_called;
 uint24_t AD7714_mock::value;
 AD7714::Channels AD7714_mock::channel;
+AD7714::Gain AD7714_mock::gain;
 uint16_t AD7714_mock::data_ready_counter;
 
-using adc = AD7714::AD7714_driver<AD7714_mock>;
+struct WDT {
+    static std::uint16_t kicks;
+    static void kick() {
+        kicks++;
+    }
+};
+std::uint16_t WDT::kicks;
+
+using adc = AD7714::AD7714_driver<AD7714_mock, WDT>;
 
 
 void test_AD7714_driver_init() {
+    AD7714_mock::init_called = false;
     adc::init();
-    TEST_ASSERT_EQUAL(AD7714_mock::MockCall::Init, AD7714_mock::call);
+    TEST_ASSERT_TRUE(AD7714_mock::init_called);
 }
 
 void test_AD7714_driver_read_data() {
@@ -83,6 +85,22 @@ void test_AD7714_driver_read_channel() {
     test(AD7714::Channels::TEST);
 }
 
+void test_AD7714_driver_read_gains() {
+    auto test = [](AD7714::Gain gain) {
+        adc::read(AD7714::Channels::TEST, gain);
+        TEST_ASSERT_EQUAL(gain, AD7714_mock::gain);
+    };
+
+    test(AD7714::Gain::GAIN_1);
+    test(AD7714::Gain::GAIN_2);
+    test(AD7714::Gain::GAIN_4);
+    test(AD7714::Gain::GAIN_8);
+    test(AD7714::Gain::GAIN_16);
+    test(AD7714::Gain::GAIN_32);
+    test(AD7714::Gain::GAIN_64);
+    test(AD7714::Gain::GAIN_128);
+}
+
 void test_AD7714_driver_waits_for_data_ready() {
     auto test = [](uint16_t val) {
         AD7714_mock::data_ready_counter = val;
@@ -98,13 +116,41 @@ void test_AD7714_driver_waits_for_data_ready() {
 }
 
 void test_AD7714_driver_timeout() {
-    AD7714_mock::data_ready_counter = 10000;
-    adc::read(AD7714::Channels::TEST);
-    TEST_ASSERT_EQUAL_UINT16(2000, AD7714_mock::data_ready_counter);
+    auto test = [](uint16_t ticks) {
+        AD7714_mock::data_ready_counter = ticks;
+        adc::read(AD7714::Channels::TEST);
+        TEST_ASSERT_EQUAL_UINT16(ticks-8000, AD7714_mock::data_ready_counter);
+    };
 
-    AD7714_mock::data_ready_counter = 15000;
-    adc::read(AD7714::Channels::TEST);
-    TEST_ASSERT_EQUAL_UINT16(7000, AD7714_mock::data_ready_counter);
+    test(10000);
+    test(15000);
+}
+
+void test_AD7714_driver_watchdog() {
+    auto test = [](uint16_t ticks) {
+        WDT::kicks = 0;
+        AD7714_mock::data_ready_counter = ticks;
+        adc::read(AD7714::Channels::TEST);
+        TEST_ASSERT_EQUAL_UINT16(ticks, WDT::kicks);
+    };
+
+    test(0);
+    test(1);
+    test(10);
+    test(1000);
+    test(5000);
+}
+
+void test_AD7714_driver_watchdog_timeout() {
+    auto test = [](uint16_t ticks) {
+        WDT::kicks = 0;
+        AD7714_mock::data_ready_counter = ticks;
+        adc::read(AD7714::Channels::TEST);
+        TEST_ASSERT_EQUAL_UINT16(8000, WDT::kicks);
+    };
+
+    test(9000);
+    test(15000);
 }
 
 void test_AD7714_driver() {
@@ -112,7 +158,10 @@ void test_AD7714_driver() {
     RUN_TEST(test_AD7714_driver_init);
     RUN_TEST(test_AD7714_driver_read_data);
     RUN_TEST(test_AD7714_driver_read_channel);
+    RUN_TEST(test_AD7714_driver_read_gains);
     RUN_TEST(test_AD7714_driver_waits_for_data_ready);
     RUN_TEST(test_AD7714_driver_timeout);
+    RUN_TEST(test_AD7714_driver_watchdog);
+    RUN_TEST(test_AD7714_driver_watchdog_timeout);
     UnityEnd();
 }

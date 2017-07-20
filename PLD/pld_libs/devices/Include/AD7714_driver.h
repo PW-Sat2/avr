@@ -2,33 +2,35 @@
 #define PLD_PLD_LIBS_DEVICES_INCLUDE_AD7714_DRIVER_H_
 
 #include <hal/hal>
+#include <hardware/interface.h>
 #include "AD7714.h"
 
 namespace pld {
 namespace devices {
 namespace AD7714 {
 
-template<typename adc>
+template<typename Adc, typename Watchdog>
 struct AD7714_driver {
     static void init() {
-        adc::init();
+        Adc::init();
     }
 
     constexpr static std::chrono::milliseconds timeout{8000};
     constexpr static std::chrono::milliseconds granulation{1};
 
-    static uint24_t read(Channels channel) {
-        adc::setup_read(channel);
+    static uint24_t read(Channels channel, Gain gain = Gain::GAIN_1) {
+        Adc::setup_read(channel, gain);
 
         std::chrono::milliseconds elapsed{0};
-        while (!adc::data_ready()) {
+        while (!Adc::data_ready()) {
             hal::sleep_for(granulation);
             elapsed += granulation;
+            Watchdog::kick();
             if (elapsed >= timeout) {
                 return 0;
             }
         }
-        return adc::read_data_no_wait();
+        return Adc::read_data_no_wait();
     }
 };
 
