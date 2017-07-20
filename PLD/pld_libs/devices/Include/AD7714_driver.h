@@ -18,7 +18,14 @@ struct AD7714_driver {
     constexpr static std::chrono::milliseconds timeout{8000};
     constexpr static std::chrono::milliseconds granulation{1};
 
-    static uint24_t read(Channels channel, Gain gain = Gain::GAIN_1) {
+    struct Result {
+        Result() : timeout{0} {}
+        bool timeout;
+        uint24_t value;
+    };
+
+    static Result read(Channels channel, Gain gain = Gain::GAIN_1) {
+        Result result;
         Adc::setup_read(channel, gain);
 
         std::chrono::milliseconds elapsed{0};
@@ -27,10 +34,12 @@ struct AD7714_driver {
             elapsed += granulation;
             Watchdog::kick();
             if (elapsed >= timeout) {
-                return 0;
+                result.timeout = true;
+                break;
             }
         }
-        return Adc::read_data_no_wait();
+        result.value = Adc::read_data_no_wait();
+        return result;
     }
 };
 

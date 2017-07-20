@@ -60,18 +60,23 @@ void test_AD7714_driver_init() {
 }
 
 void test_AD7714_driver_read_data() {
-    for (uint32_t i = 0; i <= 0xFFFFFFul; i += 1000) {
-        AD7714_mock::value = i;
-        TEST_ASSERT_EQUAL(i, adc::read(AD7714::Channels::AIN_1_2));
-    }
+    auto test = [](uint32_t value) {
+        AD7714_mock::value = value;
+        auto read = adc::read(AD7714::Channels::AIN_1_2);
+        TEST_ASSERT_FALSE(read.timeout);
+        TEST_ASSERT_EQUAL(value, read.value);
+    };
 
-    AD7714_mock::value = 0xFFFFFFul;
-    TEST_ASSERT_EQUAL(0xFFFFFF, adc::read(AD7714::Channels::AIN_1_2));
+    for (uint32_t i = 0; i <= 0xFFFFFFul; i += 1000) {
+        test(i);
+    }
+    test(0xFFFFFFul);
 }
 
 void test_AD7714_driver_read_channel() {
     auto test = [](AD7714::Channels ch) {
-        adc::read(ch);
+        auto read = adc::read(ch);
+        TEST_ASSERT_FALSE(read.timeout);
         TEST_ASSERT_EQUAL(ch, AD7714_mock::channel);
     };
 
@@ -87,7 +92,8 @@ void test_AD7714_driver_read_channel() {
 
 void test_AD7714_driver_read_gains() {
     auto test = [](AD7714::Gain gain) {
-        adc::read(AD7714::Channels::TEST, gain);
+        auto read = adc::read(AD7714::Channels::TEST, gain);
+        TEST_ASSERT_FALSE(read.timeout);
         TEST_ASSERT_EQUAL(gain, AD7714_mock::gain);
     };
 
@@ -104,7 +110,8 @@ void test_AD7714_driver_read_gains() {
 void test_AD7714_driver_waits_for_data_ready() {
     auto test = [](uint16_t val) {
         AD7714_mock::data_ready_counter = val;
-        adc::read(AD7714::Channels::TEST);
+        auto read = adc::read(AD7714::Channels::TEST);
+        TEST_ASSERT_FALSE(read.timeout);
         TEST_ASSERT_EQUAL_UINT16(0, AD7714_mock::data_ready_counter);
     };
 
@@ -116,21 +123,25 @@ void test_AD7714_driver_waits_for_data_ready() {
 }
 
 void test_AD7714_driver_timeout() {
-    auto test = [](uint16_t ticks) {
+    auto test = [](uint16_t ticks, uint24_t value) {
         AD7714_mock::data_ready_counter = ticks;
-        adc::read(AD7714::Channels::TEST);
+        AD7714_mock::value = value;
+        auto read = adc::read(AD7714::Channels::TEST);
+        TEST_ASSERT_TRUE(read.timeout);
+        TEST_ASSERT_EQUAL_UINT32(value, read.value);
         TEST_ASSERT_EQUAL_UINT16(ticks-8000, AD7714_mock::data_ready_counter);
     };
 
-    test(10000);
-    test(15000);
+    test(10000, 0xFF11FF);
+    test(15000, 0x123456);
 }
 
 void test_AD7714_driver_watchdog() {
     auto test = [](uint16_t ticks) {
         WDT::kicks = 0;
         AD7714_mock::data_ready_counter = ticks;
-        adc::read(AD7714::Channels::TEST);
+        auto read = adc::read(AD7714::Channels::TEST);
+        TEST_ASSERT_FALSE(read.timeout);
         TEST_ASSERT_EQUAL_UINT16(ticks, WDT::kicks);
     };
 
@@ -142,15 +153,18 @@ void test_AD7714_driver_watchdog() {
 }
 
 void test_AD7714_driver_watchdog_timeout() {
-    auto test = [](uint16_t ticks) {
+    auto test = [](uint16_t ticks, uint24_t value) {
         WDT::kicks = 0;
         AD7714_mock::data_ready_counter = ticks;
-        adc::read(AD7714::Channels::TEST);
+        AD7714_mock::value = value;
+        auto read = adc::read(AD7714::Channels::TEST);
+        TEST_ASSERT_TRUE(read.timeout);
+        TEST_ASSERT_EQUAL_UINT32(value, read.value);
         TEST_ASSERT_EQUAL_UINT16(8000, WDT::kicks);
     };
 
-    test(9000);
-    test(15000);
+    test(9000, 0xBEEFED);
+    test(15000, 0xDEADAA);
 }
 
 void test_AD7714_driver() {
