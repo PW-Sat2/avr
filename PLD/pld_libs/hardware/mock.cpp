@@ -35,25 +35,15 @@ void Mock::radfet_on() {
     hal::sleep_for(100ms);
 }
 
-void read_dummy_radfet_channel() {
-    hal::sleep_for(6s);
-}
-
 Telemetry::Radfet Mock::radfet_read() {
     Telemetry::Radfet rf;
     rf.temperature = 0xBAAAAD;
     rf.vth         = {0xDEAD78, 0xBEEFED, 0x1CF00D};
 
-    read_dummy_radfet_channel();
-    this->external_watchdog_kick();
-
-    read_dummy_radfet_channel();
-    this->external_watchdog_kick();
-
-    read_dummy_radfet_channel();
-    this->external_watchdog_kick();
-
-    read_dummy_radfet_channel();
+    for(int i = 0; i < 4*100; ++i) {
+        hal::sleep_for(60ms);
+        external_watchdog_kick();
+    }
 
     return rf;
 }
