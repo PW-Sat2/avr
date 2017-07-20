@@ -1,6 +1,4 @@
-#include <avr/sleep.h>
 #include <hal/hal>
-#include "unity.h"
 
 using hal::Serial0;
 

@@ -1,5 +1,6 @@
 add_library(drivers STATIC
     Include/AD7714.h
+    Include/Watchdog.h
 )
 
 target_include_directories(drivers PUBLIC Include)
