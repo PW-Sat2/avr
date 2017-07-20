@@ -21,5 +21,5 @@ target_link_libraries(unit_tests_pld
     hardware
     commands
     telemetry
-    drivers
+    devices
 )

@@ -1,6 +1,7 @@
 #include <hardware/real.h>
 #include <logger.h>
 #include <hal/hal>
+#include "Watchdog.h"
 
 using namespace hal;
 using namespace devices;
@@ -28,6 +29,7 @@ using adc128 = devices::ADC128::ADC128<adc128_interface::spi>;
 
 using watchdog_pin = hal::DigitalIO::GPIO<44>;
 using tps3813      = hal::devices::TPS3813<watchdog_pin, 10>;
+using external_watchdog = pld::devices::Watchdog<tps3813>;
 
 using interrupt = hal::DigitalIO::GPIO<10>;
 
@@ -114,7 +116,7 @@ void pld::hardware::RealHardware::init() {
 
     adg708::init();
 
-    watchdog_pin::init(DigitalIO::Mode::OUTPUT);
+    external_watchdog::init();
 }
 
 void pld::hardware::RealHardware::read_adc(
@@ -150,7 +152,7 @@ void pld::hardware::RealHardware::radfet_off() {
 }
 
 void pld::hardware::RealHardware::external_watchdog_kick() {
-    tps3813::kick();
+    external_watchdog::kick();
 }
 
 void pld::hardware::RealHardware::obc_interrupt_set() {

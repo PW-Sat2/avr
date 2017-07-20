@@ -56,10 +56,6 @@ ISR(TWI_vect) {
     Obc::process_interrupt();
 }
 
-static bool external_watchdog_should_be_kicked = false;
-ISR(TIMER1_OVF_vect) {
-    external_watchdog_should_be_kicked = true;
-}
 
 int main() {
     hal::Watchdog::disable();
@@ -81,10 +77,6 @@ int main() {
 
     Obc::init(&telemetry);
 
-    // 524 ms overflow interrupt
-    Timer1::init(Timer1::Prescaler::DIV_64, Timer1::Mode::Normal);
-    Timer1::enable_overflow_interrupt();
-
     sei();
     LOG_INFO("PLD Initialised.");
 
@@ -93,10 +85,7 @@ int main() {
         dispatcher.dispatch();
         hw->obc_interrupt_reset();
 
-        if (external_watchdog_should_be_kicked) {
-            external_watchdog_should_be_kicked = false;
-            hw->external_watchdog_kick();
-        }
+        hw->external_watchdog_kick();
 
         if (pld::debug::mock()) {
             hw = &mock_hardware;

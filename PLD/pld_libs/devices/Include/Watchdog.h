@@ -19,6 +19,7 @@ struct Watchdog {
      * Should be invoked once at the start of the program.
      */
     static void init() {
+        tps::init();
         hal::mcu::Timer1::init(hal::mcu::Timer1::Prescaler::DIV_64,
                                hal::mcu::Timer1::Mode::Normal);
         TIMSK1 = 0;  // turn off all interrupts on Timer1
