@@ -1,5 +1,4 @@
 #include <hardware/real.h>
-#include <logger.h>
 #include <hal/hal>
 #include "Watchdog.h"
 
@@ -27,8 +26,8 @@ using spi = SPI::Hardware<cs,
 using adg708 = ADG708::ADG708<Mux::A0, Mux::A1, Mux::A2, Mux::EN>;
 using adc128 = devices::ADC128::ADC128<adc128_interface::spi>;
 
-using watchdog_pin = hal::DigitalIO::GPIO<44>;
-using tps3813      = hal::devices::TPS3813<watchdog_pin, 10>;
+using watchdog_pin      = hal::DigitalIO::GPIO<44>;
+using tps3813           = hal::devices::TPS3813<watchdog_pin, 10>;
 using external_watchdog = pld::devices::Watchdog<tps3813>;
 
 using interrupt = hal::DigitalIO::GPIO<10>;

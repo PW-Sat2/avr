@@ -19,7 +19,6 @@
 
 using namespace hal;
 using namespace hal::libs;
-using hal::mcu::Timer1;
 
 pld::hardware::Mock mock_hardware;
 pld::hardware::RealHardware real_hardware;

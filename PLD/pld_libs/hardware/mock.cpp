@@ -37,7 +37,7 @@ Telemetry::Radfet Mock::radfet_read() {
     rf.temperature = 0xBAAAAD;
     rf.vth         = {0xDEAD78, 0xBEEFED, 0x1CF00D};
 
-    for(int i = 0; i < 4*100; ++i) {
+    for (int i = 0; i < 4 * 100; ++i) {
         hal::sleep_for(60ms);
         external_watchdog_kick();
     }
