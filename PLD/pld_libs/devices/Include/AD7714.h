@@ -1,8 +1,6 @@
 #ifndef PLD_PLD_LIBS_DEVICES_INCLUDE_AD7714_H_
 #define PLD_PLD_LIBS_DEVICES_INCLUDE_AD7714_H_
 
-#include <chrono>
-#include <experimental/optional>
 #include <hal/hal>
 
 namespace pld {
