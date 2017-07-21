@@ -1,5 +1,5 @@
-#ifndef PLD_PLD_LIBS_DEVICES_INCLUDE_AD7714_DRIVER_H_
-#define PLD_PLD_LIBS_DEVICES_INCLUDE_AD7714_DRIVER_H_
+#ifndef PLD_PLD_LIBS_DEVICES_INCLUDE_RADFETADC_H_
+#define PLD_PLD_LIBS_DEVICES_INCLUDE_RADFETADC_H_
 
 #include <hardware/interface.h>
 #include <hal/hal>
@@ -16,7 +16,7 @@ namespace AD7714 {
  * @tparam Watchdog Watchdog to kick.
  */
 template<typename Adc, typename Watchdog>
-struct AD7714_driver {
+struct RadfetAdc {
     /*!
      * Timeout of ADC readout operation (waiting for DATA_READY line)
      */
@@ -88,4 +88,4 @@ struct AD7714_driver {
 }  // namespace devices
 }  // namespace pld
 
-#endif  // PLD_PLD_LIBS_DEVICES_INCLUDE_AD7714_DRIVER_H_
+#endif  // PLD_PLD_LIBS_DEVICES_INCLUDE_RADFETADC_H_

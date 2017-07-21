@@ -1,4 +1,4 @@
-#include "AD7714_driver.h"
+#include "RadfetAdc.h"
 #include "AD7714.h"
 #include "unity.h"
 
@@ -53,16 +53,16 @@ struct WDT {
 };
 std::uint16_t WDT::kicks;
 
-using adc = AD7714::AD7714_driver<AD7714_mock, WDT>;
+using adc = AD7714::RadfetAdc<AD7714_mock, WDT>;
 
 
-void test_AD7714_driver_init() {
+void test_RadfetAdc_init() {
     AD7714_mock::init_called = false;
     adc::init();
     TEST_ASSERT_TRUE(AD7714_mock::init_called);
 }
 
-void test_AD7714_driver_read_data() {
+void test_RadfetAdc_read_data() {
     auto test = [](uint32_t value) {
         AD7714_mock::value = value;
 
@@ -77,7 +77,7 @@ void test_AD7714_driver_read_data() {
     test(0xFFFFFFul);
 }
 
-void test_AD7714_driver_read_channel() {
+void test_RadfetAdc_read_channel() {
     auto test = [](AD7714::Channels ch) {
         auto read = adc::read(ch);
         TEST_ASSERT_FALSE(read.timeout);
@@ -94,7 +94,7 @@ void test_AD7714_driver_read_channel() {
     test(AD7714::Channels::TEST);
 }
 
-void test_AD7714_driver_read_gains() {
+void test_RadfetAdc_read_gains() {
     auto test = [](AD7714::Gain gain) {
         auto read = adc::read(AD7714::Channels::TEST, gain);
 
@@ -112,7 +112,7 @@ void test_AD7714_driver_read_gains() {
     test(AD7714::Gain::GAIN_128);
 }
 
-void test_AD7714_driver_waits_for_data_ready() {
+void test_RadfetAdc_waits_for_data_ready() {
     auto test = [](uint16_t val) {
         AD7714_mock::data_ready_counter = val;
 
@@ -129,7 +129,7 @@ void test_AD7714_driver_waits_for_data_ready() {
     test(5000);
 }
 
-void test_AD7714_driver_timeout() {
+void test_RadfetAdc_timeout() {
     auto test = [](uint16_t ticks, uint24_t value) {
         AD7714_mock::data_ready_counter = ticks;
         AD7714_mock::value              = value;
@@ -145,7 +145,7 @@ void test_AD7714_driver_timeout() {
     test(15000, 0x123456);
 }
 
-void test_AD7714_driver_watchdog() {
+void test_RadfetAdc_watchdog() {
     auto test = [](uint16_t ticks) {
         WDT::kicks                      = 0;
         AD7714_mock::data_ready_counter = ticks;
@@ -163,7 +163,7 @@ void test_AD7714_driver_watchdog() {
     test(5000);
 }
 
-void test_AD7714_driver_watchdog_timeout() {
+void test_RadfetAdc_watchdog_timeout() {
     auto test = [](uint16_t ticks, uint24_t value) {
         WDT::kicks                      = 0;
         AD7714_mock::data_ready_counter = ticks;
@@ -180,15 +180,15 @@ void test_AD7714_driver_watchdog_timeout() {
     test(15000, 0xDEADAA);
 }
 
-void test_AD7714_driver() {
+void test_RadfetAdc() {
     UnityBegin("");
-    RUN_TEST(test_AD7714_driver_init);
-    RUN_TEST(test_AD7714_driver_read_data);
-    RUN_TEST(test_AD7714_driver_read_channel);
-    RUN_TEST(test_AD7714_driver_read_gains);
-    RUN_TEST(test_AD7714_driver_waits_for_data_ready);
-    RUN_TEST(test_AD7714_driver_timeout);
-    RUN_TEST(test_AD7714_driver_watchdog);
-    RUN_TEST(test_AD7714_driver_watchdog_timeout);
+    RUN_TEST(test_RadfetAdc_init);
+    RUN_TEST(test_RadfetAdc_read_data);
+    RUN_TEST(test_RadfetAdc_read_channel);
+    RUN_TEST(test_RadfetAdc_read_gains);
+    RUN_TEST(test_RadfetAdc_waits_for_data_ready);
+    RUN_TEST(test_RadfetAdc_timeout);
+    RUN_TEST(test_RadfetAdc_watchdog);
+    RUN_TEST(test_RadfetAdc_watchdog_timeout);
     UnityEnd();
 }

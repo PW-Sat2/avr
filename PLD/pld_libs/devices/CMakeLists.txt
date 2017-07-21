@@ -1,6 +1,6 @@
 add_library(devices STATIC
     Include/AD7714.h
-    Include/AD7714_driver.h
+    Include/RadfetAdc.h
     Include/Watchdog.h
 )
 
