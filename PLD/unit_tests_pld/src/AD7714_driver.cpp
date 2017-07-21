@@ -44,6 +44,9 @@ uint16_t AD7714_mock::data_ready_counter;
 
 struct WDT {
     static std::uint16_t kicks;
+    static void init() {
+        kicks = 0;
+    }
     static void kick() {
         kicks++;
     }
