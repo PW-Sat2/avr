@@ -1,36 +1,11 @@
-#include <hardware/real.h>
-#include <hal/hal>
+#include "hardware/real.h"
 #include "Watchdog.h"
+#include "hardware/IOMap.h"
 
 using namespace hal;
 using namespace devices;
 using namespace std::chrono_literals;
-
-namespace Mux {
-using A0 = DigitalIO::GPIO<42>;
-using A1 = DigitalIO::GPIO<40>;
-using A2 = DigitalIO::GPIO<41>;
-using EN = DigitalIO::GPIO<43>;
-}  // namespace Mux
-
-namespace adc128_interface {
-using cs = DigitalIO::GPIO<9>;
-
-using spi = SPI::Hardware<cs,
-                          SPI::HardwareClockDivisor::SPIHard_DIV_16,
-                          SPI::Polarity::idle_low,
-                          SPI::Phase::trailing_sample,
-                          SPI::DataOrder::MSB_first>;
-}  // namespace adc128_interface
-
-using adg708 = ADG708::ADG708<Mux::A0, Mux::A1, Mux::A2, Mux::EN>;
-using adc128 = devices::ADC128::ADC128<adc128_interface::spi>;
-
-using watchdog_pin      = hal::DigitalIO::GPIO<44>;
-using tps3813           = hal::devices::TPS3813<watchdog_pin, 10>;
-using external_watchdog = pld::devices::Watchdog<tps3813>;
-
-using interrupt = hal::DigitalIO::GPIO<10>;
+using namespace pld::hardware;
 
 
 using ADCChannel = devices::ADC128::Channel;
@@ -138,17 +113,6 @@ void pld::hardware::RealHardware::read_adc(
     *last->data =
         adc128::read_and_change_channel(channel_to_adc_input(last->channel));
     adg708::disable();
-}
-
-void pld::hardware::RealHardware::radfet_on() {
-}
-
-pld::hardware::Interface::RadfetMeasurement
-pld::hardware::RealHardware::radfet_read() {
-    return RadfetMeasurement();
-}
-
-void pld::hardware::RealHardware::radfet_off() {
 }
 
 void pld::hardware::RealHardware::external_watchdog_kick() {

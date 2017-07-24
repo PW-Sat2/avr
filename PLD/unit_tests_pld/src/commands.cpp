@@ -319,15 +319,15 @@ void test_commands_radfet_measure_status_ok() {
 }
 
 void test_commands_radfet_measure_status_timeout() {
-    auto test = [](bool tmp, bool vth3, bool vth2, bool vth1, uint8_t expected) {
+    auto test = [](bool tmp, bool vth2, bool vth1, bool vth0, uint8_t expected) {
         telemetry.init();
         hw                  = MockHW();
         hw.radfet_telemetry = Interface::RadfetMeasurement();
         set_radfet_status(0);
 
+        hw.radfet_telemetry.timeout_vth0        = vth0;
         hw.radfet_telemetry.timeout_vth1        = vth1;
         hw.radfet_telemetry.timeout_vth2        = vth2;
-        hw.radfet_telemetry.timeout_vth3        = vth3;
         hw.radfet_telemetry.timeout_temperature = tmp;
 
         pld::commands::RadFET_Measure().invoke(telemetry, hw, {});

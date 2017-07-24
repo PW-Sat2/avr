@@ -29,9 +29,9 @@ struct RadFET_Measure : public Command<0x85, 0> {
 
 
         auto tm = hardware.radfet_read();
+        telemetry.radfet.status.set_status(Fields::TimeoutVth0, tm.timeout_vth0);
         telemetry.radfet.status.set_status(Fields::TimeoutVth1, tm.timeout_vth1);
         telemetry.radfet.status.set_status(Fields::TimeoutVth2, tm.timeout_vth2);
-        telemetry.radfet.status.set_status(Fields::TimeoutVth3, tm.timeout_vth3);
         telemetry.radfet.status.set_status(Fields::TimeoutTemperature,
                                            tm.timeout_temperature);
 

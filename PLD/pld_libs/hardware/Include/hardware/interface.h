@@ -43,16 +43,16 @@ struct Interface {
     };
 
     struct RadfetMeasurement {
+        bool timeout_vth0;
         bool timeout_vth1;
         bool timeout_vth2;
-        bool timeout_vth3;
         bool timeout_temperature;
         pld::Telemetry::Radfet::Measurement measurement;
 
         RadfetMeasurement()
-            : timeout_vth1{false},
+            : timeout_vth0{false},
+              timeout_vth1{false},
               timeout_vth2{false},
-              timeout_vth3{false},
               timeout_temperature{false} {
         }
     };

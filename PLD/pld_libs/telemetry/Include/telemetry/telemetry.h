@@ -72,9 +72,9 @@ struct Telemetry {
         struct Status {
             enum class Fields {
                 On                 = 0,
-                TimeoutVth1        = 1,
-                TimeoutVth2        = 2,
-                TimeoutVth3        = 3,
+                TimeoutVth0        = 1,
+                TimeoutVth1        = 2,
+                TimeoutVth2        = 3,
                 TimeoutTemperature = 4,
                 MeasurementDone    = 5,
                 LCL_3V3_error      = 6,
