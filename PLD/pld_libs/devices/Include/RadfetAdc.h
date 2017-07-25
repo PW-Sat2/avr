@@ -9,6 +9,8 @@ namespace pld {
 namespace devices {
 namespace AD7714 {
 
+using namespace std::chrono_literals;
+
 /*!
  * Specialised driver for AD7714 for PLD board.
  * Implements watchdog kicking and timeout functionality.
