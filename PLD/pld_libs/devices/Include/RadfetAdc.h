@@ -69,6 +69,12 @@ struct RadfetAdc {
         Result result;
         Adc::setup_read(channel, gain);
 
+        /*!
+         * Mandatory delay before DRDY pin polling. See AD7714’s datasheet
+         * REV. C, page 23, "Self-Calibration" sub-chapter.
+         */
+        hal::sleep_for(10ms);
+
         std::chrono::milliseconds elapsed{0};
         while (!Adc::data_ready()) {
             hal::sleep_for(granulation);
