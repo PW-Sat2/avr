@@ -77,7 +77,7 @@ struct RadfetAdc {
          */
         hal::sleep_for(10ms);
 
-        std::chrono::milliseconds elapsed{0};
+        std::chrono::milliseconds elapsed{10};
         while (!Adc::data_ready()) {
             hal::sleep_for(granulation);
             elapsed += granulation;
