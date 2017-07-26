@@ -9,6 +9,8 @@ namespace pld {
 namespace devices {
 namespace AD7714 {
 
+using namespace std::chrono_literals;
+
 /*!
  * Specialised driver for AD7714 for PLD board.
  * Implements watchdog kicking and timeout functionality.
@@ -69,7 +71,13 @@ struct RadfetAdc {
         Result result;
         Adc::setup_read(channel, gain);
 
-        std::chrono::milliseconds elapsed{0};
+        /*!
+         * Mandatory delay before DRDY pin polling. See AD7714’s datasheet
+         * REV. C, page 23, "Self-Calibration" sub-chapter.
+         */
+        hal::sleep_for(10ms);
+
+        std::chrono::milliseconds elapsed{10};
         while (!Adc::data_ready()) {
             hal::sleep_for(granulation);
             elapsed += granulation;
