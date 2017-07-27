@@ -138,7 +138,8 @@ void test_RadfetAdc_timeout() {
 
         TEST_ASSERT_TRUE(read.timeout);
         TEST_ASSERT_EQUAL_UINT32(value, read.value);
-        TEST_ASSERT_EQUAL_UINT16(ticks - 8000, AD7714_mock::data_ready_counter);
+        TEST_ASSERT_EQUAL_UINT16(ticks - 8000 + 10,
+                                 AD7714_mock::data_ready_counter);
     };
 
     test(10000, 0xFF11FF);
@@ -173,7 +174,7 @@ void test_RadfetAdc_watchdog_timeout() {
 
         TEST_ASSERT_TRUE(read.timeout);
         TEST_ASSERT_EQUAL_UINT32(value, read.value);
-        TEST_ASSERT_EQUAL_UINT16(8000, WDT::kicks);
+        TEST_ASSERT_EQUAL_UINT16(8000 - 10, WDT::kicks);
     };
 
     test(9000, 0xBEEFED);

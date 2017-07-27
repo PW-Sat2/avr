@@ -2,7 +2,9 @@
 #define SUNS_SUNS_LIBS_COMMANDS_INCLUDE_COMMANDS_MEASURE_H_
 
 #include "ObcInterface/Command.h"
+#include "hardware/interface.h"
 #include "logger.h"
+#include "telemetry/telemetry.h"
 
 namespace suns {
 namespace commands {
