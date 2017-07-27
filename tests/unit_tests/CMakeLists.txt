@@ -2,6 +2,7 @@ add_compile_options(-Wno-error)
 
 add_hal_executable(unit_tests
     main.cpp
+    src/Atomic.cpp
     src/CommandDispatcherTest.cpp
 )
 
@@ -17,4 +18,5 @@ target_link_libraries(unit_tests
     unity
     terminal
     ObcInterface
+    atomic
 )

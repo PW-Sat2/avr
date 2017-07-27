@@ -7,30 +7,10 @@
 #include <cstdint>
 #include <cstring>
 #include <hal/hal>
+#include "atomic.h"
 
 
 namespace pld {
-namespace details {
-
-template<class T>
-class Atomic {
- public:
-    void operator=(const T& rhs) {
-        ATOMIC_BLOCK(ATOMIC_FORCEON) {
-            value = rhs;
-        }
-    }
-
-    operator T() const {
-        return value;
-    }
-
- private:
-    T value;
-};
-
-
-}  // namespace details
 
 struct Telemetry {
     struct SunsRef {
@@ -103,14 +83,14 @@ struct Telemetry {
         };
 
         Status status;
-        details::Atomic<Measurement> measurement;
+        avr::Atomic<Measurement> measurement;
     };
 
     uint8_t who_am_i;
-    details::Atomic<SunsRef> suns_ref;
-    details::Atomic<Temperatures> temperatures;
-    details::Atomic<Photodiodes> photodiodes;
-    details::Atomic<Housekeeping> housekeeping;
+    avr::Atomic<SunsRef> suns_ref;
+    avr::Atomic<Temperatures> temperatures;
+    avr::Atomic<Photodiodes> photodiodes;
+    avr::Atomic<Housekeeping> housekeeping;
     Radfet radfet;
 
     void init() {
