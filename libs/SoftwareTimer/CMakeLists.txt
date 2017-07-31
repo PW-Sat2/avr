@@ -1,9 +1,9 @@
-set(NAME SoftTimer)
+set(NAME SoftwareTimer)
 
 add_library(${NAME} STATIC
-    Include/SoftwareTimer.h
+    SoftwareTimer.h
 )
 
-target_include_directories(${NAME} PUBLIC Include)
+target_include_directories(${NAME} PUBLIC .)
 
-target_link_libraries(${NAME} hal logger)
+target_link_libraries(${NAME} hal)

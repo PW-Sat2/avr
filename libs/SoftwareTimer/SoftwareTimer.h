@@ -1,17 +1,19 @@
-#ifndef LIBS_SOFTWARETIMER_INCLUDE_SOFTWARETIMER_H_
-#define LIBS_SOFTWARETIMER_INCLUDE_SOFTWARETIMER_H_
+#ifndef LIBS_SOFTWARETIMER_SOFTWARETIMER_H_
+#define LIBS_SOFTWARETIMER_SOFTWARETIMER_H_
 
 #include <cstdint>
 #include <hal/hal>
+
+namespace avr {
 
 /*!
  * Software timer count-down module.
  * Allows user, for example, to create a timeout operation, such as simple
  * watchdog module.
  *
- * Timer will always count from \refitem period_ticks value down to 0.
+ * Timer will always count from period_ticks value down to 0.
  *
- * User provide callbacks to module using \refitem Callback template parameter.
+ * User provide callbacks to module using Callback template parameter.
  * Callback should have two static methods:
  * \code
  * struct Callbacks {
@@ -59,6 +61,8 @@ class SoftwareTimer : hal::libs::PureStatic {
 };
 
 template<typename Callbacks, std::uint16_t period_ticks>
-std::uint16_t SoftwareTimer<Callbacks, period_ticks>::ticks;
+std::uint16_t SoftwareTimer<Callbacks, period_ticks>::ticks = 0;
 
-#endif  // LIBS_SOFTWARETIMER_INCLUDE_SOFTWARETIMER_H_
+};  // namespace avr
+
+#endif  // LIBS_SOFTWARETIMER_SOFTWARETIMER_H_
