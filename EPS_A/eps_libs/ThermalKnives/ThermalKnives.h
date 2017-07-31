@@ -7,46 +7,68 @@
 
 namespace eps_a {
 
-template<typename ThermalKnifeInterface, char... name>
-struct ThermalKniveTimerCallbacks {
-    static void countdown(uint16_t count) {
-        ThermalKnifeInterface::enable();
-        if (count == 0) {
-            const char tkname[] = {name..., '\0'};
-            LOG_INFO("Auto disable burn switch: %s", tkname);
-        }
-    }
-
-    static void expired() {
-        ThermalKnifeInterface::disable();
-    }
-};
-
-
-template<typename SailInterface, typename SadsInterface>
-struct ThermalKnives : hal::libs::PureStatic {
+/*!
+ * ThermalKnives handling for EPS_A.
+ * It is responsible for auto-turnoff Burn switches after timeout.
+ * Pins used by this module are considered active-low.
+ * @tparam SailPin pin connected to sail BURN switch
+ * @tparam SadsPin pin connected to sads BURN switch
+ */
+template<typename SailPin, typename SadsPin>
+class ThermalKnives : hal::libs::PureStatic {
+ public:
+    /*!
+     * Possible BURN commands from OBC
+     */
     enum class Types : std::uint8_t {
         Sail = 0,
         Sads = 1,
     };
 
+    /*!
+     * Enable specific burn switch for 120 seconds.
+     * Executing this commands when burn is in progress will reset timer.
+     * @param burn_id Channel to enable.
+     */
     static void burn(Types burn_id);
+
+    /*!
+     * Constant-time tick. Should be invoked in main loop each 1 seconds.
+     */
     static void tick();
 
-
+ private:
+    /*!
+     * Auto-off timeout in ticks.
+     */
     static constexpr uint16_t AutoDisableTicks = 2 * 60;
 
-    using sail_timer = SoftwareTimer<
-        ThermalKniveTimerCallbacks<SailInterface, 'S', 'A', 'I', 'L', 'm', 'a', 'i', 'n'>,
+    template<typename ThermalKnifePin, char... name>
+    struct ThermalKniveTimerCallbacks {
+        static void countdown(uint16_t count) {
+            ThermalKnifePin::reset();
+            if (count == 0) {
+                const char tkname[] = {name..., '\0'};
+                LOG_INFO("Auto disable burn switch: %s", tkname);
+            }
+        }
+
+        static void expired() {
+            ThermalKnifePin::set();
+        }
+    };
+
+    using sail_timer = avr::SoftwareTimer<
+        ThermalKniveTimerCallbacks<SailPin, 'S', 'A', 'I', 'L', 'm', 'a', 'i', 'n'>,
         AutoDisableTicks>;
-    using sads_timer = SoftwareTimer<
-        ThermalKniveTimerCallbacks<SadsInterface, 'S', 'A', 'D', 'S', 'm', 'a', 'i', 'n'>,
+    using sads_timer = avr::SoftwareTimer<
+        ThermalKniveTimerCallbacks<SadsPin, 'S', 'A', 'D', 'S', 'm', 'a', 'i', 'n'>,
         AutoDisableTicks>;
 };
 
 
-template<typename SailInterface, typename SadsInterface>
-void ThermalKnives<SailInterface, SadsInterface>::burn(Types burn_id) {
+template<typename SailPin, typename SadsPin>
+void ThermalKnives<SailPin, SadsPin>::burn(Types burn_id) {
     switch (burn_id) {
         case Types::Sail:
             LOG_INFO("Enable burn switch: SAILmain");
@@ -60,8 +82,8 @@ void ThermalKnives<SailInterface, SadsInterface>::burn(Types burn_id) {
     }
 }
 
-template<typename SailInterface, typename SadsInterface>
-void ThermalKnives<SailInterface, SadsInterface>::tick() {
+template<typename SailPin, typename SadsPin>
+void ThermalKnives<SailPin, SadsPin>::tick() {
     sail_timer::tick();
     sads_timer::tick();
 }
