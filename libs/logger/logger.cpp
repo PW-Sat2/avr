@@ -19,7 +19,7 @@ void print_log(uint8_t level, const char* format PROGMEM, ...) {
     va_start(args, format);
 
     printf_P((PGM_P)pgm_read_word(&(_level_table[level])));
-    printf_P(format, args);
+    vfprintf_P(stdout, format, args);
     printf_P(_newline);
 
     va_end(args);
