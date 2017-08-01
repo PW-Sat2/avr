@@ -1,10 +1,10 @@
 #include <avr/sleep.h>
 #include <hal/hal>
-#include "unity.h"
 
 using hal::Serial0;
 
 void test_CommandDispatcher();
+void test_Atomic();
 
 int main() {
     Serial0.init(38400);
@@ -12,6 +12,7 @@ int main() {
     Serial0.redirect_stderr();
 
     test_CommandDispatcher();
+    test_Atomic();
 
     hal::libs::sim::stop_simulation();
 }
