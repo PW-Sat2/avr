@@ -1,5 +1,6 @@
 #include <hal/hal>
 #include "IOMap.h"
+#include "MainTimer.h"
 
 #include "logger.h"
 
@@ -49,6 +50,8 @@ int main() {
     telemetry.init();
     telemetry.who_am_i = 0x61;
     Obc::init(&telemetry);
+
+    eps_a::MainTimer::init();
 
     sei();
 
