@@ -6,6 +6,7 @@ add_hal_executable(unit_tests
     src/CommandDispatcherTest.cpp
     src/Prescaler.cpp
     src/SoftwareTimer.cpp
+    src/LclInterface.cpp
 )
 
 add_custom_target(unit_tests.run
@@ -23,4 +24,5 @@ target_link_libraries(unit_tests
     atomic
     SoftwareTimer
     Prescaler
+    LclInterface
 )

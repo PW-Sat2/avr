@@ -1,5 +1,6 @@
 add_subdirectory(atomic)
 add_subdirectory(external)
+add_subdirectory(LclInterface)
 add_subdirectory(logger)
 add_subdirectory(ObcInterface)
 add_subdirectory(Prescaler)
