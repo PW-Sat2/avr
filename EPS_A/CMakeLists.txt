@@ -16,7 +16,7 @@ add_subdirectory(${HAL_PATH} hal)
 add_subdirectory(../libs libs)
 add_subdirectory(../tests tests)
 
+add_subdirectory(src)
 add_subdirectory(eps_libs)
 
-add_subdirectory(src)
 add_subdirectory(eps_unit_tests)
