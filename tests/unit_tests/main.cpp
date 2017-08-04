@@ -6,6 +6,7 @@ using hal::Serial0;
 void test_CommandDispatcher();
 void test_Atomic();
 void test_SoftwareTimer();
+void test_Prescaler();
 
 int main() {
     Serial0.init(38400);
@@ -15,6 +16,7 @@ int main() {
     test_CommandDispatcher();
     test_Atomic();
     test_SoftwareTimer();
+    test_Prescaler();
 
     hal::libs::sim::stop_simulation();
 }

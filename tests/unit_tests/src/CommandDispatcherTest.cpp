@@ -1,7 +1,8 @@
+#include <unity.h>
 #include <cstdint>
 #include <gsl/gsl>
+
 #include "ObcInterface/CommandDispatcher.h"
-#include "unity.h"
 
 class CommandMock {
  public:

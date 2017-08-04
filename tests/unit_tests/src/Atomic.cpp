@@ -1,6 +1,7 @@
+#include <unity.h>
 #include <hal/hal>
+
 #include "atomic.h"
-#include "unity.h"
 
 using namespace avr;
 
