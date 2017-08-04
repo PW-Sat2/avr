@@ -8,4 +8,5 @@ target_link_libraries(EPS_A
     telemetry
     commands
     IOMap
+    MainTimer
 )
