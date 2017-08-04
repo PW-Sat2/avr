@@ -9,7 +9,7 @@ template<int id_>
 struct LCL {
     enum class Id : std::uint8_t {};
 
-    using IdType = Id;
+    using IdType               = Id;
     static constexpr IdType id = static_cast<Id>(id_);
 
     static bool state_on;
@@ -27,7 +27,7 @@ bool LCL<id_>::state_on;
 
 
 using LCLs = std::tuple<LCL<0>, LCL<20>, LCL<7>, LCL<0xFB>>;
-using cmd = LclCommander<LCLs>;
+using cmd  = LclCommander<LCLs>;
 
 void set_on(bool a, bool b, bool c, bool d) {
     std::tuple_element_t<0, LCLs>::state_on = a;

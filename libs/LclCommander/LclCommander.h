@@ -8,14 +8,16 @@
 namespace eps {
 
 /*!
- * Commander module for LCLs. Should be shared between modules to turn on/off/check LCLs
+ * Commander module for LCLs. Should be shared between modules to turn
+ * on/off/check LCLs
  * @tparam LCLs std::tuple containing all LclInterfaces.
  */
 template<typename LCLs>
 class LclCommander {
-public:
+ public:
     /*!
-     * Turn ON LCL with specified ID. If LCL is not found with this ID error log will be printed.
+     * Turn ON LCL with specified ID. If LCL is not found with this ID error log
+     * will be printed.
      * @param id Numeric value of LCL ID.
      */
     static void on(uint8_t id) {
@@ -23,14 +25,15 @@ public:
     }
 
     /*!
-     * Turn OFF LCL with specified ID. If LCL is not found with this ID error log will be printed.
+     * Turn OFF LCL with specified ID. If LCL is not found with this ID error
+     * log will be printed.
      * @param id Numeric value of LCL ID.
      */
     static void off(uint8_t id) {
         Dispatch<OffExec, LCLs>::dispatch(id);
     }
 
-private:
+ private:
     template<template<typename> typename Exec, typename Tuple>
     struct Dispatch {
         template<int index, int tag>

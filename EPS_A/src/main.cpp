@@ -7,14 +7,17 @@
 #include "ObcInterface/CommandDispatcher.h"
 #include "ObcInterface/ObcInterface.h"
 
+#include "commands/LCL.h"
 #include "commands/PowerCycle.h"
 
+#include "LclCommander.h"
 #include "telemetry.h"
 
 using namespace hal;
 using namespace hal::libs;
 
 eps_a::Telemetry telemetry;
+using LclCommander = eps::LclCommander<eps_a::iomap::lcl::AllLcls>;
 
 struct Executor {
     template<typename Command>
@@ -23,9 +26,12 @@ struct Executor {
     }
 };
 
-using EPSACommandDispatcher = CommandDispatcher<Executor,                    //
-                                                eps_a::commands::PowerCycle  //
-                                                >;
+using EPSACommandDispatcher =
+    CommandDispatcher<Executor,                                  //
+                      eps_a::commands::PowerCycle,               //
+                      eps_a::commands::EnableLCL<LclCommander>,  //
+                      eps_a::commands::DisableLCL<LclCommander>  //
+                      >;
 EPSACommandDispatcher dispatcher;
 
 void CommandCallback(gsl::span<const uint8_t> _c) {
