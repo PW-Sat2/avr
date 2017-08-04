@@ -2,6 +2,7 @@
 #define EPS_A_EPS_LIBS_IOMAP_IOMAP_H_
 
 #include <hal/hal>
+#include "LclInterface.h"
 
 namespace eps_a {
 namespace iomap {
@@ -28,11 +29,6 @@ struct MpptChannel {
     using Adc124 = hal::devices::ADC124::ADC124<AdcSPI>;
     using Dac121 = hal::devices::DAC121::DAC121<DacSPI>;
 };
-
-template<typename PinOn, typename PinFlagB, std::uint8_t>
-struct LCL
-    : hal::devices::FPF270x<PinOn, PinFlagB, hal::DigitalIO::Dummy<false>> {};
-
 }  // namespace details
 
 
@@ -113,29 +109,43 @@ enum class LclId : std::uint8_t {
     Ants     = 6,
 };
 
-using TkMain = details::LCL<tk_main::PinOn,     //
-                            tk_main::PinFlagB,  //
-                            num(LclId::TkMain)>;
+// clang-format off
+using TkMain = eps::LclInterface<tk_main::PinOn,
+                        tk_main::PinFlagB,
+                        LclId,
+                        LclId::TkMain,
+                        'T', 'K', 'm', 'a', 'i', 'n'>;
 
-using Suns = details::LCL<suns::PinOn,     //
-                          suns::PinFlagB,  //
-                          num(LclId::Suns)>;
+using Suns = eps::LclInterface<suns::PinOn,
+                      suns::PinFlagB,
+                      LclId,
+                      LclId::Suns,
+                      'S', 'u', 'n', 'S'>;
 
-using CamNadir = details::LCL<cam_nadir::PinOn,     //
-                              cam_nadir::PinFlagB,  //
-                              num(LclId::CamNadir)>;
+using CamNadir = eps::LclInterface<cam_nadir::PinOn,
+                          cam_nadir::PinFlagB,
+                          LclId,
+                          LclId::CamNadir,
+                          'C', 'a', 'm', 'N', 'a', 'd', 'i', 'r'>;
 
-using CamWing = details::LCL<cam_wing::PinOn,     //
-                             cam_wing::PinFlagB,  //
-                             num(LclId::CamWing)>;
+using CamWing = eps::LclInterface<cam_wing::PinOn,
+                         cam_wing::PinFlagB,
+                         LclId,
+                         LclId::CamWing,
+                         'C', 'a', 'm', 'W', 'i', 'n', 'g'>;
 
-using Sens = details::LCL<sens::PinOn,     //
-                          sens::PinFlagB,  //
-                          num(LclId::Sens)>;
+using Sens = eps::LclInterface<sens::PinOn,
+                      sens::PinFlagB,
+                      LclId,
+                      LclId::Sens,
+                      'S', 'e', 'n', 's'>;
 
-using Ants = details::LCL<ants::PinOn,     //
-                          ants::PinFlagB,  //
-                          num(LclId::Ants)>;
+using Ants = eps::LclInterface<ants::PinOn,
+                      ants::PinFlagB,
+                      LclId,
+                      LclId::Ants,
+                      'A', 'n', 't', 's'>;
+// clang-format on
 
 using AllLcls = std::tuple<TkMain, Suns, CamNadir, CamWing, Sens, Ants>;
 
