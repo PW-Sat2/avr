@@ -9,4 +9,5 @@ target_link_libraries(EPS_A
     commands
     IOMap
     MainTimer
+    LclCommander
 )

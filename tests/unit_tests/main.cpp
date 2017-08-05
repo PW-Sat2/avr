@@ -7,6 +7,8 @@ void test_CommandDispatcher();
 void test_Atomic();
 void test_SoftwareTimer();
 void test_Prescaler();
+void test_LclInterface();
+void test_LclCommander();
 
 int main() {
     Serial0.init(38400);
@@ -17,6 +19,8 @@ int main() {
     test_Atomic();
     test_SoftwareTimer();
     test_Prescaler();
+    test_LclInterface();
+    test_LclCommander();
 
     hal::libs::sim::stop_simulation();
 }

@@ -1,13 +1,12 @@
-set(NAME commands)
+set(NAME LclCommander)
 
 add_library(${NAME} STATIC
-    commands/PowerCycle.h
-    commands/LCL.h
+    LclCommander.h
 )
 
 target_include_directories(${NAME} PUBLIC .)
 
 target_link_libraries(${NAME}
     hal
-    ObcInterface
+    LclInterface
 )
