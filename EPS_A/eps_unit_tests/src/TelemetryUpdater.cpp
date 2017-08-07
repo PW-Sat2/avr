@@ -76,14 +76,14 @@ struct Mppt {
     struct MpptMock {
         template<MpptChannel mppt_channel>
         struct MpptChannelMock {
-            struct adc_spi {
+            struct AdcSpi {
                 static void init() {
                     TEST_ASSERT_FALSE(data.initialised[num(mppt_channel)]);
                     data.initialised[num(mppt_channel)] = true;
                 }
             };
 
-            struct adc124 {
+            struct Adc124 {
                 static uint12_t read_and_change_channel(Adc124Ch ch) {
                     static Adc124Ch channel = Adc124Ch::IN0;
 

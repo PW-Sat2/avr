@@ -79,14 +79,14 @@ class TelemetryUpdater : hal::libs::PureStatic {
 
     template<typename MpptCh>
     static void update_mppt_channel(Telemetry::SingleMpptChannel& tm) {
-        MpptCh::adc_spi::init();
+        MpptCh::AdcSpi::init();
 
-        MpptCh::adc124::read_and_change_channel(Adc124Ch::IN0);
+        MpptCh::Adc124::read_and_change_channel(Adc124Ch::IN0);
 
-        tm.solar_current = MpptCh::adc124::read_and_change_channel(Adc124Ch::IN1);
-        tm.solar_voltage = MpptCh::adc124::read_and_change_channel(Adc124Ch::IN2);
-        tm.output_voltage = MpptCh::adc124::read_and_change_channel(Adc124Ch::IN3);
-        tm.temperature = MpptCh::adc124::read_and_change_channel(Adc124Ch::IN3);
+        tm.solar_current = MpptCh::Adc124::read_and_change_channel(Adc124Ch::IN1);
+        tm.solar_voltage = MpptCh::Adc124::read_and_change_channel(Adc124Ch::IN2);
+        tm.output_voltage = MpptCh::Adc124::read_and_change_channel(Adc124Ch::IN3);
+        tm.temperature = MpptCh::Adc124::read_and_change_channel(Adc124Ch::IN3);
     }
 };
 

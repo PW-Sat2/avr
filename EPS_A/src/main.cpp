@@ -1,5 +1,6 @@
 #include <hal/hal>
 #include "IOMap.h"
+#include "TelemetryUpdater.h"
 
 #include "MainTimer.h"
 #include "Prescaler.h"
@@ -54,6 +55,9 @@ using Obc = drivers::ObcInterface<0x35,                                       //
                                   EPSACommandDispatcher::max_command_length,  //
                                   eps_a::Telemetry>;
 
+using TelemetryUpdater =
+    eps_a::TelemetryUpdater<telemetry, iomap::mux::Mux, hal::Analog::AnalogGPIO, iomap::Mppt>;
+
 ISR(TWI_vect) {
     Obc::process_interrupt();
     dispatcher.dispatch();
@@ -78,8 +82,10 @@ int main() {
 
     while (1) {
         if (eps_a::MainTimer::expired()) {
+            TelemetryUpdater::update_mppt();
             if (timer_1second.expired()) {
                 ThermalKnives::tick();
+                TelemetryUpdater::update_general();
             }
         }
     }
