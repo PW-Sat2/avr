@@ -34,6 +34,14 @@ class LclInterface {
     static constexpr char name[] = {name_..., '\0'};
 
     /*!
+     * Initialises LCL and log message
+     */
+    static void init() {
+        LOG_INFO("[LCL] INIT %s\n", name);
+        FPF::init();
+    }
+
+    /*!
      * Turn on LCL and log message
      */
     static void on() {

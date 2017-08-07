@@ -1,5 +1,8 @@
 add_hal_executable(EPS_A
     main.cpp
+    eps/eps.cpp
+    eps/eps.h
+    eps/main.h
 )
 
 target_link_libraries(EPS_A
