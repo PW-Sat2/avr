@@ -12,4 +12,5 @@ target_link_libraries(EPS_A
     LclCommander
     Prescaler
     ThermalKnives
+    TelemetryUpdater
 )
