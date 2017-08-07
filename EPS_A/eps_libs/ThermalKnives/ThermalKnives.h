@@ -21,9 +21,16 @@ class ThermalKnives : hal::libs::PureStatic {
      * Possible BURN commands from OBC
      */
     enum class Types : std::uint8_t {
-        Sail = 0,
-        Sads = 1,
+        Sail = 1,
+        Sads = 2,
     };
+
+    /*!
+     * Enable specific burn switch for 120 seconds.
+     * Executing this commands when burn is in progress will reset timer.
+     * @param burn_id Channel to enable.
+     */
+    static void burn(uint8_t burn_id);
 
     /*!
      * Enable specific burn switch for 120 seconds.
@@ -68,18 +75,25 @@ class ThermalKnives : hal::libs::PureStatic {
 
 
 template<typename SailPin, typename SadsPin>
-void ThermalKnives<SailPin, SadsPin>::burn(Types burn_id) {
+void ThermalKnives<SailPin, SadsPin>::burn(uint8_t burn_id) {
     switch (burn_id) {
-        case Types::Sail:
+        case num(Types::Sail):
             LOG_INFO("Enable burn switch: SAILmain");
             sail_timer::reset();
             break;
 
-        case Types::Sads:
+        case num(Types::Sads):
             LOG_INFO("Enable burn switch: SADSmain");
             sads_timer::reset();
             break;
+        default:
+            LOG_ERROR("Unknown BURN id %d\n", burn_id);
     }
+}
+
+template<typename SailPin, typename SadsPin>
+void ThermalKnives<SailPin, SadsPin>::burn(Types burn_id) {
+    burn(num(burn_id));
 }
 
 template<typename SailPin, typename SadsPin>

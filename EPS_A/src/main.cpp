@@ -25,8 +25,9 @@ using namespace eps_a::iomap;
 
 eps_a::Telemetry telemetry;
 
-using LclCommander = eps::LclCommander<iomap::lcl::AllLcls>;
-using ThermalKnives = eps_a::ThermalKnives<iomap::thermal_knives::PinSail, iomap::thermal_knives::PinSads>;
+using LclCommander  = eps::LclCommander<iomap::lcl::AllLcls>;
+using ThermalKnives = eps_a::ThermalKnives<iomap::thermal_knives::PinSail,   //
+                                           iomap::thermal_knives::PinSads>;  //
 
 struct Executor {
     template<typename Command>
@@ -36,11 +37,11 @@ struct Executor {
 };
 
 using EPSACommandDispatcher =
-    CommandDispatcher<Executor,                                  //
-                      eps_a::commands::PowerCycle,               //
-                      eps_a::commands::EnableLCL<LclCommander>,  //
-                      eps_a::commands::DisableLCL<LclCommander>, //
-                      eps_a::commands::ThermalKnives<ThermalKnives> //
+    CommandDispatcher<Executor,                                      //
+                      eps_a::commands::PowerCycle,                   //
+                      eps_a::commands::EnableLCL<LclCommander>,      //
+                      eps_a::commands::DisableLCL<LclCommander>,     //
+                      eps_a::commands::ThermalKnives<ThermalKnives>  //
                       >;
 EPSACommandDispatcher dispatcher;
 
