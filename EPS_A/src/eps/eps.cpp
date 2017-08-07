@@ -52,4 +52,6 @@ void eps_a::init_obc_interface() {
     telemetry.init();
     telemetry.who_am_i = 0x61;
     Obc::init(&telemetry);
+
+    ::ObcWatchdog::kick();
 }

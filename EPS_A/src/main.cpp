@@ -19,8 +19,6 @@ ISR(TWI_vect) {
 avr::Prescaler<33> timer_1second;
 void each_33ms() {
     TelemetryUpdater::update_mppt();
-    ATOMIC_BLOCK(ATOMIC_FORCEON) {
-    }
 
     if (timer_1second.expired()) {
         each_1sec();
@@ -30,6 +28,7 @@ void each_33ms() {
 void each_1sec() {
     ATOMIC_BLOCK(ATOMIC_FORCEON) {
         ThermalKnives::tick();
+        ObcWatchdog::tick();
     }
     TelemetryUpdater::update_general();
 }

@@ -17,4 +17,5 @@ target_link_libraries(EPS_A
     ThermalKnives
     TelemetryUpdater
     PowerCycle
+    ObcWatchdog
 )

@@ -7,16 +7,21 @@
 #include "telemetry.h"
 
 #include "commands/LCL.h"
+#include "commands/ObcWatchdog.h"
 #include "commands/PowerCycle.h"
 #include "commands/ThermalKnives.h"
 
 #include "LclCommander.h"
+#include "ObcWatchdog.h"
+#include "PowerCycle/PowerCycle.h"
 #include "TelemetryUpdater.h"
 #include "ThermalKnives.h"
 
 extern eps_a::Telemetry telemetry;
 
 using LclCommander = eps::LclCommander<eps_a::iomap::lcl::AllLcls>;
+using ObcWatchdog  = eps_a::ObcWatchdog<eps_a::full_power_cycle>;
+
 
 using ThermalKnives =
     eps_a::ThermalKnives<eps_a::iomap::thermal_knives::PinSail,   //
@@ -30,11 +35,12 @@ struct Executor {
 };
 
 using EPSACommandDispatcher =
-    CommandDispatcher<Executor,                                      //
-                      eps_a::commands::PowerCycle,                   //
-                      eps_a::commands::EnableLCL<LclCommander>,      //
-                      eps_a::commands::DisableLCL<LclCommander>,     //
-                      eps_a::commands::ThermalKnives<ThermalKnives>  //
+    CommandDispatcher<Executor,                                       //
+                      eps_a::commands::PowerCycle,                    //
+                      eps_a::commands::EnableLCL<LclCommander>,       //
+                      eps_a::commands::DisableLCL<LclCommander>,      //
+                      eps_a::commands::ThermalKnives<ThermalKnives>,  //
+                      eps_a::commands::ObcWatchdog<ObcWatchdog>       //
                       >;
 
 extern EPSACommandDispatcher dispatcher;
