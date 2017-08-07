@@ -8,49 +8,109 @@ using AdcCh = hal::Analog::InternalADC::Input;
 
 Telemetry tm;
 
-struct Data {
-    std::array<std::array<uint10_t, 4>, 4> data;
+struct General {
+    struct Data {
+        std::array<std::array<uint10_t, 4>, 4> data;
+        MuxCh selected_mux_channel;
 
-    uint10_t& get(MuxCh mux, AdcCh adc) {
-        return data[num(adc)][num(mux)];
-    }
+        uint10_t& get(MuxCh mux, AdcCh adc) {
+            return data[num(adc)][num(mux)];
+        }
+
+        static uint10_t sim(MuxCh mux, AdcCh ch) {
+            uint16_t val = 10u * num(mux) + num(ch);
+            return val;
+        }
+    };
+
+    static Data data;
+
+
+    struct MuxMock {
+        static void select(MuxCh ch) {
+            data.selected_mux_channel = ch;
+        }
+    };
+
+
+    template<AdcCh adc_input>
+    struct ADCMock {
+        static_assert(adc_input == AdcCh::ADC0 ||      //
+                          adc_input == AdcCh::ADC1 ||  //
+                          adc_input == AdcCh::ADC2 ||  //
+                          adc_input == AdcCh::ADC3,
+                      "Wrong channel!");
+
+        static uint10_t read() {
+            return data.get(data.selected_mux_channel, adc_input);
+        }
+    };
 };
+General::Data General::data;
 
-Data data;
+struct Mppt {
+    using Adc124Ch = hal::devices::ADC124::Channel;
 
-MuxCh selected_mux_channel;
+    enum class MpptChannel {
+        X  = 0,
+        Yp = 1,
+        Yn = 2,
+    };
 
-struct MuxMock {
-    static void select(MuxCh ch) {
-        selected_mux_channel = ch;
-    }
+    struct Data {
+        std::array<bool, 3> initialised;
+        std::array<std::array<uint12_t, 4>, 3> data;
+
+        uint12_t& get(MpptChannel ch, Adc124Ch adc) {
+            return data[num(ch)][num(adc) >> 3];
+        }
+
+        uint12_t sim(MpptChannel ch, Adc124Ch adc) {
+            uint12_t val = 10u * num(ch) + num(adc) >> 3;
+            return val;
+        }
+    };
+
+    static Data data;
+
+    struct MpptMock {
+        template<MpptChannel mppt_channel>
+        struct MpptChannelMock {
+            struct adc_spi {
+                static void init() {
+                    TEST_ASSERT_FALSE(data.initialised[num(mppt_channel)]);
+                    data.initialised[num(mppt_channel)] = true;
+                }
+            };
+
+            struct adc124 {
+                static uint12_t read_and_change_channel(Adc124Ch ch) {
+                    static Adc124Ch channel = Adc124Ch::IN0;
+
+                    TEST_ASSERT_TRUE(data.initialised[num(mppt_channel)]);
+
+                    uint12_t val = data.get(mppt_channel, channel);
+
+                    channel = ch;
+                    return val;
+                }
+            };
+        };
+
+        using MpptX  = MpptChannelMock<MpptChannel::X>;
+        using MpptYp = MpptChannelMock<MpptChannel::Yp>;
+        using MpptYn = MpptChannelMock<MpptChannel::Yn>;
+    };
 };
+Mppt::Data Mppt::data;
 
+using tm_updater =
+    TelemetryUpdater<tm, General::MuxMock, General::ADCMock, Mppt::MpptMock>;
 
-template<AdcCh adc_input>
-struct ADCMock {
-    static_assert(adc_input == AdcCh::ADC0 ||      //
-                      adc_input == AdcCh::ADC1 ||  //
-                      adc_input == AdcCh::ADC2 ||  //
-                      adc_input == AdcCh::ADC3,
-                  "Wrong channel!");
-
-    static uint10_t read() {
-        return data.get(selected_mux_channel, adc_input);
-    }
-};
-
-using tm_updater = TelemetryUpdater<tm, MuxMock, ADCMock>;
-
-uint10_t count(MuxCh mux, AdcCh ch) {
-    uint16_t val = 10u * num(mux) + num(ch);
-    return val;
-}
-
-void test_TelemetryUpdater_example_pass() {
+void test_TelemetryUpdater_general() {
     for (auto mux : {MuxCh::S1, MuxCh::S2, MuxCh::S3, MuxCh::S4}) {
         for (auto adc : {AdcCh::ADC0, AdcCh::ADC1, AdcCh::ADC2, AdcCh::ADC3}) {
-            data.get(mux, adc) = count(mux, adc);
+            General::data.get(mux, adc) = General::Data::sim(mux, adc);
         }
     }
 
@@ -59,7 +119,7 @@ void test_TelemetryUpdater_example_pass() {
     Telemetry::General tm = ::tm.general;
 
     auto check = [](MuxCh mux, AdcCh adc, uint10_t value) {
-        TEST_ASSERT_EQUAL_INT(count(mux, adc), value);
+        TEST_ASSERT_EQUAL_INT(General::Data::sim(mux, adc), value);
     };
 
     check(MuxCh::S1, AdcCh::ADC0, tm.distribution.vbat_current);
@@ -82,10 +142,45 @@ void test_TelemetryUpdater_example_pass() {
     check(MuxCh::S4, AdcCh::ADC3, tm.battery_controller.controller_a_voltage);
 }
 
+void test_TelemetryUpdater_mppt() {
+    Mppt::data.initialised.fill(false);
+
+    for (auto ch :
+         {Mppt::MpptChannel::X, Mppt::MpptChannel::Yp, Mppt::MpptChannel::Yn}) {
+        for (auto adc : {Mppt::Adc124Ch::IN0,
+                         Mppt::Adc124Ch::IN1,
+                         Mppt::Adc124Ch::IN2,
+                         Mppt::Adc124Ch::IN3}) {
+            Mppt::data.get(ch, adc) = Mppt::data.sim(ch, adc);
+        }
+    }
+
+    tm_updater::update_mppt();
+
+    Telemetry::AllMpptChannels tm = ::tm.mppt;
+
+    auto check = [=](Mppt::Adc124Ch adc,
+                     uint16_t Telemetry::SingleMpptChannel::*ptr) {
+        TEST_ASSERT_EQUAL_INT(Mppt::data.sim(Mppt::MpptChannel::X, adc),
+                              tm.mpptx.*ptr);
+        TEST_ASSERT_EQUAL_INT(Mppt::data.sim(Mppt::MpptChannel::Yp, adc),
+                              tm.mpptyp.*ptr);
+        TEST_ASSERT_EQUAL_INT(Mppt::data.sim(Mppt::MpptChannel::Yn, adc),
+                              tm.mpptyn.*ptr);
+    };
+
+    check(Mppt::Adc124Ch::IN0, &Telemetry::SingleMpptChannel::solar_current);
+    check(Mppt::Adc124Ch::IN1, &Telemetry::SingleMpptChannel::solar_voltage);
+    check(Mppt::Adc124Ch::IN2, &Telemetry::SingleMpptChannel::output_voltage);
+    check(Mppt::Adc124Ch::IN3, &Telemetry::SingleMpptChannel::temperature);
+}
+
+
 void test_TelemetryUpdater() {
     UnityBegin("");
 
-    RUN_TEST(test_TelemetryUpdater_example_pass);
+    RUN_TEST(test_TelemetryUpdater_general);
+    RUN_TEST(test_TelemetryUpdater_mppt);
 
     UnityEnd();
 }

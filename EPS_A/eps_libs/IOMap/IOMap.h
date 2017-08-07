@@ -48,11 +48,11 @@ using PinEN = hal::DigitalIO::GPIO<16>;
 using Mux = hal::devices::ADG709::ADG709<PinA0, PinA1, PinEN>;
 }  // namespace mux
 
-namespace mppt {
-using MpptX  = details::MpptChannel<6, 43>;
-using MpptYp = details::MpptChannel<27, 28>;
-using MpptYn = details::MpptChannel<31, 32>;
-}  // namespace mppt
+struct Mppt {
+    using MpptX  = details::MpptChannel<6, 43>;
+    using MpptYp = details::MpptChannel<27, 28>;
+    using MpptYn = details::MpptChannel<31, 32>;
+};
 
 namespace thermal_knives {
 using PinSail = hal::DigitalIO::GPIO<41>;

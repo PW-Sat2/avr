@@ -12,10 +12,12 @@ namespace eps_a {
  * @tparam telemetry Telemetry to update
  * @tparam Mux ADG709 mux type (device from IOMap)
  * @tparam InternalADC InternalADC from hal (hal::Analog::AnalogGPIO)
+ * @tparam Mppt MPPT structure to use (from IOMap)
  */
 template<eps_a::Telemetry& telemetry,
          typename Mux,
-         template<hal::Analog::InternalADC::Input> typename InternalADC>
+         template<hal::Analog::InternalADC::Input> typename InternalADC,
+         typename Mppt>
 class TelemetryUpdater : hal::libs::PureStatic {
  public:
     /*!
@@ -52,6 +54,19 @@ class TelemetryUpdater : hal::libs::PureStatic {
         telemetry.general = tm;
     }
 
+    /*!
+     * Update all MPPT channels telemetry.
+     */
+    static void update_mppt() {
+        Telemetry::AllMpptChannels tm = telemetry.mppt;
+
+        update_mppt_channel<typename Mppt::MpptX>(tm.mpptx);
+        update_mppt_channel<typename Mppt::MpptYp>(tm.mpptyp);
+        update_mppt_channel<typename Mppt::MpptYn>(tm.mpptyn);
+
+        telemetry.mppt = tm;
+    }
+
  private:
     using MuxCh = hal::devices::ADG709::Channel;
 
@@ -59,6 +74,20 @@ class TelemetryUpdater : hal::libs::PureStatic {
     using Adc = InternalADC<input>;
 
     using AdcCh = hal::Analog::InternalADC::Input;
+
+    using Adc124Ch = hal::devices::ADC124::Channel;
+
+    template<typename MpptCh>
+    static void update_mppt_channel(Telemetry::SingleMpptChannel& tm) {
+        MpptCh::adc_spi::init();
+
+        MpptCh::adc124::read_and_change_channel(Adc124Ch::IN0);
+
+        tm.solar_current = MpptCh::adc124::read_and_change_channel(Adc124Ch::IN1);
+        tm.solar_voltage = MpptCh::adc124::read_and_change_channel(Adc124Ch::IN2);
+        tm.output_voltage = MpptCh::adc124::read_and_change_channel(Adc124Ch::IN3);
+        tm.temperature = MpptCh::adc124::read_and_change_channel(Adc124Ch::IN3);
+    }
 };
 
 }  // namespace eps_a
