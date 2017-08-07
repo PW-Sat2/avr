@@ -52,6 +52,7 @@ struct Telemetry {
         std::uint16_t power_cycles;
         std::uint32_t uptime;
         std::uint16_t temperature;
+        std::uint16_t supply_temperature;
     };
 
     struct AllMpptChannels {
@@ -78,7 +79,7 @@ struct Telemetry {
         std::memset(this, 0xFF, sizeof(eps_a::Telemetry));
     }
 };
-static_assert(sizeof(Telemetry) == 70,
+static_assert(sizeof(Telemetry) == 72,
               "Incorrect size of Telemetry structure (padding?)");
 static_assert(std::is_pod<Telemetry>::value, "POD");
 

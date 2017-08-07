@@ -5,6 +5,7 @@ add_hal_executable(eps_unit_tests
     src/ThermalKnives.cpp
     src/MainTimer.cpp
     src/LCLCommands.cpp
+    src/TelemetryUpdater.cpp
 )
 
 add_custom_target(eps_unit_tests.run
@@ -21,4 +22,5 @@ target_link_libraries(eps_unit_tests
     ThermalKnives
     MainTimer
     commands
+    TelemetryUpdater
 )

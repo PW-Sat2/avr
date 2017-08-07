@@ -6,6 +6,7 @@ using hal::Serial0;
 void test_TK();
 void test_MainTimer();
 void test_LCL_Commands();
+void test_TelemetryUpdater();
 
 int main() {
     Serial0.init(38400);
@@ -15,6 +16,7 @@ int main() {
     test_TK();
     test_MainTimer();
     test_LCL_Commands();
+    test_TelemetryUpdater();
 
     hal::libs::sim::stop_simulation();
 }

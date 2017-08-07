@@ -13,21 +13,21 @@ namespace details {
 template<int adc_cs_nr, int dac_cs_nr>
 struct MpptChannel {
     using PinAdcCS = hal::DigitalIO::GPIO<adc_cs_nr>;
-    using AdcSPI   = hal::SPI::Hardware<PinAdcCS,
+    using AdcSpi   = hal::SPI::Hardware<PinAdcCS,
                                       hal::SPI::HardwareClockDivisor::SPIHard_DIV_4,
                                       hal::SPI::Polarity::idle_low,
                                       hal::SPI::Phase::trailing_sample,
                                       hal::SPI::DataOrder::MSB_first>;
 
     using PinDacCS = hal::DigitalIO::GPIO<dac_cs_nr>;
-    using DacSPI   = hal::SPI::Hardware<PinDacCS,
+    using DacSpi   = hal::SPI::Hardware<PinDacCS,
                                       hal::SPI::HardwareClockDivisor::SPIHard_DIV_4,
                                       hal::SPI::Polarity::idle_low,
                                       hal::SPI::Phase::leading_sample,
                                       hal::SPI::DataOrder::MSB_first>;
 
-    using Adc124 = hal::devices::ADC124::ADC124<AdcSPI>;
-    using Dac121 = hal::devices::DAC121::DAC121<DacSPI>;
+    using Adc124 = hal::devices::ADC124::ADC124<AdcSpi>;
+    using Dac121 = hal::devices::DAC121::DAC121<DacSpi>;
 };
 }  // namespace details
 
@@ -48,11 +48,11 @@ using PinEN = hal::DigitalIO::GPIO<16>;
 using Mux = hal::devices::ADG709::ADG709<PinA0, PinA1, PinEN>;
 }  // namespace mux
 
-namespace mppt {
-using MpptX  = details::MpptChannel<6, 43>;
-using MpptYp = details::MpptChannel<27, 28>;
-using MpptYn = details::MpptChannel<31, 32>;
-}  // namespace mppt
+struct Mppt {
+    using MpptX  = details::MpptChannel<6, 43>;
+    using MpptYp = details::MpptChannel<27, 28>;
+    using MpptYn = details::MpptChannel<31, 32>;
+};
 
 namespace thermal_knives {
 using PinSail = hal::DigitalIO::GPIO<41>;
