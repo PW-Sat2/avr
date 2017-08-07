@@ -2,7 +2,7 @@
 
 #include "ObcWatchdog.h"
 
-static constexpr auto timeout = 5 * 60;
+static constexpr auto timeout = 10 * 60;
 
 static bool full_power_cycle_requested = false;
 

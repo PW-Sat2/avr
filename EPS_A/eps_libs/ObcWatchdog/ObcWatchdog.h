@@ -20,7 +20,7 @@ struct ObcWatchdog {
         }
     };
 
-    using timer = avr::SoftwareTimer<Callbacks, 5 * 60>;
+    using timer = avr::SoftwareTimer<Callbacks, 10 * 60>;
 
     static void tick() {
         timer::tick();
