@@ -12,7 +12,12 @@ struct LCL {
     using IdType               = Id;
     static constexpr IdType id = static_cast<Id>(id_);
 
+    static bool initialised;
     static bool state_on;
+
+    static void init() {
+        initialised = true;
+    }
 
     static void on() {
         state_on = true;
@@ -24,7 +29,8 @@ struct LCL {
 };
 template<int id_>
 bool LCL<id_>::state_on;
-
+template<int id_>
+bool LCL<id_>::initialised;
 
 using LCLs = std::tuple<LCL<0>, LCL<20>, LCL<7>, LCL<0xFB>>;
 using cmd  = LclCommander<LCLs>;
@@ -43,6 +49,20 @@ void test_on(bool a, bool b, bool c, bool d) {
     TEST_ASSERT_EQUAL(d, (std::tuple_element_t<3, LCLs>::state_on));
 }
 
+void reset_initialised() {
+    std::tuple_element_t<0, LCLs>::initialised = false;
+    std::tuple_element_t<1, LCLs>::initialised = false;
+    std::tuple_element_t<2, LCLs>::initialised = false;
+    std::tuple_element_t<3, LCLs>::initialised = false;
+}
+
+void test_initialised() {
+    TEST_ASSERT_TRUE((std::tuple_element_t<0, LCLs>::initialised));
+    TEST_ASSERT_TRUE((std::tuple_element_t<1, LCLs>::initialised));
+    TEST_ASSERT_TRUE((std::tuple_element_t<2, LCLs>::initialised));
+    TEST_ASSERT_TRUE((std::tuple_element_t<3, LCLs>::initialised));
+}
+
 void test_LclCommander_notfound() {
     set_on(true, true, true, true);
 
@@ -57,6 +77,14 @@ void test_LclCommander_notfound() {
     cmd::off(1);
 
     test_on(false, false, false, false);
+}
+
+void test_LclCommander_init() {
+    reset_initialised();
+
+    cmd::init();
+
+    test_initialised();
 }
 
 void test_LclCommander_on() {
@@ -101,6 +129,7 @@ void test_LclCommander() {
     UnityBegin("");
 
     RUN_TEST(test_LclCommander_notfound);
+    RUN_TEST(test_LclCommander_init);
     RUN_TEST(test_LclCommander_on);
     RUN_TEST(test_LclCommander_off);
 

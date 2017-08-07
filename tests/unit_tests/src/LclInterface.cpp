@@ -7,7 +7,12 @@ using namespace eps;
 
 template<int tag>
 struct WritePinIOMock {
+    static hal::DigitalIO::Mode mode;
     static bool value;
+
+    static void init(hal::DigitalIO::Mode mode_) {
+        mode = mode_;
+    }
     static void set() {
         value = true;
     }
@@ -17,11 +22,21 @@ struct WritePinIOMock {
 };
 template<int tag>
 bool WritePinIOMock<tag>::value;
+template<int tag>
+hal::DigitalIO::Mode WritePinIOMock<tag>::mode;
 
 template<int tag>
 struct ReadPinIOMock {
     static bool value;
+    static hal::DigitalIO::Mode mode;
+    static void init(hal::DigitalIO::Mode mode_) {
+        mode = mode_;
+    }
 };
+template<int tag>
+bool ReadPinIOMock<tag>::value;
+template<int tag>
+hal::DigitalIO::Mode ReadPinIOMock<tag>::mode;
 
 using OnMock    = WritePinIOMock<0>;
 using FlagBMock = ReadPinIOMock<0>;
@@ -42,6 +57,16 @@ void test_LclInterface_id() {
     TEST_ASSERT_EQUAL_INT(0x7A4785, LCL2::id);
 }
 
+void test_LclInterface_init() {
+    OnMock::mode    = hal::DigitalIO::Mode::INPUT_PULLUP;
+    FlagBMock::mode = hal::DigitalIO::Mode::OUTPUT;
+
+    LCL1::init();
+
+    TEST_ASSERT_EQUAL(hal::DigitalIO::Mode::OUTPUT, OnMock::mode);
+    TEST_ASSERT_EQUAL(hal::DigitalIO::Mode::INPUT_PULLUP, FlagBMock::mode);
+}
+
 void test_LclInterface_on() {
     OnMock::value = true;
     LCL1::on();
@@ -59,6 +84,7 @@ void test_LclInterface() {
 
     RUN_TEST(test_LclInterface_name);
     RUN_TEST(test_LclInterface_id);
+    RUN_TEST(test_LclInterface_init);
     RUN_TEST(test_LclInterface_on);
     RUN_TEST(test_LclInterface_off);
 

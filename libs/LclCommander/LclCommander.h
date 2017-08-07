@@ -16,6 +16,13 @@ template<typename LCLs>
 class LclCommander {
  public:
     /*!
+     * Initialises all LCLs (set proper GPIO modes)
+     */
+    static void init() {
+        hal::libs::for_each_tuple_type<InitExec, LCLs>();
+    }
+
+    /*!
      * Turn ON LCL with specified ID. If LCL is not found with this ID error log
      * will be printed.
      * @param id Numeric value of LCL ID.
@@ -31,6 +38,13 @@ class LclCommander {
      */
     static void off(uint8_t id) {
         Dispatch<OffExec, LCLs>::dispatch(id);
+    }
+
+    /*!
+     * Turn OFF all LCLs.
+     */
+    static void off_all() {
+        hal::libs::for_each_tuple_type<OffExec, LCLs>();
     }
 
  private:
@@ -57,6 +71,13 @@ class LclCommander {
 
         static void dispatch(uint8_t id) {
             Do<0, 0>::run(id);
+        }
+    };
+
+    template<typename Lcl>
+    struct InitExec {
+        static void run() {
+            Lcl::init();
         }
     };
 
