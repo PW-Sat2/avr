@@ -7,6 +7,7 @@ void test_TK();
 void test_MainTimer();
 void test_LCL_Commands();
 void test_TelemetryUpdater();
+void test_ObcWatchdog();
 
 int main() {
     Serial0.init(38400);
@@ -17,6 +18,7 @@ int main() {
     test_MainTimer();
     test_LCL_Commands();
     test_TelemetryUpdater();
+    test_ObcWatchdog();
 
     hal::libs::sim::stop_simulation();
 }
