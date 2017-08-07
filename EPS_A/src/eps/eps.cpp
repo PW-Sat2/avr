@@ -8,6 +8,8 @@ using namespace eps_a;
 using namespace std::chrono_literals;
 
 void eps_a::init_hardware() {
+    hal::Watchdog::disable();
+
     Serial0.init(38400);
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();

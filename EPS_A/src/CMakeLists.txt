@@ -16,4 +16,5 @@ target_link_libraries(EPS_A
     Prescaler
     ThermalKnives
     TelemetryUpdater
+    PowerCycle
 )
