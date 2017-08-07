@@ -1,6 +1,9 @@
 #include <hal/hal>
 #include "IOMap.h"
+
 #include "MainTimer.h"
+#include "Prescaler.h"
+#include "ThermalKnives.h"
 
 #include "logger.h"
 
@@ -9,15 +12,22 @@
 
 #include "commands/LCL.h"
 #include "commands/PowerCycle.h"
+#include "commands/ThermalKnives.h"
 
 #include "LclCommander.h"
 #include "telemetry.h"
 
 using namespace hal;
 using namespace hal::libs;
+namespace iomap {
+using namespace eps_a::iomap;
+}
 
 eps_a::Telemetry telemetry;
-using LclCommander = eps::LclCommander<eps_a::iomap::lcl::AllLcls>;
+
+using LclCommander  = eps::LclCommander<iomap::lcl::AllLcls>;
+using ThermalKnives = eps_a::ThermalKnives<iomap::thermal_knives::PinSail,   //
+                                           iomap::thermal_knives::PinSads>;  //
 
 struct Executor {
     template<typename Command>
@@ -27,10 +37,11 @@ struct Executor {
 };
 
 using EPSACommandDispatcher =
-    CommandDispatcher<Executor,                                  //
-                      eps_a::commands::PowerCycle,               //
-                      eps_a::commands::EnableLCL<LclCommander>,  //
-                      eps_a::commands::DisableLCL<LclCommander>  //
+    CommandDispatcher<Executor,                                      //
+                      eps_a::commands::PowerCycle,                   //
+                      eps_a::commands::EnableLCL<LclCommander>,      //
+                      eps_a::commands::DisableLCL<LclCommander>,     //
+                      eps_a::commands::ThermalKnives<ThermalKnives>  //
                       >;
 EPSACommandDispatcher dispatcher;
 
@@ -61,9 +72,16 @@ int main() {
 
     sei();
 
+    avr::Prescaler<33> timer_1second;
+
     LOG_INFO("EPS A initialized.");
 
     while (1) {
+        if (eps_a::MainTimer::expired()) {
+            if (timer_1second.expired()) {
+                ThermalKnives::tick();
+            }
+        }
     }
 
     hal::libs::sim::stop_simulation();
