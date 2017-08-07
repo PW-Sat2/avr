@@ -10,4 +10,6 @@ target_link_libraries(EPS_A
     IOMap
     MainTimer
     LclCommander
+    Prescaler
+    ThermalKnives
 )

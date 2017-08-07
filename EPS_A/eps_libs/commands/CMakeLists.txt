@@ -3,6 +3,7 @@ set(NAME commands)
 add_library(${NAME} STATIC
     commands/PowerCycle.h
     commands/LCL.h
+    commands/ThermalKnives.h
 )
 
 target_include_directories(${NAME} PUBLIC .)
