@@ -53,7 +53,7 @@ class ThermalKnives : hal::libs::PureStatic {
     template<typename ThermalKnifePin, char... name>
     struct ThermalKniveTimerCallbacks {
         static void countdown(uint16_t count) {
-            ThermalKnifePin::reset();
+            ThermalKnifePin::set();
             if (count == 0) {
                 const char tkname[] = {name..., '\0'};
                 LOG_INFO("Auto disable burn switch: %s", tkname);
@@ -61,7 +61,7 @@ class ThermalKnives : hal::libs::PureStatic {
         }
 
         static void expired() {
-            ThermalKnifePin::set();
+            ThermalKnifePin::reset();
         }
     };
 
