@@ -4,8 +4,6 @@
 #include "eps/eps.h"
 #include "eps/main.h"
 
-#include "PowerCycleCounter.h"
-
 void each_33ms();
 void each_1sec();
 
