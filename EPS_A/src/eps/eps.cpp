@@ -61,3 +61,9 @@ void eps_a::emergency_sail_deployment() {
     LOG_FATAL("Opening SAIL");
     LOG_FATAL("Unimplemented!");
 }
+
+
+void eps_a::emergency_sail_deployment() {
+    LOG_FATAL("Opening SAIL");
+    LOG_FATAL("Unimplemented!");
+}
