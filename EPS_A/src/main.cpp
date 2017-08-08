@@ -4,6 +4,8 @@
 #include "eps/eps.h"
 #include "eps/main.h"
 
+#include "PowerCycleCounter.h"
+
 void each_33ms();
 void each_1sec();
 
@@ -40,6 +42,7 @@ int main() {
     eps_a::init_hardware();
     LOG_INFO("Loaded EPS_A software rev. " GIT_REVISION
              ", local state: " GIT_CHANGES);
+    avr::power_cycle_counters::bootup(eps_a::emergency_sail_deployment);
     eps_a::init_obc_interface();
 
     sei();
