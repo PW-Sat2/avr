@@ -8,6 +8,7 @@
 
 #include "commands/LCL.h"
 #include "commands/PowerCycle.h"
+#include "commands/ThermalKnives.h"
 
 #include "LclCommander.h"
 #include "TelemetryUpdater.h"
@@ -17,6 +18,10 @@ extern eps_a::Telemetry telemetry;
 
 using LclCommander = eps::LclCommander<eps_a::iomap::lcl::AllLcls>;
 
+using ThermalKnives =
+    eps_a::ThermalKnives<eps_a::iomap::thermal_knives::PinSail,   //
+                         eps_a::iomap::thermal_knives::PinSads>;  //
+
 struct Executor {
     template<typename Command>
     void invoke(Command& cmd, gsl::span<uint8_t> args) {
@@ -25,10 +30,11 @@ struct Executor {
 };
 
 using EPSACommandDispatcher =
-    CommandDispatcher<Executor,                                  //
-                      eps_a::commands::PowerCycle,               //
-                      eps_a::commands::EnableLCL<LclCommander>,  //
-                      eps_a::commands::DisableLCL<LclCommander>  //
+    CommandDispatcher<Executor,                                      //
+                      eps_a::commands::PowerCycle,                   //
+                      eps_a::commands::EnableLCL<LclCommander>,      //
+                      eps_a::commands::DisableLCL<LclCommander>,     //
+                      eps_a::commands::ThermalKnives<ThermalKnives>  //
                       >;
 
 extern EPSACommandDispatcher dispatcher;
@@ -47,8 +53,5 @@ using TelemetryUpdater = eps_a::TelemetryUpdater<telemetry,                //
                                                  hal::Analog::AnalogGPIO,  //
                                                  eps_a::iomap::Mppt>;
 
-using ThermalKnives =
-    eps_a::ThermalKnives<eps_a::iomap::thermal_knives::PinSail,   //
-                         eps_a::iomap::thermal_knives::PinSads>;  //
 
 #endif  // EPS_A_SRC_EPS_MAIN_H_
