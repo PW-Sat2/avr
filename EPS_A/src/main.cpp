@@ -14,6 +14,8 @@ ISR(TWI_vect) {
 
 int main() {
     eps_a::init_hardware();
+    LOG_INFO("Loaded EPS_A software rev. " GIT_REVISION
+             ", local state: " GIT_CHANGES);
     eps_a::init_obc_interface();
 
     sei();
