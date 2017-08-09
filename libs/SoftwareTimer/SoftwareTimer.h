@@ -32,14 +32,14 @@ namespace avr {
  * @tparam Callbacks Callbacks provided by user.
  * @tparam period_ticks TOP value of counter.
  */
-template<typename Callbacks, std::uint16_t period_ticks>
+template<typename Callbacks, std::uint64_t period_ticks>
 class SoftwareTimer : hal::libs::PureStatic {
  public:
     /*!
      * Reset timer counter to TOP value (period_ticks).
      */
     static void reset() {
-        ticks = period_ticks;
+        ticks = max_value;
     }
 
     /*!
@@ -57,11 +57,15 @@ class SoftwareTimer : hal::libs::PureStatic {
     }
 
  private:
-    static std::uint16_t ticks;
+    using Type = hal::libs::type_for_value<period_ticks>;
+
+    constexpr static Type max_value = period_ticks;
+    static Type ticks;
 };
 
-template<typename Callbacks, std::uint16_t period_ticks>
-std::uint16_t SoftwareTimer<Callbacks, period_ticks>::ticks = 0;
+template<typename Callbacks, std::uint64_t period_ticks>
+typename SoftwareTimer<Callbacks, period_ticks>::Type
+    SoftwareTimer<Callbacks, period_ticks>::ticks = 0;
 
 };  // namespace avr
 
