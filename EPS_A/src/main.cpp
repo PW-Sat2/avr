@@ -15,6 +15,9 @@ ISR(TWI_vect) {
     Obc::process_interrupt();
     dispatcher.dispatch();
 }
+void CommandCallback(gsl::span<const uint8_t> _c) {
+    dispatcher.parse(_c);
+}
 
 avr::Prescaler<33> timer_1second;
 void each_33ms() {

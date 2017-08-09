@@ -45,9 +45,7 @@ using EPSACommandDispatcher =
 
 extern EPSACommandDispatcher dispatcher;
 
-static void CommandCallback(gsl::span<const uint8_t> _c) {
-    dispatcher.parse(_c);
-}
+void CommandCallback(gsl::span<const uint8_t> _c);
 
 using Obc = drivers::ObcInterface<0x35,                                       //
                                   CommandCallback,                            //
