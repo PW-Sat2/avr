@@ -18,6 +18,10 @@ class Atomic {
         return value;
     }
 
+    const T& get() const {
+        return value;
+    }
+
  private:
     T value;
 };

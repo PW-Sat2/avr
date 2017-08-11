@@ -19,4 +19,5 @@ target_link_libraries(EPS_A
     PowerCycle
     ObcWatchdog
     PowerCycleCounter
+    BatteryManager
 )
