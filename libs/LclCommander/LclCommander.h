@@ -47,6 +47,11 @@ class LclCommander {
         hal::libs::for_each_tuple_type<OffExec, LCLs>();
     }
 
+
+    static void handle_overcurrent() {
+        hal::libs::for_each_tuple_type<CheckOvercurrentExec, LCLs>();
+    }
+
  private:
     template<template<typename> typename Exec, typename Tuple>
     struct Dispatch {
@@ -92,6 +97,16 @@ class LclCommander {
     struct OffExec {
         static void run() {
             Lcl::off();
+        }
+    };
+
+    template<typename Lcl>
+    struct CheckOvercurrentExec {
+        static void run() {
+            if (Lcl::overcurrent()) {
+                Lcl::off();
+                LOG_ERROR("[LCL] Overcurrent %s", Lcl::name);
+            }
         }
     };
 };

@@ -12,6 +12,8 @@ struct LCL {
     using IdType               = Id;
     static constexpr IdType id = static_cast<Id>(id_);
 
+    static constexpr char name[] = "";
+
     static bool initialised;
     static bool state_on;
 
@@ -26,11 +28,20 @@ struct LCL {
     static void off() {
         state_on = false;
     }
+
+    static bool overcurrent_;
+    static bool overcurrent() {
+        return overcurrent_;
+    }
 };
 template<int id_>
 bool LCL<id_>::state_on;
 template<int id_>
 bool LCL<id_>::initialised;
+template<int id_>
+bool LCL<id_>::overcurrent_;
+template<int id_>
+constexpr char LCL<id_>::name[];
 
 using LCLs = std::tuple<LCL<0>, LCL<20>, LCL<7>, LCL<0xFB>>;
 using cmd  = LclCommander<LCLs>;
@@ -61,6 +72,13 @@ void test_initialised() {
     TEST_ASSERT_TRUE((std::tuple_element_t<1, LCLs>::initialised));
     TEST_ASSERT_TRUE((std::tuple_element_t<2, LCLs>::initialised));
     TEST_ASSERT_TRUE((std::tuple_element_t<3, LCLs>::initialised));
+}
+
+void set_overcurrent(bool a, bool b, bool c, bool d) {
+    std::tuple_element_t<0, LCLs>::overcurrent_ = a;
+    std::tuple_element_t<1, LCLs>::overcurrent_ = b;
+    std::tuple_element_t<2, LCLs>::overcurrent_ = c;
+    std::tuple_element_t<3, LCLs>::overcurrent_ = d;
 }
 
 void test_LclCommander_notfound() {
@@ -125,6 +143,39 @@ void test_LclCommander_off() {
     test_on(0, 0, 0, 0);
 }
 
+void test_LclCommander_overcurrent() {
+    set_on(1, 1, 1, 1);
+
+    set_overcurrent(0, 0, 0, 0);
+    cmd::handle_overcurrent();
+    test_on(1, 1, 1, 1);
+
+    set_overcurrent(0, 0, 0, 1);
+    cmd::handle_overcurrent();
+    test_on(1, 1, 1, 0);
+    cmd::handle_overcurrent();
+    test_on(1, 1, 1, 0);
+    cmd::handle_overcurrent();
+    test_on(1, 1, 1, 0);
+
+    set_overcurrent(0, 0, 1, 1);
+    cmd::handle_overcurrent();
+    test_on(1, 1, 0, 0);
+
+    set_overcurrent(0, 0, 0, 0);
+    cmd::handle_overcurrent();
+    test_on(1, 1, 0, 0);
+
+    set_overcurrent(1, 0, 0, 0);
+    cmd::handle_overcurrent();
+    test_on(0, 1, 0, 0);
+
+    set_on(1, 1, 1, 1);
+    set_overcurrent(1, 0, 1, 1);
+    cmd::handle_overcurrent();
+    test_on(0, 1, 0, 0);
+}
+
 void test_LclCommander() {
     UnityBegin("");
 
@@ -132,6 +183,7 @@ void test_LclCommander() {
     RUN_TEST(test_LclCommander_init);
     RUN_TEST(test_LclCommander_on);
     RUN_TEST(test_LclCommander_off);
+    RUN_TEST(test_LclCommander_overcurrent);
 
     UnityEnd();
 }

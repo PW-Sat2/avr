@@ -37,7 +37,7 @@ class LclInterface {
      * Initialises LCL and log message
      */
     static void init() {
-        LOG_INFO("[LCL] INIT %s\n", name);
+        LOG_INFO("[LCL] INIT %s", name);
         FPF::init();
     }
 
@@ -45,7 +45,7 @@ class LclInterface {
      * Turn on LCL and log message
      */
     static void on() {
-        LOG_INFO("[LCL] ON %s\n", name);
+        LOG_INFO("[LCL] ON %s", name);
         FPF::on();
     }
 
@@ -53,8 +53,12 @@ class LclInterface {
      * Turn off LCL and log message
      */
     static void off() {
-        LOG_INFO("[LCL] OFF %s\n", name);
+        LOG_INFO("[LCL] OFF %s", name);
         FPF::off();
+    }
+
+    static bool overcurrent() {
+        return FPF::error_occured();
     }
 
  private:
