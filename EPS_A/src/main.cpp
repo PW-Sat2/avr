@@ -62,11 +62,9 @@ void each_30min() {
 
 avr::BatteryManager<eps_a::iomap::battery_controller::PinCharge> battery_manager;
 void each_10sec() {
-    auto general = telemetry.general.get();
-
-    battery_manager.tick(general.battery_controller.controller_a_voltage,
-                         std::max(general.battery_pack.temperature_a,
-                                  general.battery_pack.temperature_b));
+    // TODO(ggajoch): replace with real battery voltage when calibrated
+    // TODO(ggajoch): replace with real temperatures when they are measured
+    battery_manager.tick(10, 0);
 }
 
 
