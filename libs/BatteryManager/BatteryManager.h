@@ -11,13 +11,15 @@ namespace avr {
  * Implements battery charging algorithm and battery heater.
  * @tparam PinCharge Pin used to enable battery charging LCL.
  * @tparam PinHeater Pin used to enable battery heater.
+ * @tparam PinDischarge Pin used to enable discharging battery.
  */
-template<typename PinCharge, typename PinHeater>
+template<typename PinCharge, typename PinDischarge, typename PinHeater>
 class BatteryManager {
  public:
     BatteryManager()
         : battery_charger(state_standby, state_charging),
-          battery_heater(state_heating_off, state_heating_on) {
+          battery_heater(state_heating_off, state_heating_on),
+          battery_discharger(state_discharging_off, state_discharging_on) {
     }
 
     /*!
@@ -28,6 +30,7 @@ class BatteryManager {
      */
     void tick(float battery_voltage, float max_battery_temperature) {
         battery_charger.tick(battery_voltage, max_battery_temperature);
+        battery_discharger.tick(battery_voltage, max_battery_temperature);
         battery_heater.tick(max_battery_temperature);
     }
 
@@ -88,6 +91,34 @@ class BatteryManager {
     StateHeaterON state_heating_on;
     StateHeaterOFF state_heating_off;
     BatteryHeaterFSM battery_heater;
+
+
+    using BatteryDischargeFSM = TwoStateFsm<float, float>;
+
+    struct StateDischargingON : BatteryDischargeFSM::IState {
+        void action() override {
+            PinDischarge::set();
+        }
+
+        bool should_change(float battery_voltage, float max_temperature) override {
+            return (battery_voltage < 6.3 or max_temperature > 58);
+        }
+    };
+
+    struct StateDischargingOFF : BatteryDischargeFSM::IState {
+        void action() override {
+            LOG_ERROR("[BATC] Battery Disconnected");
+            PinDischarge::reset();
+        }
+
+        bool should_change(float battery_voltage, float max_temperature) override {
+            return (battery_voltage > 6.8 and max_temperature < 55);
+        }
+    };
+
+    StateDischargingON state_discharging_on;
+    StateDischargingOFF state_discharging_off;
+    BatteryDischargeFSM battery_discharger;
 };
 
 }  // namespace avr
