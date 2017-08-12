@@ -6,6 +6,7 @@
 #include "ObcInterface/ObcInterface.h"
 #include "telemetry.h"
 
+#include "commands/DisableOverheatProtection.h"
 #include "commands/LCL.h"
 #include "commands/ObcWatchdog.h"
 #include "commands/PowerCycle.h"
@@ -13,6 +14,7 @@
 
 #include "LclCommander.h"
 #include "ObcWatchdog.h"
+#include "OverheatProtection.h"
 #include "PowerCycle/PowerCycle.h"
 #include "TelemetryUpdater.h"
 #include "ThermalKnives.h"
@@ -27,6 +29,8 @@ using ThermalKnives =
     eps_a::ThermalKnives<eps_a::iomap::thermal_knives::PinSail,   //
                          eps_a::iomap::thermal_knives::PinSads>;  //
 
+using OverheatProtection = avr::OverheatProtection<LclCommander, 50>;
+
 struct Executor {
     template<typename Command>
     void invoke(Command& cmd, gsl::span<uint8_t> args) {
@@ -40,7 +44,8 @@ using EPSACommandDispatcher =
                       eps_a::commands::EnableLCL<LclCommander>,       //
                       eps_a::commands::DisableLCL<LclCommander>,      //
                       eps_a::commands::ThermalKnives<ThermalKnives>,  //
-                      eps_a::commands::ObcWatchdog<ObcWatchdog>       //
+                      eps_a::commands::ObcWatchdog<ObcWatchdog>,      //
+                      eps_a::commands::DisableOverheatProtection<OverheatProtection>  //
                       >;
 
 extern EPSACommandDispatcher dispatcher;

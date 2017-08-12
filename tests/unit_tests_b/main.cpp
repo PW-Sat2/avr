@@ -5,6 +5,7 @@ using hal::Serial0;
 
 void test_BatteryManager();
 void test_TwoStateFsm();
+void test_OverheatProtection();
 
 int main() {
     Serial0.init(38400);
@@ -13,6 +14,7 @@ int main() {
 
     test_BatteryManager();
     test_TwoStateFsm();
+    test_OverheatProtection();
 
     hal::libs::sim::stop_simulation();
 }

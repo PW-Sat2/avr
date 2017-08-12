@@ -42,6 +42,9 @@ void each_1sec() {
     }
     TelemetryUpdater::update_general();
 
+    // TODO(ggajoch): use real temperature
+    OverheatProtection::tick(0);
+
     if (timer_10second.expired()) {
         each_10sec();
     }

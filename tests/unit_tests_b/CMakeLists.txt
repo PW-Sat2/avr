@@ -2,6 +2,7 @@ add_hal_executable(unit_tests_b
     main.cpp
     src/BatteryManager.cpp
     src/TwoStateFsm.cpp
+    src/OverheatProtection.cpp
 )
 
 add_custom_target(unit_tests_b.run
@@ -17,4 +18,5 @@ target_link_libraries(unit_tests_b
     terminal
     BatteryManager
     TwoStateFsm
+    OverheatProtection
 )
