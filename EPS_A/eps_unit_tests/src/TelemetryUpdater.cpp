@@ -66,7 +66,7 @@ struct Mppt {
         }
 
         uint12_t sim(MpptChannel ch, Adc124Ch adc) {
-            uint12_t val = 10u * num(ch) + num(adc) >> 3;
+            uint12_t val = 10u * num(ch) + (num(adc) >> 3);
             return val;
         }
     };
