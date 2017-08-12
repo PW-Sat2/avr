@@ -1,6 +1,7 @@
 #ifndef LIBS_LCLCOMMANDER_LCLCOMMANDER_H_
 #define LIBS_LCLCOMMANDER_LCLCOMMANDER_H_
 
+#include <bitset>
 #include <tuple>
 
 #include "LclInterface.h"
@@ -52,7 +53,19 @@ class LclCommander {
         hal::libs::for_each_tuple_type<CheckOvercurrentExec, LCLs>();
     }
 
+    static uint8_t overcurrent_status() {
+        return status_overcurrent.to_ulong();
+    }
+
+    static uint8_t on_status() {
+        status_on.reset();
+        hal::libs::for_each_tuple_type<CheckOnExec, LCLs>();
+        return status_on.to_ulong();
+    }
+
  private:
+    static std::bitset<std::tuple_size<LCLs>::value> status_overcurrent, status_on;
+
     template<template<typename> typename Exec, typename Tuple>
     struct Dispatch {
         template<int index, int tag>
@@ -83,6 +96,7 @@ class LclCommander {
     struct InitExec {
         static void run() {
             Lcl::init();
+            status_overcurrent[Lcl::bit_pos] = true;
         }
     };
 
@@ -90,6 +104,7 @@ class LclCommander {
     struct OnExec {
         static void run() {
             Lcl::on();
+            status_overcurrent[Lcl::bit_pos] = true;
         }
     };
 
@@ -97,6 +112,7 @@ class LclCommander {
     struct OffExec {
         static void run() {
             Lcl::off();
+            status_overcurrent[Lcl::bit_pos] = true;
         }
     };
 
@@ -106,11 +122,24 @@ class LclCommander {
             if (Lcl::overcurrent()) {
                 Lcl::off();
                 LOG_ERROR("[LCL] Overcurrent %s", Lcl::name);
+                status_overcurrent[Lcl::bit_pos] = false;
             }
+        }
+    };
+
+    template<typename Lcl>
+    struct CheckOnExec {
+        static void run() {
+            status_on[Lcl::bit_pos] = Lcl::is_on();
         }
     };
 };
 
+template<typename LCLs>
+std::bitset<std::tuple_size<LCLs>::value> LclCommander<LCLs>::status_overcurrent;
+
+template<typename LCLs>
+std::bitset<std::tuple_size<LCLs>::value> LclCommander<LCLs>::status_on;
 
 }  // namespace eps
 

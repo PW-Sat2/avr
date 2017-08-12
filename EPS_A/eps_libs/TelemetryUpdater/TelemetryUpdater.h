@@ -14,11 +14,13 @@ namespace eps_a {
  * @tparam Mux ADG709 mux type (device from IOMap)
  * @tparam InternalADC InternalADC from hal (hal::Analog::AnalogGPIO)
  * @tparam Mppt MPPT structure to use (from IOMap)
+ * @tparam LclCommander LCL commander to use to get statuses of LCLs
  */
 template<eps_a::Telemetry& telemetry,
          typename Mux,
          template<hal::Analog::InternalADC::Input> typename InternalADC,
-         typename Mppt>
+         typename Mppt,
+         typename LclCommander>
 class TelemetryUpdater : hal::libs::PureStatic {
  public:
     /*!
@@ -52,13 +54,16 @@ class TelemetryUpdater : hal::libs::PureStatic {
         tm.controller_a.supply_temperature         = Adc<AdcCh::ADC2>::read();
         tm.battery_controller.controller_a_voltage = Adc<AdcCh::ADC3>::read();
 
-
         auto power_cycles              = avr::power_cycle_counters::get();
         tm.controller_a.power_cycles   = power_cycles.all;
         tm.controller_a.safety_counter = power_cycles.safety;
 
         static uint32_t uptime = 0;
         tm.controller_a.uptime = uptime++;
+
+        tm.distribution.lcl_state = LclCommander::on_status();
+        tm.distribution.lcl_flagb = LclCommander::overcurrent_status();
+
 
         telemetry.general = tm;
     }

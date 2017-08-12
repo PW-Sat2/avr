@@ -104,8 +104,22 @@ struct Mppt {
 };
 Mppt::Data Mppt::data;
 
+struct LclCommanderMock {
+    static uint8_t on_status_val;
+    static uint8_t on_status() {
+        return on_status_val;
+    }
+
+    static uint8_t overcurrent_status_val;
+    static uint8_t overcurrent_status() {
+        return overcurrent_status_val;
+    }
+};
+uint8_t LclCommanderMock::on_status_val;
+uint8_t LclCommanderMock::overcurrent_status_val;
+
 using tm_updater =
-    TelemetryUpdater<tm, General::MuxMock, General::ADCMock, Mppt::MpptMock>;
+    TelemetryUpdater<tm, General::MuxMock, General::ADCMock, Mppt::MpptMock, LclCommanderMock>;
 
 void test_TelemetryUpdater_general() {
     for (auto mux : {MuxCh::S1, MuxCh::S2, MuxCh::S3, MuxCh::S4}) {
@@ -175,12 +189,42 @@ void test_TelemetryUpdater_mppt() {
     check(Mppt::Adc124Ch::IN3, &Telemetry::SingleMpptChannel::temperature);
 }
 
+void test_TelemetryUpdater_lcl_status() {
+    LclCommanderMock::overcurrent_status_val = 0xA7;
+
+    uint8_t val = 0;
+    do {
+        LclCommanderMock::on_status_val = val;
+
+        tm_updater::update_general();
+
+        Telemetry::General gen = tm.general;
+        TEST_ASSERT_EQUAL(0xA7, gen.distribution.lcl_flagb);
+        TEST_ASSERT_EQUAL(val, gen.distribution.lcl_state);
+    } while (val++ != 0xFF);
+
+
+    LclCommanderMock::on_status_val = 0x5E;
+
+    val = 0;
+    do {
+        LclCommanderMock::overcurrent_status_val = val;
+
+        tm_updater::update_general();
+
+        Telemetry::General gen = tm.general;
+        TEST_ASSERT_EQUAL(0x5E, gen.distribution.lcl_state);
+        TEST_ASSERT_EQUAL(val, gen.distribution.lcl_flagb);
+    } while (val++ != 0xFF);
+}
+
 
 void test_TelemetryUpdater() {
     UnityBegin("");
 
     RUN_TEST(test_TelemetryUpdater_general);
     RUN_TEST(test_TelemetryUpdater_mppt);
+    RUN_TEST(test_TelemetryUpdater_lcl_status);
 
     UnityEnd();
 }
