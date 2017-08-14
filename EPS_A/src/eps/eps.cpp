@@ -55,3 +55,9 @@ void eps_a::init_obc_interface() {
 
     ::ObcWatchdog::kick();
 }
+
+
+void eps_a::emergency_sail_deployment() {
+    LOG_FATAL("Opening SAIL");
+    LOG_FATAL("Unimplemented!");
+}

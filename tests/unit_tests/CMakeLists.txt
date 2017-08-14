@@ -8,6 +8,8 @@ add_hal_executable(unit_tests
     src/SoftwareTimer.cpp
     src/LclInterface.cpp
     src/LclCommander.cpp
+    src/redundancy.cpp
+    src/PowerCycleCounter.cpp
 )
 
 add_custom_target(unit_tests.run
@@ -27,4 +29,6 @@ target_link_libraries(unit_tests
     Prescaler
     LclInterface
     LclCommander
+    redundancy
+    PowerCycleCounter
 )

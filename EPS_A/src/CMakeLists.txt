@@ -18,4 +18,5 @@ target_link_libraries(EPS_A
     TelemetryUpdater
     PowerCycle
     ObcWatchdog
+    PowerCycleCounter
 )
