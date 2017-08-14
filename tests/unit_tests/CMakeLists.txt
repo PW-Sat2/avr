@@ -10,6 +10,7 @@ add_hal_executable(unit_tests
     src/LclCommander.cpp
     src/redundancy.cpp
     src/PowerCycleCounter.cpp
+    src/calibration.cpp
 )
 
 add_custom_target(unit_tests.run
@@ -31,4 +32,5 @@ target_link_libraries(unit_tests
     LclCommander
     redundancy
     PowerCycleCounter
+    calibration
 )

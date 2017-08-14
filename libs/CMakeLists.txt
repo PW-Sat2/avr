@@ -1,4 +1,5 @@
 add_subdirectory(atomic)
+add_subdirectory(calibration)
 add_subdirectory(EepromCounter)
 add_subdirectory(external)
 add_subdirectory(LclCommander)

@@ -11,6 +11,7 @@ void test_LclInterface();
 void test_LclCommander();
 void test_RedundancyTest();
 void test_PowerCycleCounter();
+void test_calibration();
 
 int main() {
     Serial0.init(38400);
@@ -25,6 +26,7 @@ int main() {
     test_LclCommander();
     test_RedundancyTest();
     test_PowerCycleCounter();
+    test_calibration();
 
     hal::libs::sim::stop_simulation();
 }
