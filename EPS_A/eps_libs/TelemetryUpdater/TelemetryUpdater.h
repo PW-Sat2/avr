@@ -20,11 +20,8 @@ template<eps_a::Telemetry& telemetry,
          typename Mux,
          template<hal::Analog::InternalADC::Input> typename InternalADC,
          typename Mppt,
-<<<<<<< d067e737884eac12985054b77c5ed4d6f8a14f68
-         typename LclCommander>
-=======
+         typename LclCommander,
          typename BatteryPackTemperatureSensors>
->>>>>>> TMP121 usage and telemetry fill
 class TelemetryUpdater : hal::libs::PureStatic {
  public:
     /*!

@@ -58,6 +58,7 @@ using TelemetryUpdater =
                             eps_a::iomap::mux::Mux,   //
                             hal::Analog::AnalogGPIO,  //
                             eps_a::iomap::Mppt,       //
+                            LclCommander,             //
                             eps_a::iomap::battery_controller::TemperatureSensors>;
 
 
