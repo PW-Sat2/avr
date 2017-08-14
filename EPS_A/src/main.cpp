@@ -22,6 +22,7 @@ void CommandCallback(gsl::span<const uint8_t> _c) {
 avr::Prescaler<33> timer_1second;
 void each_33ms() {
     TelemetryUpdater::update_mppt();
+    LclCommander::handle_overcurrent();
 
     if (timer_1second.expired()) {
         each_1sec();
