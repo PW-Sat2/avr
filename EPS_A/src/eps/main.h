@@ -52,11 +52,14 @@ using Obc = drivers::ObcInterface<0x35,                                       //
                                   EPSACommandDispatcher::max_command_length,  //
                                   eps_a::Telemetry>;
 
-using TelemetryUpdater = eps_a::TelemetryUpdater<telemetry,                //
-                                                 eps_a::iomap::mux::Mux,   //
-                                                 hal::Analog::AnalogGPIO,  //
-                                                 eps_a::iomap::Mppt,       //
-                                                 LclCommander>;
+
+using TelemetryUpdater =
+    eps_a::TelemetryUpdater<telemetry,                //
+                            eps_a::iomap::mux::Mux,   //
+                            hal::Analog::AnalogGPIO,  //
+                            eps_a::iomap::Mppt,       //
+                            LclCommander,             //
+                            eps_a::iomap::battery_controller::TemperatureSensors>;
 
 
 #endif  // EPS_A_SRC_EPS_MAIN_H_

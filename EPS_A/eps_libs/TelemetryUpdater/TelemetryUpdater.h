@@ -20,7 +20,8 @@ template<eps_a::Telemetry& telemetry,
          typename Mux,
          template<hal::Analog::InternalADC::Input> typename InternalADC,
          typename Mppt,
-         typename LclCommander>
+         typename LclCommander,
+         typename BatteryPackTemperatureSensors>
 class TelemetryUpdater : hal::libs::PureStatic {
  public:
     /*!
@@ -63,6 +64,14 @@ class TelemetryUpdater : hal::libs::PureStatic {
 
         tm.distribution.lcl_state = LclCommander::on_status();
         tm.distribution.lcl_flagb = LclCommander::overcurrent_status();
+
+        BatteryPackTemperatureSensors::TemperatureSensorA::Spi::init();
+        tm.battery_pack.temperature_a =
+            BatteryPackTemperatureSensors::TemperatureSensorA::Tmp121::read_raw();
+
+        BatteryPackTemperatureSensors::TemperatureSensorB::Spi::init();
+        tm.battery_pack.temperature_b =
+            BatteryPackTemperatureSensors::TemperatureSensorB::Tmp121::read_raw();
 
 
         telemetry.general = tm;

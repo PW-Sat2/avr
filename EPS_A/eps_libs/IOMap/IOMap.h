@@ -64,6 +64,22 @@ namespace battery_controller {
 using PinHeater    = hal::DigitalIO::GPIO<34>;
 using PinCharge    = hal::DigitalIO::GPIO<33>;
 using PinDischarge = hal::DigitalIO::GPIO<14>;
+
+template<int cs_nr>
+struct BatSensor {
+    using PinCs = hal::DigitalIO::GPIO<cs_nr>;
+    using Spi   = hal::SPI::Hardware<PinCs,
+                                   hal::SPI::HardwareClockDivisor::SPIHard_DIV_16,
+                                   hal::SPI::Polarity::idle_low,
+                                   hal::SPI::Phase::leading_sample,
+                                   hal::SPI::DataOrder::MSB_first>;
+
+    using Tmp121 = hal::devices::TMP121<Spi>;
+};
+struct TemperatureSensors {
+    using TemperatureSensorA = BatSensor<29>;
+    using TemperatureSensorB = BatSensor<30>;
+};
 }  // namespace battery_controller
 
 

@@ -66,7 +66,7 @@ struct Mppt {
         }
 
         uint12_t sim(MpptChannel ch, Adc124Ch adc) {
-            uint12_t val = 10u * num(ch) + num(adc) >> 3;
+            uint12_t val = 10u * num(ch) + (num(adc) >> 3);
             return val;
         }
     };
@@ -118,8 +118,39 @@ struct LclCommanderMock {
 uint8_t LclCommanderMock::on_status_val;
 uint8_t LclCommanderMock::overcurrent_status_val;
 
+template<int tag>
+struct TempSensorMock {
+    static bool initialised;
+
+    struct Spi {
+        static void init() {
+            initialised = true;
+        }
+    };
+    struct Tmp121 {
+        static uint13_t value;
+
+        static uint13_t read_raw() {
+            if (!initialised)
+                return 0;
+
+            initialised = false;
+            return value;
+        }
+    };
+};
+template<int tag>
+bool TempSensorMock<tag>::initialised;
+template<int tag>
+uint13_t TempSensorMock<tag>::Tmp121::value;
+
+struct TempSensorsMock {
+    using TemperatureSensorA = TempSensorMock<0>;
+    using TemperatureSensorB = TempSensorMock<1>;
+};
+
 using tm_updater =
-    TelemetryUpdater<tm, General::MuxMock, General::ADCMock, Mppt::MpptMock, LclCommanderMock>;
+    TelemetryUpdater<tm, General::MuxMock, General::ADCMock, Mppt::MpptMock, LclCommanderMock, TempSensorsMock>;
 
 void test_TelemetryUpdater_general() {
     for (auto mux : {MuxCh::S1, MuxCh::S2, MuxCh::S3, MuxCh::S4}) {
@@ -218,6 +249,34 @@ void test_TelemetryUpdater_lcl_status() {
     } while (val++ != 0xFF);
 }
 
+void test_TelemetryUpdater_battery_pack_temperature_sensors() {
+    TempSensorsMock::TemperatureSensorB::Tmp121::value = 0x1FEF;
+
+    uint16_t val = 0;
+    do {
+        TempSensorsMock::TemperatureSensorA::Tmp121::value = val;
+
+        tm_updater::update_general();
+
+        Telemetry::General gen = tm.general;
+        TEST_ASSERT_EQUAL(val, gen.battery_pack.temperature_a);
+        TEST_ASSERT_EQUAL(0x1FEF, gen.battery_pack.temperature_b);
+    } while (val++ != 0x1FFF);
+
+
+    TempSensorsMock::TemperatureSensorA::Tmp121::value = 0x1ABC;
+
+    val = 0;
+    do {
+        TempSensorsMock::TemperatureSensorB::Tmp121::value = val;
+
+        tm_updater::update_general();
+
+        Telemetry::General gen = tm.general;
+        TEST_ASSERT_EQUAL(0x1ABC, gen.battery_pack.temperature_a);
+        TEST_ASSERT_EQUAL(val, gen.battery_pack.temperature_b);
+    } while (val++ != 0x1FFF);
+}
 
 void test_TelemetryUpdater() {
     UnityBegin("");
@@ -225,6 +284,7 @@ void test_TelemetryUpdater() {
     RUN_TEST(test_TelemetryUpdater_general);
     RUN_TEST(test_TelemetryUpdater_mppt);
     RUN_TEST(test_TelemetryUpdater_lcl_status);
+    RUN_TEST(test_TelemetryUpdater_battery_pack_temperature_sensors);
 
     UnityEnd();
 }
