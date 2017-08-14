@@ -62,22 +62,22 @@ void test_TK_BurnsTurnOn() {
     // enable SAIL
     tk::burn(tk::Types::Sail);
     tk::tick();
-    check<PinSail>({PinOper::Reset});
-    check<PinSads>({PinOper::Set});
+    check<PinSail>({PinOper::Set});
+    check<PinSads>({PinOper::Reset});
 
     tk::tick();
-    check<PinSail>({PinOper::Reset});
-    check<PinSads>({PinOper::Set});
+    check<PinSail>({PinOper::Set});
+    check<PinSads>({PinOper::Reset});
 
     // enable SADS
     tk::burn(tk::Types::Sads);
     tk::tick();
-    check<PinSail>({PinOper::Reset});
-    check<PinSads>({PinOper::Reset});
+    check<PinSail>({PinOper::Set});
+    check<PinSads>({PinOper::Set});
 
     tk::tick();
-    check<PinSail>({PinOper::Reset});
-    check<PinSads>({PinOper::Reset});
+    check<PinSail>({PinOper::Set});
+    check<PinSads>({PinOper::Set});
 
     clear();
 }
@@ -86,39 +86,39 @@ void test_TK_BurnsTimeout() {
     // enable SAIL
     tk::burn(tk::Types::Sail);
     tk::tick();
-    check<PinSail>({PinOper::Reset});
-    check<PinSads>({PinOper::Set});
+    check<PinSail>({PinOper::Set});
+    check<PinSads>({PinOper::Reset});
 
     // enable SADS one tick later
     tk::burn(tk::Types::Sads);
     tk::tick();
-    check<PinSail>({PinOper::Reset});
-    check<PinSads>({PinOper::Reset});
+    check<PinSail>({PinOper::Set});
+    check<PinSads>({PinOper::Set});
 
     auto timeout = 120 - 2;  // seconds
     while (--timeout) {
         tk::tick();
-        check<PinSail>({PinOper::Reset});
-        check<PinSads>({PinOper::Reset});
+        check<PinSail>({PinOper::Set});
+        check<PinSads>({PinOper::Set});
     }
 
     // SAIL auto-off
     tk::tick();
-    check<PinSail>({PinOper::Reset, PinOper::Set});
-    check<PinSads>({PinOper::Reset});
+    check<PinSail>({PinOper::Set, PinOper::Reset});
+    check<PinSads>({PinOper::Set});
 
     // SADS auto-off
     tk::tick();
-    check<PinSail>({PinOper::Set});
-    check<PinSads>({PinOper::Reset, PinOper::Set});
+    check<PinSail>({PinOper::Reset});
+    check<PinSads>({PinOper::Set, PinOper::Reset});
 
     // both channels off
     tk::tick();
-    check<PinSail>({PinOper::Set});
-    check<PinSads>({PinOper::Set});
+    check<PinSail>({PinOper::Reset});
+    check<PinSads>({PinOper::Reset});
     tk::tick();
-    check<PinSail>({PinOper::Set});
-    check<PinSads>({PinOper::Set});
+    check<PinSail>({PinOper::Reset});
+    check<PinSads>({PinOper::Reset});
 }
 
 void test_TK_BurnsTimeoutExtendedByCommand() {
@@ -128,8 +128,8 @@ void test_TK_BurnsTimeoutExtendedByCommand() {
     // wait for 100 seconds
     for (int i = 0; i < 100; ++i) {
         tk::tick();
-        check<PinSail>({PinOper::Reset});
-        check<PinSads>({PinOper::Reset});
+        check<PinSail>({PinOper::Set});
+        check<PinSads>({PinOper::Set});
     }
 
     // re-enable
@@ -139,17 +139,17 @@ void test_TK_BurnsTimeoutExtendedByCommand() {
     auto timeout = 120;
     while (--timeout) {
         tk::tick();
-        check<PinSail>({PinOper::Reset});
-        check<PinSads>({PinOper::Reset});
+        check<PinSail>({PinOper::Set});
+        check<PinSads>({PinOper::Set});
     }
 
     tk::tick();
-    check<PinSail>({PinOper::Reset, PinOper::Set});
-    check<PinSads>({PinOper::Reset, PinOper::Set});
+    check<PinSail>({PinOper::Set, PinOper::Reset});
+    check<PinSads>({PinOper::Set, PinOper::Reset});
 
     tk::tick();
-    check<PinSail>({PinOper::Set});
-    check<PinSads>({PinOper::Set});
+    check<PinSail>({PinOper::Reset});
+    check<PinSads>({PinOper::Reset});
 }
 
 void test_TK() {

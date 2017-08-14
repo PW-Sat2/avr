@@ -49,6 +49,7 @@ PLD_unit_tests:
 
 EPS_A_unit_tests:
 	make -C EPS_A/cmake-build-release unit_tests.run
+	make -C EPS_A/cmake-build-release eps_unit_tests.run
 
 EPS_B_unit_tests:
 	make -C EPS_B/cmake-build-release unit_tests.run
