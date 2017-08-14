@@ -5,7 +5,7 @@
 
 using namespace avr;
 
-
+template<int tag>
 struct PinMock {
     static bool value;
 
@@ -19,11 +19,13 @@ struct PinMock {
         TEST_ASSERT_EQUAL(desired, value);
     }
 };
-bool PinMock::value;
+template<int tag>
+bool PinMock<tag>::value;
 
-using PinCharge = PinMock;
+using PinCharge = PinMock<0>;
+using PinHeater = PinMock<1>;
 
-BatteryManager<PinMock> battery_manager;
+BatteryManager<PinCharge, PinHeater> battery_manager;
 
 void test_BatteryManager_default_state() {
     battery_manager.tick(0, 1000);
@@ -87,6 +89,30 @@ void test_BatteryManager_charging_temperature() {
     PinCharge::check(true);
 }
 
+constexpr static float heater_temp_high = 5;
+constexpr static float heater_temp_low  = 0;
+void test_BatteryManager_heater() {
+    for (float t = -50; t < heater_temp_high; t += 0.1) {
+        battery_manager.tick(0, t);
+        PinHeater::check(true);
+    }
+    for (float t = heater_temp_high + 0.1; t >= heater_temp_low; t -= 0.1) {
+        battery_manager.tick(0, t);
+        PinHeater::check(false);
+    }
+    for (float t = heater_temp_low - 0.1; t <= heater_temp_high; t += 0.1) {
+        battery_manager.tick(0, t);
+        PinHeater::check(true);
+    }
+    for (float t = heater_temp_high + 0.1; t >= heater_temp_low; t -= 0.1) {
+        battery_manager.tick(0, t);
+        PinHeater::check(false);
+    }
+
+    battery_manager.tick(0, heater_temp_low - 0.1);
+    PinHeater::check(true);
+}
+
 
 void test_BatteryManager() {
     UnityBegin("");
@@ -94,6 +120,7 @@ void test_BatteryManager() {
     RUN_TEST(test_BatteryManager_default_state);
     RUN_TEST(test_BatteryManager_charging_voltage);
     RUN_TEST(test_BatteryManager_charging_temperature);
+    RUN_TEST(test_BatteryManager_heater);
 
     UnityEnd();
 }

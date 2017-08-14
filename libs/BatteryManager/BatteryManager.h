@@ -8,13 +8,16 @@ namespace avr {
 
 /*!
  * Battery manager.
- * Implements battery charging algorithm.
+ * Implements battery charging algorithm and battery heater.
  * @tparam PinCharge Pin used to enable battery charging LCL.
+ * @tparam PinHeater Pin used to enable battery heater.
  */
-template<typename PinCharge>
+template<typename PinCharge, typename PinHeater>
 class BatteryManager {
  public:
-    BatteryManager() : battery_charger(state_standby, state_charging) {
+    BatteryManager()
+        : battery_charger(state_standby, state_charging),
+          battery_heater(state_heating_off, state_heating_on) {
     }
 
     /*!
@@ -25,6 +28,7 @@ class BatteryManager {
      */
     void tick(float battery_voltage, float max_battery_temperature) {
         battery_charger.tick(battery_voltage, max_battery_temperature);
+        battery_heater.tick(max_battery_temperature);
     }
 
  private:
@@ -54,8 +58,36 @@ class BatteryManager {
 
     StateChargingON state_charging;
     StateChargingOFF state_standby;
-
     BatteryChargeFSM battery_charger;
+
+
+    using BatteryHeaterFSM = TwoStateFsm<float>;
+
+    struct StateHeaterON : BatteryHeaterFSM::IState {
+        void action() override {
+            LOG_INFO("[BATC] Heating ON");
+            PinHeater::set();
+        }
+
+        bool should_change(float max_temperature) override {
+            return (max_temperature > 5);
+        }
+    };
+
+    struct StateHeaterOFF : BatteryHeaterFSM::IState {
+        void action() override {
+            LOG_INFO("[BATC] Heating OFF");
+            PinHeater::reset();
+        }
+
+        bool should_change(float max_temperature) override {
+            return (max_temperature < 0);
+        }
+    };
+
+    StateHeaterON state_heating_on;
+    StateHeaterOFF state_heating_off;
+    BatteryHeaterFSM battery_heater;
 };
 
 }  // namespace avr

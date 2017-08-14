@@ -47,7 +47,9 @@ void each_1sec() {
     }
 }
 
-avr::BatteryManager<eps_a::iomap::battery_controller::PinCharge> battery_manager;
+avr::BatteryManager<eps_a::iomap::battery_controller::PinCharge,
+                    eps_a::iomap::battery_controller::PinHeater>
+    battery_manager;
 
 avr::Prescaler<6 * 30> timer_30min;
 void each_10sec() {
