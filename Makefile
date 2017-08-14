@@ -44,18 +44,22 @@ SunS_build:
 ## -------------------------- RUN TESTS -------------------------------------
 
 PLD_unit_tests:
-	make -C PLD/cmake-build-release unit_tests.run
+	make -C PLD/cmake-build-release unit_tests_a.run
+	make -C PLD/cmake-build-release unit_tests_b.run
 	make -C PLD/cmake-build-release unit_tests_pld.run
 
 EPS_A_unit_tests:
-	make -C EPS_A/cmake-build-release unit_tests.run
+	make -C EPS_A/cmake-build-release unit_tests_a.run
+	make -C EPS_A/cmake-build-release unit_tests_b.run
 	make -C EPS_A/cmake-build-release eps_unit_tests.run
 
 EPS_B_unit_tests:
-	make -C EPS_B/cmake-build-release unit_tests.run
+	make -C EPS_B/cmake-build-release unit_tests_a.run
+	make -C EPS_B/cmake-build-release unit_tests_b.run
 
 SunS_unit_tests:
-	make -C SunS/cmake-build-release unit_tests.run
+	make -C SunS/cmake-build-release unit_tests_a.run
+	make -C SunS/cmake-build-release unit_tests_b.run
 	make -C SunS/cmake-build-release unit_tests_suns.run
 
 ## -------------------------- NON-FLIGHT STUFF  -------------------------------------
