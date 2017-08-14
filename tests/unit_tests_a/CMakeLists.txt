@@ -1,6 +1,4 @@
-add_compile_options(-Wno-error)
-
-add_hal_executable(unit_tests
+add_hal_executable(unit_tests_a
     main.cpp
     src/Atomic.cpp
     src/CommandDispatcherTest.cpp
@@ -13,15 +11,15 @@ add_hal_executable(unit_tests
     src/calibration.cpp
 )
 
-add_custom_target(unit_tests.run
-    COMMAND ${SIMAVR} -m ${SIMAVR_TARGET} unit_tests.elf 2>&1 | tee ${CMAKE_BINARY_DIR}/unit_tests.output
-    COMMAND grep "FAIL" ${CMAKE_BINARY_DIR}/unit_tests.output && exit 1; || exit 0;
-    DEPENDS unit_tests
+add_custom_target(unit_tests_a.run
+    COMMAND ${SIMAVR} -m ${SIMAVR_TARGET} unit_tests_a.elf 2>&1 | tee ${CMAKE_BINARY_DIR}/unit_tests_a.output
+    COMMAND grep "FAIL" ${CMAKE_BINARY_DIR}/unit_tests_a.output && exit 1; || exit 0;
+    DEPENDS unit_tests_a
 )
 
 include_directories(.)
 
-target_link_libraries(unit_tests
+target_link_libraries(unit_tests_a
     unity
     terminal
     ObcInterface

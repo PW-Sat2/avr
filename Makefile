@@ -1,4 +1,4 @@
-LINTER_PARAMS=--extensions=hpp,cpp,h,c --filter=-legal/copyright,-build/include,-runtime/arrays,-runtime/references,-build/c++11,-build/namespaces,-runtime/explicit,-runtime/printf,-runtime/int,-readability/inheritance --linelength=120
+LINTER_PARAMS=--extensions=hpp,cpp,h,c --filter=-legal/copyright,-build/include,-runtime/arrays,-runtime/references,-build/c++11,-build/namespaces,-runtime/explicit,-runtime/printf,-runtime/int,-readability/inheritance,-readability/alt_tokens --linelength=120
 
 SOURCES := $(shell find . -type f \( -name "*.cpp" -o -name "*.h" \) | grep -v "AVR-HAL" | grep -v "cmake-build-")
 
@@ -44,18 +44,22 @@ SunS_build:
 ## -------------------------- RUN TESTS -------------------------------------
 
 PLD_unit_tests:
-	make -C PLD/cmake-build-release unit_tests.run
+	make -C PLD/cmake-build-release unit_tests_a.run
+	make -C PLD/cmake-build-release unit_tests_b.run
 	make -C PLD/cmake-build-release unit_tests_pld.run
 
 EPS_A_unit_tests:
-	make -C EPS_A/cmake-build-release unit_tests.run
+	make -C EPS_A/cmake-build-release unit_tests_a.run
+	make -C EPS_A/cmake-build-release unit_tests_b.run
 	make -C EPS_A/cmake-build-release eps_unit_tests.run
 
 EPS_B_unit_tests:
-	make -C EPS_B/cmake-build-release unit_tests.run
+	make -C EPS_B/cmake-build-release unit_tests_a.run
+	make -C EPS_B/cmake-build-release unit_tests_b.run
 
 SunS_unit_tests:
-	make -C SunS/cmake-build-release unit_tests.run
+	make -C SunS/cmake-build-release unit_tests_a.run
+	make -C SunS/cmake-build-release unit_tests_b.run
 	make -C SunS/cmake-build-release unit_tests_suns.run
 
 ## -------------------------- NON-FLIGHT STUFF  -------------------------------------
