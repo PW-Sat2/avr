@@ -29,6 +29,11 @@ class LclInterface {
     static constexpr IdType id = id_;
 
     /*!
+     * Bit position of this LCL in status flags
+     */
+    static constexpr uint8_t bit_pos = num(id_) - 1;
+
+    /*!
      * Name of this LCL
      */
     static constexpr char name[] = {name_..., '\0'};
@@ -59,6 +64,10 @@ class LclInterface {
 
     static bool overcurrent() {
         return FPF::error_occured();
+    }
+
+    static bool is_on() {
+        return !PinOn::read();
     }
 
  private:

@@ -6,7 +6,7 @@
 using namespace eps;
 
 template<int tag>
-struct WritePinIOMock {
+struct WriteReadPinIOMock {
     static hal::DigitalIO::Mode mode;
     static bool value;
 
@@ -19,11 +19,14 @@ struct WritePinIOMock {
     static void reset() {
         value = false;
     }
+    static bool read() {
+        return value;
+    }
 };
 template<int tag>
-bool WritePinIOMock<tag>::value;
+bool WriteReadPinIOMock<tag>::value;
 template<int tag>
-hal::DigitalIO::Mode WritePinIOMock<tag>::mode;
+hal::DigitalIO::Mode WriteReadPinIOMock<tag>::mode;
 
 template<int tag>
 struct ReadPinIOMock {
@@ -41,12 +44,18 @@ bool ReadPinIOMock<tag>::value;
 template<int tag>
 hal::DigitalIO::Mode ReadPinIOMock<tag>::mode;
 
-using OnMock    = WritePinIOMock<0>;
+using OnMock    = WriteReadPinIOMock<0>;
 using FlagBMock = ReadPinIOMock<0>;
 
-using LCL1 = LclInterface<OnMock, FlagBMock, int, 0, 't', 'e', 's', 't'>;
+enum LCLId : uint8_t {
+    Id1 = 1,
+    Id2 = 0x7A,
+};
+
+using LCL1 =
+    LclInterface<OnMock, FlagBMock, LCLId, LCLId::Id1, 't', 'e', 's', 't'>;
 using LCL2 =
-    LclInterface<OnMock, FlagBMock, uint32_t, 0x7A4785, 'a', 'b', 'c', 'd', 'e', 'f'>;
+    LclInterface<OnMock, FlagBMock, LCLId, LCLId::Id2, 'a', 'b', 'c', 'd', 'e', 'f'>;
 
 void test_LclInterface_name() {
     TEST_ASSERT_EQUAL_STRING("test", LCL1::name);
@@ -54,10 +63,12 @@ void test_LclInterface_name() {
 }
 
 void test_LclInterface_id() {
-    static_assert(std::is_same<int, LCL1::IdType>::value, "");
-    static_assert(std::is_same<std::uint32_t, LCL2::IdType>::value, "");
-    TEST_ASSERT_EQUAL_INT(0, LCL1::id);
-    TEST_ASSERT_EQUAL_INT(0x7A4785, LCL2::id);
+    static_assert(std::is_same<LCLId, LCL1::IdType>::value, "");
+    static_assert(std::is_same<LCLId, LCL2::IdType>::value, "");
+    static_assert(LCL1::id == 1, "");
+    static_assert(LCL2::id == 0x7A, "");
+    static_assert(LCL1::bit_pos == 0, "");
+    static_assert(LCL2::bit_pos == 0x79, "");
 }
 
 void test_LclInterface_init() {
@@ -89,6 +100,23 @@ void test_LclInterface_overcurrent() {
     TEST_ASSERT_FALSE(LCL1::overcurrent());
 }
 
+void test_LclInterface_is_on() {
+    LCL1::on();
+    TEST_ASSERT_TRUE(LCL1::is_on());
+    TEST_ASSERT_TRUE(LCL1::is_on());
+    TEST_ASSERT_TRUE(LCL1::is_on());
+
+    LCL1::off();
+    TEST_ASSERT_FALSE(LCL1::is_on());
+    TEST_ASSERT_FALSE(LCL1::is_on());
+    TEST_ASSERT_FALSE(LCL1::is_on());
+
+    LCL1::on();
+    TEST_ASSERT_TRUE(LCL1::is_on());
+    TEST_ASSERT_TRUE(LCL1::is_on());
+    TEST_ASSERT_TRUE(LCL1::is_on());
+}
+
 void test_LclInterface() {
     UnityBegin("");
 
@@ -98,6 +126,7 @@ void test_LclInterface() {
     RUN_TEST(test_LclInterface_on);
     RUN_TEST(test_LclInterface_off);
     RUN_TEST(test_LclInterface_overcurrent);
+    RUN_TEST(test_LclInterface_is_on);
 
     UnityEnd();
 }

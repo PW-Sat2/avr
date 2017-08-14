@@ -55,7 +55,8 @@ using Obc = drivers::ObcInterface<0x35,                                       //
 using TelemetryUpdater = eps_a::TelemetryUpdater<telemetry,                //
                                                  eps_a::iomap::mux::Mux,   //
                                                  hal::Analog::AnalogGPIO,  //
-                                                 eps_a::iomap::Mppt>;
+                                                 eps_a::iomap::Mppt,       //
+                                                 LclCommander>;
 
 
 #endif  // EPS_A_SRC_EPS_MAIN_H_
