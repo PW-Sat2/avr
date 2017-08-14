@@ -48,6 +48,7 @@ void each_1sec() {
 }
 
 avr::BatteryManager<eps_a::iomap::battery_controller::PinCharge,
+                    eps_a::iomap::battery_controller::PinDischarge,
                     eps_a::iomap::battery_controller::PinHeater>
     battery_manager;
 
