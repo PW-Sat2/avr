@@ -7,8 +7,9 @@ namespace avr {
 namespace calibration {
 namespace tmp121 {
 
-float raw_to_celsius(uint13_t);
-}
+float raw_to_celsius(const uint13_t);
+
+}  // namespace tmp121
 }  // namespace calibration
 }  // namespace avr
 
