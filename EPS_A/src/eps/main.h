@@ -25,9 +25,8 @@ using LclCommander = eps::LclCommander<eps_a::iomap::lcl::AllLcls>;
 using ObcWatchdog  = eps_a::ObcWatchdog<eps_a::full_power_cycle>;
 
 
-using ThermalKnives =
-    eps_a::ThermalKnives<eps_a::iomap::thermal_knives::PinSail,   //
-                         eps_a::iomap::thermal_knives::PinSads>;  //
+using ThermalKnives = avr::ThermalKnives<eps_a::iomap::thermal_knives::PinSail,  //
+                                         eps_a::iomap::thermal_knives::PinSads>;  //
 
 using OverheatProtection = avr::OverheatProtection<LclCommander, 50>;
 

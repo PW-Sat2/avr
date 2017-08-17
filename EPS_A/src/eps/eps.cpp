@@ -59,5 +59,6 @@ void eps_a::init_obc_interface() {
 
 void eps_a::emergency_sail_deployment() {
     LOG_FATAL("Opening SAIL");
-    LOG_FATAL("Unimplemented!");
+    ::LclCommander::on(num(iomap::lcl::LclId::TkMain));
+    ThermalKnives::burn(ThermalKnives::Types::Sail);
 }

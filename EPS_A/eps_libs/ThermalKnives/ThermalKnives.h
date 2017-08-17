@@ -5,7 +5,7 @@
 #include <hal/hal>
 #include "SoftwareTimer.h"
 
-namespace eps_a {
+namespace avr {
 
 /*!
  * ThermalKnives handling for EPS_A.
@@ -102,6 +102,6 @@ void ThermalKnives<SailPin, SadsPin>::tick() {
     sads_timer::tick();
 }
 
-}  // namespace eps_a
+}  // namespace avr
 
 #endif  // EPS_A_EPS_LIBS_THERMALKNIVES_THERMALKNIVES_H_

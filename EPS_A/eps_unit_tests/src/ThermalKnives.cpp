@@ -26,7 +26,7 @@ hal::libs::FIFO_data<PinOper, 5> TK_pin<tag>::invocations;
 using PinSail = TK_pin<std::true_type>;
 using PinSads = TK_pin<std::false_type>;
 
-using tk = eps_a::ThermalKnives<PinSail, PinSads>;
+using tk = avr::ThermalKnives<PinSail, PinSads>;
 
 template<typename T>
 void check(std::initializer_list<PinOper> operations) {
