@@ -6,6 +6,7 @@
 
 #include "LclInterface.h"
 
+namespace avr {
 namespace eps {
 
 /*!
@@ -142,5 +143,6 @@ template<typename LCLs>
 std::bitset<std::tuple_size<LCLs>::value> LclCommander<LCLs>::status_on;
 
 }  // namespace eps
+}  // namespace avr
 
 #endif  // LIBS_LCLCOMMANDER_LCLCOMMANDER_H_

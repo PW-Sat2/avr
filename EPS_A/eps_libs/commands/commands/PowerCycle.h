@@ -2,18 +2,18 @@
 #define EPS_A_EPS_LIBS_COMMANDS_COMMANDS_POWERCYCLE_H_
 
 #include "ObcInterface/Command.h"
-#include "PowerCycle/PowerCycle.h"
 #include "logger.h"
 
 namespace eps_a {
 namespace commands {
 
+template<typename FullPowerCycle>
 class PowerCycle : public Command<0xE0, 0> {
  public:
     void invoke(gsl::span<const std::uint8_t>) {
         LOG_INFO("Performing full power cycle on demand.");
 
-        full_power_cycle();
+        FullPowerCycle::perform();
     }
 };
 

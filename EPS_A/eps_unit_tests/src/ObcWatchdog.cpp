@@ -10,7 +10,7 @@ static void callback() {
     full_power_cycle_requested = true;
 }
 
-using wdt = eps_a::ObcWatchdog<callback>;
+using wdt = avr::eps::ObcWatchdog<callback>;
 
 void test_ObcWatchdog_init() {
     TEST_ASSERT_FALSE(full_power_cycle_requested);

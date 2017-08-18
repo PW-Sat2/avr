@@ -1,7 +1,6 @@
 add_subdirectory(commands)
 add_subdirectory(IOMap)
 add_subdirectory(MainTimer)
-add_subdirectory(ObcWatchdog)
 add_subdirectory(PowerCycle)
 add_subdirectory(telemetry)
 add_subdirectory(TelemetryUpdater)

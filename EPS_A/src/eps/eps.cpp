@@ -26,8 +26,8 @@ void eps_a::init_hardware() {
 
     iomap::mux::Mux::init();
 
-    eps::LclCommander<iomap::lcl::AllLcls>::init();
-    eps::LclCommander<iomap::lcl::AllLcls>::off_all();
+    LclCommander::init();
+    LclCommander::off_all();
 
     iomap::thermal_knives::PinSail::init(DigitalIO::Mode::OUTPUT);
     iomap::thermal_knives::PinSads::init(DigitalIO::Mode::OUTPUT);
@@ -53,7 +53,7 @@ void eps_a::init_obc_interface() {
     telemetry.who_am_i = 0x61;
     Obc::init(&telemetry);
 
-    ::ObcWatchdog::kick();
+    ObcWatchdog::kick();
 }
 
 

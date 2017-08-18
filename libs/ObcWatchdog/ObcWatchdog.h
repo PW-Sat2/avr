@@ -1,10 +1,11 @@
-#ifndef EPS_A_EPS_LIBS_OBCWATCHDOG_OBCWATCHDOG_H_
-#define EPS_A_EPS_LIBS_OBCWATCHDOG_OBCWATCHDOG_H_
+#ifndef LIBS_OBCWATCHDOG_OBCWATCHDOG_H_
+#define LIBS_OBCWATCHDOG_OBCWATCHDOG_H_
 
 #include "SoftwareTimer.h"
 #include "logger.h"
 
-namespace eps_a {
+namespace avr {
+namespace eps {
 
 template<void (*full_power_cycle)()>
 struct ObcWatchdog {
@@ -14,6 +15,7 @@ struct ObcWatchdog {
                 LOG_WARNING("OBC Watchdog - 30 seconds left");
             }
         }
+
         static void expired() {
             LOG_FATAL("OBC Watchdog expired");
             full_power_cycle();
@@ -32,5 +34,7 @@ struct ObcWatchdog {
     }
 };
 
-}  // namespace eps_a
-#endif  // EPS_A_EPS_LIBS_OBCWATCHDOG_OBCWATCHDOG_H_
+}  // namespace eps
+}  // namespace avr
+
+#endif  // LIBS_OBCWATCHDOG_OBCWATCHDOG_H_

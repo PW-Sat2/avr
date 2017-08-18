@@ -15,14 +15,17 @@
 #include "LclCommander.h"
 #include "ObcWatchdog.h"
 #include "OverheatProtection.h"
-#include "PowerCycle/PowerCycle.h"
+#include "PowerCycle.h"
 #include "TelemetryUpdater.h"
 #include "ThermalKnives.h"
 
 extern eps_a::Telemetry telemetry;
 
-using LclCommander = eps::LclCommander<eps_a::iomap::lcl::AllLcls>;
-using ObcWatchdog  = eps_a::ObcWatchdog<eps_a::full_power_cycle>;
+using FullPowerCycle =
+    avr::eps::FullPowerCycle<eps_a::iomap::PowerCycle, eps_a::iomap::watchdog::Watchdog>;
+
+using LclCommander = avr::eps::LclCommander<eps_a::iomap::lcl::AllLcls>;
+using ObcWatchdog  = avr::eps::ObcWatchdog<FullPowerCycle::perform>;
 
 
 using ThermalKnives = avr::ThermalKnives<eps_a::iomap::thermal_knives::PinSail,  //
@@ -39,7 +42,7 @@ struct Executor {
 
 using EPSACommandDispatcher =
     CommandDispatcher<Executor,                                       //
-                      eps_a::commands::PowerCycle,                    //
+                      eps_a::commands::PowerCycle<FullPowerCycle>,    //
                       eps_a::commands::EnableLCL<LclCommander>,       //
                       eps_a::commands::DisableLCL<LclCommander>,      //
                       eps_a::commands::ThermalKnives<ThermalKnives>,  //

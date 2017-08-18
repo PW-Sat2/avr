@@ -1,13 +1,11 @@
 set(NAME PowerCycle)
 
 add_library(${NAME} STATIC
-    Include/PowerCycle/PowerCycle.h
-    PowerCycle.cpp
+    PowerCycle.h
 )
 
-target_include_directories(${NAME} PUBLIC Include)
+target_include_directories(${NAME} PUBLIC .)
 
 target_link_libraries(${NAME}
     hal
-    IOMap
 )
