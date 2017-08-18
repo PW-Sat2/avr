@@ -27,9 +27,6 @@ template<uint8_t i2c_address, void (*callback)(gsl::span<const uint8_t>), uint8_
 class ObcInterface {
  public:
     static_assert(std::is_pod<DataType>::value, "Telemetry is not a POD!");
-    static_assert(
-        sizeof(DataType) > 1,
-        "DataType have to contain error code + at least one data field");
     static_assert(i2c_address <= 0x7F, "I2C address should be 7-bit!");
 
     /*!
