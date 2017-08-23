@@ -1,24 +1,11 @@
 add_hal_executable(EPS_A
     main.cpp
-    eps/eps.cpp
-    eps/eps.h
-    eps/main.h
 )
 
 target_link_libraries(EPS_A
-    ObcInterface
-    logger
-    telemetry
-    eps_commands
     IOMap
+    eps
     MainTimer
-    LclCommander
-    Prescaler
-    ThermalKnives
+    telemetry
     TelemetryUpdater
-    PowerCycle
-    ObcWatchdog
-    OverheatProtection
-    BatteryManager
-    PowerCycleCounter
 )

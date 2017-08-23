@@ -1,12 +1,13 @@
-set(NAME commands)
+set(NAME TelemetryUpdater)
 
 add_library(${NAME} STATIC
-    commands/PowerCycle.h
+    TelemetryUpdater.h
 )
 
 target_include_directories(${NAME} PUBLIC .)
 
 target_link_libraries(${NAME}
     hal
-    ObcInterface
+    telemetry
+    PowerCycleCounter
 )
