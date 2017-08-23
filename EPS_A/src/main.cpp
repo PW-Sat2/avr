@@ -1,19 +1,23 @@
 #include "eps.h"
 
-#include "IOMap.h"
+struct Settings {
+    constexpr static char side           = 'A';
+    constexpr static uint8_t i2c_address = 0x35;
+    constexpr static uint8_t who_am_i    = 0x61;
 
+    template<typename Eps>
+    struct Specialisation {
+        static void init() {
+            eps::IOMap::Mux::init();
+        }
 
-using namespace hal;
-
-
-struct ThisControllerInit {
-    static void init() {
-        eps_a::iomap::mux::Mux::init();
-    }
+        static void each_33ms() {
+            Eps::TelemetryUpdater::update_mppt();
+        }
+    };
 };
 
-using Eps =
-    Epss<'A', 0x35, 0x61, eps_a::Telemetry, eps_a::IOMap, ThisControllerInit>;
+using Eps = Epss<Settings>;
 
 
 ISR(TWI_vect) {

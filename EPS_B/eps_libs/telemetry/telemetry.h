@@ -7,7 +7,7 @@
 
 #include "atomic.h"
 
-namespace eps_b {
+namespace eps {
 
 struct Telemetry {
     struct BatteryPack {
@@ -49,6 +49,6 @@ static_assert(sizeof(Telemetry) == 18,
 static_assert(std::is_pod<Telemetry>::value, "POD");
 
 
-}  // namespace eps_b
+}  // namespace eps
 
 #endif  // EPS_B_EPS_LIBS_TELEMETRY_TELEMETRY_H_

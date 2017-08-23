@@ -2,7 +2,10 @@
 #define LIBS_EPS_EPS_H_
 
 #include <BatteryManager.h>
-#include "MainTimer.h"
+#include <MainTimer.h>
+#include <PowerCycleCounter.h>
+#include <TelemetryUpdater.h>
+#include <telemetry.h>
 #include "ObcInterface/CommandDispatcher.h"
 #include "ObcInterface/ObcInterface.h"
 
@@ -16,14 +19,20 @@
 #include "ObcWatchdog.h"
 #include "OverheatProtection.h"
 #include "PowerCycle.h"
-#include "TelemetryUpdater.h"
 #include "ThermalKnives.h"
 
 #include "Prescaler.h"
 
-template<char side, uint8_t i2c_address, uint8_t who_am_i, typename Telemetry, typename iomap, typename Init>
+#include "IOMap.h"
+
+
+template<typename Settings>
 struct Epss {
-    using This = Epss<side, i2c_address, who_am_i, Telemetry, iomap, Init>;
+    using This      = Epss<Settings>;
+    using IOMap     = eps::IOMap;
+    using Telemetry = eps::Telemetry;
+    using MainTimer = eps::MainTimer;
+    using Specific  = typename Settings::template Specialisation<This>;
 
     static void CommandCallback(gsl::span<const uint8_t> _c) {
         dispatcher.parse(_c);
@@ -42,11 +51,11 @@ struct Epss {
         Serial0.redirect_stdio();
         Serial0.redirect_stderr();
 
-        eps_a::MainTimer::init();
+        MainTimer::init();
 
-        iomap::PowerCycle::init(DigitalIO::Mode::OUTPUT);
+        IOMap::PowerCycle::init(DigitalIO::Mode::OUTPUT);
 
-        iomap::watchdog::Watchdog::init();
+        IOMap::watchdog::Watchdog::init();
 
         Analog::InternalADC::init(Analog::InternalADC::Prescaler::DIV_128,
                                   Analog::InternalADC::Reference::AREF);
@@ -54,28 +63,28 @@ struct Epss {
         LclCommander::init();
         LclCommander::off_all();
 
-        Init::init();
+        Specific::init();
 
-        iomap::thermal_knives::PinSail::init(DigitalIO::Mode::OUTPUT);
-        iomap::thermal_knives::PinSads::init(DigitalIO::Mode::OUTPUT);
+        IOMap::thermal_knives::PinSail::init(DigitalIO::Mode::OUTPUT);
+        IOMap::thermal_knives::PinSads::init(DigitalIO::Mode::OUTPUT);
 
-        iomap::battery_controller::PinHeater::set();
-        iomap::battery_controller::PinHeater::init(DigitalIO::Mode::OUTPUT);
+        IOMap::battery_controller::PinHeater::set();
+        IOMap::battery_controller::PinHeater::init(DigitalIO::Mode::OUTPUT);
 
-        iomap::battery_controller::PinCharge::init(DigitalIO::Mode::OUTPUT);
-        iomap::battery_controller::PinDischarge::init(DigitalIO::Mode::OUTPUT);
+        IOMap::battery_controller::PinCharge::init(DigitalIO::Mode::OUTPUT);
+        IOMap::battery_controller::PinDischarge::init(DigitalIO::Mode::OUTPUT);
 
-        iomap::SerialRx::init(DigitalIO::Mode::INPUT_PULLUP);
+        IOMap::SerialRx::init(DigitalIO::Mode::INPUT_PULLUP);
 
         // delay to make sure capacitances in power cycle circuit are
         // discharged. This is to prevent to fast power cycle.
         hal::sleep_for(150ms);
-        iomap::PowerCycle::set();
+        IOMap::PowerCycle::set();
     }
 
     static void init_obc_interface() {
         telemetry.init();
-        telemetry.who_am_i = who_am_i;
+        telemetry.who_am_i = Settings::who_am_i;
         Obc::init(&telemetry);
 
         ObcWatchdog::kick();
@@ -89,25 +98,25 @@ struct Epss {
         init_hardware();
         LOG_INFO("Loaded EPS %c software rev. " GIT_REVISION
                  ", local state: " GIT_CHANGES,
-                 side);
+                 Settings::side);
 
         check_reset_counter();
         init_obc_interface();
 
-        LOG_INFO("EPS %c initialized.", side);
+        LOG_INFO("EPS %c initialized.", Settings::side);
         sei();
     }
 
     using FullPowerCycle =
-        eps::FullPowerCycle<typename iomap::PowerCycle, typename iomap::watchdog::Watchdog>;
+        eps::FullPowerCycle<typename IOMap::PowerCycle, typename IOMap::watchdog::Watchdog>;
 
-    using LclCommander = eps::LclCommander<typename iomap::lcl::AllLcls>;
+    using LclCommander = eps::LclCommander<typename IOMap::lcl::AllLcls>;
     using ObcWatchdog  = eps::ObcWatchdog<FullPowerCycle::perform>;
 
 
     using ThermalKnives =
-        eps::ThermalKnives<typename iomap::thermal_knives::PinSail,
-                           typename iomap::thermal_knives::PinSads>;  //
+        eps::ThermalKnives<typename IOMap::thermal_knives::PinSail,
+                           typename IOMap::thermal_knives::PinSads>;  //
 
     using OverheatProtection = eps::OverheatProtection<LclCommander, 50>;
 
@@ -128,26 +137,22 @@ struct Epss {
                           eps::commands::DisableOverheatProtection<OverheatProtection>  //
                           >;
 
-    using Obc = drivers::ObcInterface<i2c_address,      //
-                                      CommandCallback,  //
+    using Obc = drivers::ObcInterface<Settings::i2c_address,  //
+                                      CommandCallback,        //
                                       EPSACommandDispatcher::max_command_length,  //
-                                      eps_a::Telemetry>;
+                                      Telemetry>;
 
     static Telemetry telemetry;
 
 
     using TelemetryUpdater =
-        eps_a::TelemetryUpdater<telemetry,
-                                typename iomap::Mux,
-                                hal::Analog::AnalogGPIO,
-                                typename iomap::Mppt,
-                                LclCommander,
-                                typename iomap::battery_controller::TemperatureSensors>;
+        eps::TelemetryUpdater<telemetry, hal::Analog::AnalogGPIO, This>;
 
 
     static avr::Prescaler<33> timer_1second;
     static void each_33ms() {
-        TelemetryUpdater::update_mppt();
+        Specific::each_33ms();
+
         LclCommander::handle_overcurrent();
 
         if (timer_1second.expired()) {
@@ -172,9 +177,9 @@ struct Epss {
     }
 
     using BatteryManager =
-        eps::BatteryManager<typename iomap::battery_controller::PinCharge,
-                            typename iomap::battery_controller::PinDischarge,
-                            typename iomap::battery_controller::PinHeater>;
+        eps::BatteryManager<typename IOMap::battery_controller::PinCharge,
+                            typename IOMap::battery_controller::PinDischarge,
+                            typename IOMap::battery_controller::PinHeater>;
     static BatteryManager battery_manager;
 
     static avr::Prescaler<6 * 30> timer_30min;
@@ -202,31 +207,29 @@ struct Epss {
 
     static void run() {
         while (1) {
-            if (eps_a::MainTimer::expired()) {
+            if (MainTimer::expired()) {
                 each_33ms();
             }
         }
     }
 };
 
-template<char side, uint8_t i2c_address, uint8_t who_am_i, typename Telemetry, typename iomap, typename Init>
-Telemetry Epss<side, i2c_address, who_am_i, Telemetry, iomap, Init>::telemetry;
+template<typename Settings>
+eps::Telemetry Epss<Settings>::telemetry;
 
-template<char side, uint8_t i2c_address, uint8_t who_am_i, typename Telemetry, typename iomap, typename Init>
-typename Epss<side, i2c_address, who_am_i, Telemetry, iomap, Init>::EPSACommandDispatcher
-    Epss<side, i2c_address, who_am_i, Telemetry, iomap, Init>::dispatcher;
+template<typename Settings>
+typename Epss<Settings>::EPSACommandDispatcher Epss<Settings>::dispatcher;
 
-template<char side, uint8_t i2c_address, uint8_t who_am_i, typename Telemetry, typename iomap, typename Init>
-avr::Prescaler<33> Epss<side, i2c_address, who_am_i, Telemetry, iomap, Init>::timer_1second;
+template<typename Settings>
+avr::Prescaler<33> Epss<Settings>::timer_1second;
 
-template<char side, uint8_t i2c_address, uint8_t who_am_i, typename Telemetry, typename iomap, typename Init>
-avr::Prescaler<10> Epss<side, i2c_address, who_am_i, Telemetry, iomap, Init>::timer_10second;
+template<typename Settings>
+avr::Prescaler<10> Epss<Settings>::timer_10second;
 
-template<char side, uint8_t i2c_address, uint8_t who_am_i, typename Telemetry, typename iomap, typename Init>
-avr::Prescaler<6 * 30> Epss<side, i2c_address, who_am_i, Telemetry, iomap, Init>::timer_30min;
+template<typename Settings>
+avr::Prescaler<6 * 30> Epss<Settings>::timer_30min;
 
-template<char side, uint8_t i2c_address, uint8_t who_am_i, typename Telemetry, typename iomap, typename Init>
-typename Epss<side, i2c_address, who_am_i, Telemetry, iomap, Init>::BatteryManager
-    Epss<side, i2c_address, who_am_i, Telemetry, iomap, Init>::battery_manager;
+template<typename Settings>
+typename Epss<Settings>::BatteryManager Epss<Settings>::battery_manager;
 
 #endif  // LIBS_EPS_EPS_H_

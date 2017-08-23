@@ -1,6 +1,6 @@
 #include "MainTimer.h"
 
-using namespace eps_a;
+using namespace eps;
 
 void MainTimer::init() {
     // Timer1 - 1us tick

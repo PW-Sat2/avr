@@ -4,7 +4,7 @@
 #include <cstring>
 #include "atomic.h"
 
-namespace eps_a {
+namespace eps {
 
 struct Telemetry {
     struct SingleMpptChannelState {
@@ -76,7 +76,7 @@ struct Telemetry {
     avr::Atomic<General> general;
 
     void init() {
-        std::memset(this, 0xFF, sizeof(eps_a::Telemetry));
+        std::memset(this, 0xFF, sizeof(*this));
     }
 };
 static_assert(sizeof(Telemetry) == 72,
@@ -84,6 +84,6 @@ static_assert(sizeof(Telemetry) == 72,
 static_assert(std::is_pod<Telemetry>::value, "POD");
 
 
-}  // namespace eps_a
+}  // namespace eps
 
 #endif  // EPS_A_EPS_LIBS_TELEMETRY_TELEMETRY_H_

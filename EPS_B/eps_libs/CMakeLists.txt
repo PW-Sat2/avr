@@ -1,2 +1,4 @@
-add_subdirectory(commands)
+add_subdirectory(IOMap)
+add_subdirectory(MainTimer)
 add_subdirectory(telemetry)
+add_subdirectory(TelemetryUpdater)

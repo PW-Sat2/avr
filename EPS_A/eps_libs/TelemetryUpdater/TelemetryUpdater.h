@@ -5,7 +5,7 @@
 #include "PowerCycleCounter.h"
 #include "telemetry.h"
 
-namespace eps_a {
+namespace eps {
 
 /*!
  * Telemetry updater module. Updates telemetry values when ivoked.
@@ -16,12 +16,9 @@ namespace eps_a {
  * @tparam Mppt MPPT structure to use (from IOMap)
  * @tparam LclCommander LCL commander to use to get statuses of LCLs
  */
-template<eps_a::Telemetry& telemetry,
-         typename Mux,
+template<eps::Telemetry& telemetry,
          template<hal::Analog::InternalADC::Input> typename InternalADC,
-         typename Mppt,
-         typename LclCommander,
-         typename BatteryPackTemperatureSensors>
+         typename Eps>
 class TelemetryUpdater : hal::libs::PureStatic {
  public:
     /*!
@@ -30,26 +27,26 @@ class TelemetryUpdater : hal::libs::PureStatic {
      * stores result atomically in telemetry table.
      */
     static void update_general() {
-        eps_a::Telemetry::General tm = telemetry.general;
+        eps::Telemetry::General tm = telemetry.general;
 
-        Mux::select(MuxCh::S1);
+        Eps::IOMap::Mux::select(MuxCh::S1);
         tm.distribution.vbat_current      = Adc<AdcCh::ADC0>::read();
         tm.distribution.dcdc_5v_current   = Adc<AdcCh::ADC1>::read();
         tm.battery_controller.temperature = Adc<AdcCh::ADC3>::read();
 
-        Mux::select(MuxCh::S2);
+        Eps::IOMap::Mux::select(MuxCh::S2);
         tm.distribution.vbat_voltage         = Adc<AdcCh::ADC0>::read();
         tm.distribution.dcdc_5v_voltage      = Adc<AdcCh::ADC1>::read();
         tm.controller_a.temperature          = Adc<AdcCh::ADC2>::read();
         tm.battery_controller.charge_current = Adc<AdcCh::ADC3>::read();
 
-        Mux::select(MuxCh::S3);
+        Eps::IOMap::Mux::select(MuxCh::S3);
         tm.distribution.dcdc_3v3_current        = Adc<AdcCh::ADC0>::read();
         tm.dcdc_3v3_temperature                 = Adc<AdcCh::ADC1>::read();
         tm.controller_b.supply_voltage          = Adc<AdcCh::ADC2>::read();
         tm.battery_controller.discharge_current = Adc<AdcCh::ADC3>::read();
 
-        Mux::select(MuxCh::S4);
+        Eps::IOMap::Mux::select(MuxCh::S4);
         tm.distribution.dcdc_3v3_voltage           = Adc<AdcCh::ADC0>::read();
         tm.dcdc_5v_temperature                     = Adc<AdcCh::ADC1>::read();
         tm.controller_a.supply_temperature         = Adc<AdcCh::ADC2>::read();
@@ -62,16 +59,16 @@ class TelemetryUpdater : hal::libs::PureStatic {
         static uint32_t uptime = 0;
         tm.controller_a.uptime = uptime++;
 
-        tm.distribution.lcl_state = LclCommander::on_status();
-        tm.distribution.lcl_flagb = LclCommander::overcurrent_status();
+        tm.distribution.lcl_state = Eps::LclCommander::on_status();
+        tm.distribution.lcl_flagb = Eps::LclCommander::overcurrent_status();
 
-        BatteryPackTemperatureSensors::TemperatureSensorA::Spi::init();
-        tm.battery_pack.temperature_a =
-            BatteryPackTemperatureSensors::TemperatureSensorA::Tmp121::read_raw();
+        Eps::IOMap::battery_controller::TemperatureSensors::TemperatureSensorA::Spi::init();
+        tm.battery_pack.temperature_a = Eps::IOMap::battery_controller::
+            TemperatureSensors::TemperatureSensorA::Tmp121::read_raw();
 
-        BatteryPackTemperatureSensors::TemperatureSensorB::Spi::init();
-        tm.battery_pack.temperature_b =
-            BatteryPackTemperatureSensors::TemperatureSensorB::Tmp121::read_raw();
+        Eps::IOMap::battery_controller::TemperatureSensors::TemperatureSensorB::Spi::init();
+        tm.battery_pack.temperature_b = Eps::IOMap::battery_controller::
+            TemperatureSensors::TemperatureSensorB::Tmp121::read_raw();
 
 
         telemetry.general = tm;
@@ -83,9 +80,9 @@ class TelemetryUpdater : hal::libs::PureStatic {
     static void update_mppt() {
         Telemetry::AllMpptChannels tm = telemetry.mppt;
 
-        update_mppt_channel<typename Mppt::MpptX>(tm.mpptx);
-        update_mppt_channel<typename Mppt::MpptYp>(tm.mpptyp);
-        update_mppt_channel<typename Mppt::MpptYn>(tm.mpptyn);
+        update_mppt_channel<typename Eps::IOMap::Mppt::MpptX>(tm.mpptx);
+        update_mppt_channel<typename Eps::IOMap::Mppt::MpptYp>(tm.mpptyp);
+        update_mppt_channel<typename Eps::IOMap::Mppt::MpptYn>(tm.mpptyn);
 
         telemetry.mppt = tm;
     }
@@ -113,6 +110,6 @@ class TelemetryUpdater : hal::libs::PureStatic {
     }
 };
 
-}  // namespace eps_a
+}  // namespace eps
 
 #endif  // EPS_A_EPS_LIBS_TELEMETRYUPDATER_TELEMETRYUPDATER_H_

@@ -1,9 +1,9 @@
-#ifndef EPS_A_EPS_LIBS_MAINTIMER_MAINTIMER_H_
-#define EPS_A_EPS_LIBS_MAINTIMER_MAINTIMER_H_
+#ifndef EPS_B_EPS_LIBS_MAINTIMER_MAINTIMER_H_
+#define EPS_B_EPS_LIBS_MAINTIMER_MAINTIMER_H_
 
 #include <hal/hal>
 
-namespace eps_a {
+namespace eps {
 
 /*!
  * Main EPS_A timer. Uses Timer1 in CTC_OCR1A mode.
@@ -23,6 +23,6 @@ struct MainTimer {
 };
 
 
-};  // namespace eps_a
+};  // namespace eps
 
-#endif  // EPS_A_EPS_LIBS_MAINTIMER_MAINTIMER_H_
+#endif  // EPS_B_EPS_LIBS_MAINTIMER_MAINTIMER_H_

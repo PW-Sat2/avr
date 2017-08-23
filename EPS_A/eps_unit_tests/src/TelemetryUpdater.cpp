@@ -1,156 +1,174 @@
 #include <TelemetryUpdater.h>
 #include "unity.h"
 
-using namespace eps_a;
+using namespace eps;
 
 using MuxCh = hal::devices::ADG709::Channel;
 using AdcCh = hal::Analog::InternalADC::Input;
 
 Telemetry tm;
 
-struct General {
-    struct Data {
-        std::array<std::array<uint10_t, 4>, 4> data;
-        MuxCh selected_mux_channel;
+struct EpsMock {
+    struct IOMap {
+        struct General {
+            struct Data {
+                std::array<std::array<uint10_t, 4>, 4> data;
+                MuxCh selected_mux_channel;
 
-        uint10_t& get(MuxCh mux, AdcCh adc) {
-            return data[num(adc)][num(mux)];
-        }
+                uint10_t& get(MuxCh mux, AdcCh adc) {
+                    return data[num(adc)][num(mux)];
+                }
 
-        static uint10_t sim(MuxCh mux, AdcCh ch) {
-            uint16_t val = 10u * num(mux) + num(ch);
-            return val;
-        }
-    };
-
-    static Data data;
-
-
-    struct MuxMock {
-        static void select(MuxCh ch) {
-            data.selected_mux_channel = ch;
-        }
-    };
-
-
-    template<AdcCh adc_input>
-    struct ADCMock {
-        static_assert(adc_input == AdcCh::ADC0 ||      //
-                          adc_input == AdcCh::ADC1 ||  //
-                          adc_input == AdcCh::ADC2 ||  //
-                          adc_input == AdcCh::ADC3,
-                      "Wrong channel!");
-
-        static uint10_t read() {
-            return data.get(data.selected_mux_channel, adc_input);
-        }
-    };
-};
-General::Data General::data;
-
-struct Mppt {
-    using Adc124Ch = hal::devices::ADC124::Channel;
-
-    enum class MpptChannel {
-        X  = 0,
-        Yp = 1,
-        Yn = 2,
-    };
-
-    struct Data {
-        std::array<bool, 3> initialised;
-        std::array<std::array<uint12_t, 4>, 3> data;
-
-        uint12_t& get(MpptChannel ch, Adc124Ch adc) {
-            return data[num(ch)][num(adc) >> 3];
-        }
-
-        uint12_t sim(MpptChannel ch, Adc124Ch adc) {
-            uint12_t val = 10u * num(ch) + (num(adc) >> 3);
-            return val;
-        }
-    };
-
-    static Data data;
-
-    struct MpptMock {
-        template<MpptChannel mppt_channel>
-        struct MpptChannelMock {
-            struct AdcSpi {
-                static void init() {
-                    TEST_ASSERT_FALSE(data.initialised[num(mppt_channel)]);
-                    data.initialised[num(mppt_channel)] = true;
+                static uint10_t sim(MuxCh mux, AdcCh ch) {
+                    uint16_t val = 10u * num(mux) + num(ch);
+                    return val;
                 }
             };
 
-            struct Adc124 {
-                static uint12_t read_and_change_channel(Adc124Ch ch) {
-                    static Adc124Ch channel = Adc124Ch::IN0;
+            static Data data;
 
-                    TEST_ASSERT_TRUE(data.initialised[num(mppt_channel)]);
 
-                    uint12_t val = data.get(mppt_channel, channel);
+            template<AdcCh adc_input>
+            struct ADCMock {
+                static_assert(adc_input == AdcCh::ADC0 ||      //
+                                  adc_input == AdcCh::ADC1 ||  //
+                                  adc_input == AdcCh::ADC2 ||  //
+                                  adc_input == AdcCh::ADC3,
+                              "Wrong channel!");
 
-                    channel = ch;
-                    return val;
+                static uint10_t read() {
+                    return data.get(data.selected_mux_channel, adc_input);
                 }
             };
         };
 
-        using MpptX  = MpptChannelMock<MpptChannel::X>;
-        using MpptYp = MpptChannelMock<MpptChannel::Yp>;
-        using MpptYn = MpptChannelMock<MpptChannel::Yn>;
+        struct Mux {
+            static void select(MuxCh ch) {
+                General::data.selected_mux_channel = ch;
+            }
+        };
+
+
+        struct Mppt {
+            using Adc124Ch = hal::devices::ADC124::Channel;
+
+            enum class MpptChannel {
+                X  = 0,
+                Yp = 1,
+                Yn = 2,
+            };
+
+            struct Data {
+                std::array<bool, 3> initialised;
+                std::array<std::array<uint12_t, 4>, 3> data;
+
+                uint12_t& get(MpptChannel ch, Adc124Ch adc) {
+                    return data[num(ch)][num(adc) >> 3];
+                }
+
+                uint12_t sim(MpptChannel ch, Adc124Ch adc) {
+                    uint12_t val = 10u * num(ch) + (num(adc) >> 3);
+                    return val;
+                }
+            };
+
+            static Data data;
+
+            template<MpptChannel mppt_channel>
+            struct MpptChannelMock {
+                struct AdcSpi {
+                    static void init() {
+                        TEST_ASSERT_FALSE(data.initialised[num(mppt_channel)]);
+                        data.initialised[num(mppt_channel)] = true;
+                    }
+                };
+
+                struct Adc124 {
+                    static uint12_t read_and_change_channel(Adc124Ch ch) {
+                        static Adc124Ch channel = Adc124Ch::IN0;
+
+                        TEST_ASSERT_TRUE(data.initialised[num(mppt_channel)]);
+
+                        uint12_t val = data.get(mppt_channel, channel);
+
+                        channel = ch;
+                        return val;
+                    }
+                };
+            };
+            using MpptX  = MpptChannelMock<MpptChannel::X>;
+            using MpptYp = MpptChannelMock<MpptChannel::Yp>;
+            using MpptYn = MpptChannelMock<MpptChannel::Yn>;
+        };
+
+        struct battery_controller {
+            template<int tag>
+            struct TempSensorMock {
+                static bool initialised;
+
+                struct Spi {
+                    static void init() {
+                        initialised = true;
+                    }
+                };
+
+                struct Tmp121 {
+                    static uint13_t value;
+
+                    static uint13_t read_raw() {
+                        if (!initialised)
+                            return 0;
+
+                        initialised = false;
+                        return value;
+                    }
+                };
+            };
+
+
+            struct TemperatureSensors {
+                using TemperatureSensorA = TempSensorMock<0>;
+                using TemperatureSensorB = TempSensorMock<1>;
+            };
+        };
+    };
+
+    struct LclCommander {
+        static uint8_t on_status_val;
+
+        static uint8_t on_status() {
+            return on_status_val;
+        }
+
+        static uint8_t overcurrent_status_val;
+
+        static uint8_t overcurrent_status() {
+            return overcurrent_status_val;
+        }
     };
 };
+
+using General         = EpsMock::IOMap::General;
+using Mppt            = EpsMock::IOMap::Mppt;
+using LclCommander    = EpsMock::LclCommander;
+using TempSensorsMock = EpsMock::IOMap::battery_controller::TemperatureSensors;
+template<int tag>
+using TempSensorMock = EpsMock::IOMap::battery_controller::TempSensorMock<tag>;
+
+General::Data General::data;
 Mppt::Data Mppt::data;
-
-struct LclCommanderMock {
-    static uint8_t on_status_val;
-    static uint8_t on_status() {
-        return on_status_val;
-    }
-
-    static uint8_t overcurrent_status_val;
-    static uint8_t overcurrent_status() {
-        return overcurrent_status_val;
-    }
-};
-uint8_t LclCommanderMock::on_status_val;
-uint8_t LclCommanderMock::overcurrent_status_val;
+uint8_t LclCommander::on_status_val;
+uint8_t LclCommander::overcurrent_status_val;
 
 template<int tag>
-struct TempSensorMock {
-    static bool initialised;
-
-    struct Spi {
-        static void init() {
-            initialised = true;
-        }
-    };
-    struct Tmp121 {
-        static uint13_t value;
-
-        static uint13_t read_raw() {
-            if (!initialised)
-                return 0;
-
-            initialised = false;
-            return value;
-        }
-    };
-};
+bool EpsMock::IOMap::battery_controller::TempSensorMock<tag>::initialised;
 template<int tag>
-bool TempSensorMock<tag>::initialised;
-template<int tag>
-uint13_t TempSensorMock<tag>::Tmp121::value;
+uint13_t EpsMock::IOMap::battery_controller::TempSensorMock<tag>::Tmp121::value;
 
-struct TempSensorsMock {
-    using TemperatureSensorA = TempSensorMock<0>;
-    using TemperatureSensorB = TempSensorMock<1>;
-};
-
-using tm_updater =
-    TelemetryUpdater<tm, General::MuxMock, General::ADCMock, Mppt::MpptMock, LclCommanderMock, TempSensorsMock>;
+// using tm_updater =
+//    TelemetryUpdater<tm, General::Mux, General::ADCMock, Mppt::MpptMock,
+//    LclCommander, TempSensorsMock>;
+using tm_updater = TelemetryUpdater<tm, General::ADCMock, EpsMock>;
 
 void test_TelemetryUpdater_general() {
     for (auto mux : {MuxCh::S1, MuxCh::S2, MuxCh::S3, MuxCh::S4}) {
@@ -221,11 +239,11 @@ void test_TelemetryUpdater_mppt() {
 }
 
 void test_TelemetryUpdater_lcl_status() {
-    LclCommanderMock::overcurrent_status_val = 0xA7;
+    LclCommander::overcurrent_status_val = 0xA7;
 
     uint8_t val = 0;
     do {
-        LclCommanderMock::on_status_val = val;
+        LclCommander::on_status_val = val;
 
         tm_updater::update_general();
 
@@ -235,11 +253,11 @@ void test_TelemetryUpdater_lcl_status() {
     } while (val++ != 0xFF);
 
 
-    LclCommanderMock::on_status_val = 0x5E;
+    LclCommander::on_status_val = 0x5E;
 
     val = 0;
     do {
-        LclCommanderMock::overcurrent_status_val = val;
+        LclCommander::overcurrent_status_val = val;
 
         tm_updater::update_general();
 
