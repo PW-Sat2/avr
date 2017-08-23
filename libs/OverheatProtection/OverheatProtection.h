@@ -3,7 +3,7 @@
 
 #include "logger.h"
 
-namespace avr {
+namespace eps {
 
 template<typename LclCommander, std::int8_t temp_threshold>
 struct OverheatProtection {
@@ -25,6 +25,6 @@ struct OverheatProtection {
 template<typename LclCommander, std::int8_t temp_threshold>
 volatile bool OverheatProtection<LclCommander, temp_threshold>::enabled = true;
 
-}  // namespace avr
+}  // namespace eps
 
 #endif  // LIBS_OVERHEATPROTECTION_OVERHEATPROTECTION_H_

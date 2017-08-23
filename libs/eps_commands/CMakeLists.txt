@@ -1,4 +1,4 @@
-set(NAME commands)
+set(NAME eps_commands)
 
 add_library(${NAME} STATIC
     commands/PowerCycle.h

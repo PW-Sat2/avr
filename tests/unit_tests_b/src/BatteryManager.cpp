@@ -26,7 +26,7 @@ using PinCharge    = PinMock<0>;
 using PinDischarge = PinMock<1>;
 using PinHeater    = PinMock<2>;
 
-BatteryManager<PinCharge, PinDischarge, PinHeater> battery_manager;
+eps::BatteryManager<PinCharge, PinDischarge, PinHeater> battery_manager;
 
 void test_BatteryManager_default_state() {
     battery_manager.tick(0, 1000);

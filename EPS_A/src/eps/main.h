@@ -22,16 +22,16 @@
 extern eps_a::Telemetry telemetry;
 
 using FullPowerCycle =
-    avr::eps::FullPowerCycle<eps_a::iomap::PowerCycle, eps_a::iomap::watchdog::Watchdog>;
+    eps::FullPowerCycle<eps_a::iomap::PowerCycle, eps_a::iomap::watchdog::Watchdog>;
 
-using LclCommander = avr::eps::LclCommander<eps_a::iomap::lcl::AllLcls>;
-using ObcWatchdog  = avr::eps::ObcWatchdog<FullPowerCycle::perform>;
+using LclCommander = eps::LclCommander<eps_a::iomap::lcl::AllLcls>;
+using ObcWatchdog  = eps::ObcWatchdog<FullPowerCycle::perform>;
 
 
-using ThermalKnives = avr::ThermalKnives<eps_a::iomap::thermal_knives::PinSail,  //
+using ThermalKnives = eps::ThermalKnives<eps_a::iomap::thermal_knives::PinSail,  //
                                          eps_a::iomap::thermal_knives::PinSads>;  //
 
-using OverheatProtection = avr::OverheatProtection<LclCommander, 50>;
+using OverheatProtection = eps::OverheatProtection<LclCommander, 50>;
 
 struct Executor {
     template<typename Command>
@@ -41,13 +41,13 @@ struct Executor {
 };
 
 using EPSACommandDispatcher =
-    CommandDispatcher<Executor,                                       //
-                      eps_a::commands::PowerCycle<FullPowerCycle>,    //
-                      eps_a::commands::EnableLCL<LclCommander>,       //
-                      eps_a::commands::DisableLCL<LclCommander>,      //
-                      eps_a::commands::ThermalKnives<ThermalKnives>,  //
-                      eps_a::commands::ObcWatchdog<ObcWatchdog>,      //
-                      eps_a::commands::DisableOverheatProtection<OverheatProtection>  //
+    CommandDispatcher<Executor,                                     //
+                      eps::commands::PowerCycle<FullPowerCycle>,    //
+                      eps::commands::EnableLCL<LclCommander>,       //
+                      eps::commands::DisableLCL<LclCommander>,      //
+                      eps::commands::ThermalKnives<ThermalKnives>,  //
+                      eps::commands::ObcWatchdog<ObcWatchdog>,      //
+                      eps::commands::DisableOverheatProtection<OverheatProtection>  //
                       >;
 
 extern EPSACommandDispatcher dispatcher;

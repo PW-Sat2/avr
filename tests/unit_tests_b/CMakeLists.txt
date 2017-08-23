@@ -1,8 +1,11 @@
 add_hal_executable(unit_tests_b
     main.cpp
     src/BatteryManager.cpp
-    src/TwoStateFsm.cpp
+    src/LCLCommands.cpp
+    src/ObcWatchdog.cpp
     src/OverheatProtection.cpp
+    src/ThermalKnives.cpp
+    src/TwoStateFsm.cpp
 )
 
 add_custom_target(unit_tests_b.run
@@ -19,4 +22,7 @@ target_link_libraries(unit_tests_b
     BatteryManager
     TwoStateFsm
     OverheatProtection
+    eps_commands
+    ObcWatchdog
+    ThermalKnives
 )

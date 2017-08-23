@@ -9,7 +9,7 @@ target_link_libraries(EPS_A
     ObcInterface
     logger
     telemetry
-    commands
+    eps_commands
     IOMap
     MainTimer
     LclCommander

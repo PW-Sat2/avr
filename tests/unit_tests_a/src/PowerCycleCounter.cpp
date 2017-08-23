@@ -3,7 +3,7 @@
 #include "PowerCycleCounter.h"
 
 using namespace avr;
-using namespace avr::power_cycle_counters;
+using namespace eps::power_cycle_counters;
 
 static bool deployed = false;
 static void deploy() {

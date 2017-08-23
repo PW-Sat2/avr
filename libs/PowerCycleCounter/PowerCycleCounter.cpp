@@ -2,7 +2,8 @@
 #include "EepromCounter.h"
 
 using namespace avr;
-using namespace avr::power_cycle_counters;
+using namespace eps;
+using namespace eps::power_cycle_counters;
 
 EepromCounter<uint16_t>::type EEMEM var_counter_safety{0, 0, 0, 0, 0};
 EepromCounter<uint16_t>::type EEMEM var_counter_all{0, 0, 0, 0, 0};

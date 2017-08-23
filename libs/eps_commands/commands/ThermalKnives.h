@@ -1,10 +1,10 @@
-#ifndef EPS_A_EPS_LIBS_COMMANDS_COMMANDS_THERMALKNIVES_H_
-#define EPS_A_EPS_LIBS_COMMANDS_COMMANDS_THERMALKNIVES_H_
+#ifndef LIBS_EPS_COMMANDS_COMMANDS_THERMALKNIVES_H_
+#define LIBS_EPS_COMMANDS_COMMANDS_THERMALKNIVES_H_
 
 #include "ObcInterface/Command.h"
 #include "logger.h"
 
-namespace eps_a {
+namespace eps {
 namespace commands {
 
 template<typename TKModule>
@@ -15,6 +15,6 @@ struct ThermalKnives : public Command<0xE3, 1> {
 };
 
 }  // namespace commands
-}  // namespace eps_a
+}  // namespace eps
 
-#endif  // EPS_A_EPS_LIBS_COMMANDS_COMMANDS_THERMALKNIVES_H_
+#endif  // LIBS_EPS_COMMANDS_COMMANDS_THERMALKNIVES_H_

@@ -1,10 +1,10 @@
-#ifndef EPS_A_EPS_LIBS_COMMANDS_COMMANDS_LCL_H_
-#define EPS_A_EPS_LIBS_COMMANDS_COMMANDS_LCL_H_
+#ifndef LIBS_EPS_COMMANDS_COMMANDS_LCL_H_
+#define LIBS_EPS_COMMANDS_COMMANDS_LCL_H_
 
 #include "ObcInterface/Command.h"
 #include "logger.h"
 
-namespace eps_a {
+namespace eps {
 namespace commands {
 
 template<typename LclCommander>
@@ -24,6 +24,6 @@ class DisableLCL : public Command<0xE2, 1> {
 };
 
 }  // namespace commands
-}  // namespace eps_a
+}  // namespace eps
 
-#endif  // EPS_A_EPS_LIBS_COMMANDS_COMMANDS_LCL_H_
+#endif  // LIBS_EPS_COMMANDS_COMMANDS_LCL_H_

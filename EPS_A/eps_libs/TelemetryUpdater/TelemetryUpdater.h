@@ -55,7 +55,7 @@ class TelemetryUpdater : hal::libs::PureStatic {
         tm.controller_a.supply_temperature         = Adc<AdcCh::ADC2>::read();
         tm.battery_controller.controller_a_voltage = Adc<AdcCh::ADC3>::read();
 
-        auto power_cycles              = avr::power_cycle_counters::get();
+        auto power_cycles              = eps::power_cycle_counters::get();
         tm.controller_a.power_cycles   = power_cycles.all;
         tm.controller_a.safety_counter = power_cycles.safety;
 

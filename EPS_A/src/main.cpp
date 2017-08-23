@@ -50,7 +50,7 @@ void each_1sec() {
     }
 }
 
-avr::BatteryManager<eps_a::iomap::battery_controller::PinCharge,
+eps::BatteryManager<eps_a::iomap::battery_controller::PinCharge,
                     eps_a::iomap::battery_controller::PinDischarge,
                     eps_a::iomap::battery_controller::PinHeater>
     battery_manager;
@@ -67,7 +67,7 @@ void each_10sec() {
 
 void each_30min() {
     LOG_INFO("Reset Safety Counter");
-    avr::power_cycle_counters::reset();
+    eps::power_cycle_counters::reset();
 }
 
 
@@ -75,7 +75,7 @@ int main() {
     eps_a::init_hardware();
     LOG_INFO("Loaded EPS_A software rev. " GIT_REVISION
              ", local state: " GIT_CHANGES);
-    avr::power_cycle_counters::bootup(eps_a::emergency_sail_deployment);
+    eps::power_cycle_counters::bootup(eps_a::emergency_sail_deployment);
     eps_a::init_obc_interface();
 
     sei();

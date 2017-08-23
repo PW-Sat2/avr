@@ -18,7 +18,7 @@ static void check_lcls(bool status) {
     reset();
 }
 
-using overheat = avr::OverheatProtection<LclCommanderMock, 20>;
+using overheat = eps::OverheatProtection<LclCommanderMock, 20>;
 
 void test_OverheatProtection_enabled_by_default() {
     reset();

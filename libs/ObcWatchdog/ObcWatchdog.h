@@ -4,7 +4,6 @@
 #include "SoftwareTimer.h"
 #include "logger.h"
 
-namespace avr {
 namespace eps {
 
 template<void (*full_power_cycle)()>
@@ -35,6 +34,5 @@ struct ObcWatchdog {
 };
 
 }  // namespace eps
-}  // namespace avr
 
 #endif  // LIBS_OBCWATCHDOG_OBCWATCHDOG_H_

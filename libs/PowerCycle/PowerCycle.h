@@ -1,7 +1,6 @@
-#ifndef EPS_A_EPS_LIBS_POWERCYCLE_POWERCYCLE_H_
-#define EPS_A_EPS_LIBS_POWERCYCLE_POWERCYCLE_H_
+#ifndef LIBS_POWERCYCLE_POWERCYCLE_H_
+#define LIBS_POWERCYCLE_POWERCYCLE_H_
 
-namespace avr {
 namespace eps {
 
 template<typename PowerCyclePin, typename Watchdog>
@@ -43,6 +42,5 @@ struct FullPowerCycle {
 };
 
 }  // namespace eps
-}  // namespace avr
 
-#endif  // EPS_A_EPS_LIBS_POWERCYCLE_POWERCYCLE_H_
+#endif  // LIBS_POWERCYCLE_POWERCYCLE_H_

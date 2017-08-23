@@ -3,7 +3,7 @@
 
 #include "EepromCounter.h"
 
-namespace avr {
+namespace eps {
 namespace power_cycle_counters {
 
 /*!
@@ -43,6 +43,6 @@ Counter get();
 void reset();
 
 }  // namespace power_cycle_counters
-}  // namespace avr
+}  // namespace eps
 
 #endif  // LIBS_POWERCYCLECOUNTER_POWERCYCLECOUNTER_H_

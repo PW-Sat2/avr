@@ -58,7 +58,7 @@ template<int id_, uint8_t bit_pos_>
 bool LCL<id_, bit_pos_>::is_on_invoked;
 
 using LCLs = std::tuple<LCL<0, 0>, LCL<20, 1>, LCL<7, 2>, LCL<0xFB, 3>>;
-using cmd  = avr::eps::LclCommander<LCLs>;
+using cmd  = eps::LclCommander<LCLs>;
 
 void set_on(bool a, bool b, bool c, bool d) {
     std::tuple_element_t<0, LCLs>::state_on = a;

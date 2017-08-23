@@ -2,11 +2,8 @@ add_compile_options(-Wno-error)
 
 add_hal_executable(eps_unit_tests
     main.cpp
-    src/ThermalKnives.cpp
     src/MainTimer.cpp
-    src/LCLCommands.cpp
     src/TelemetryUpdater.cpp
-    src/ObcWatchdog.cpp
 )
 
 add_custom_target(eps_unit_tests.run
@@ -20,9 +17,6 @@ include_directories(.)
 target_link_libraries(eps_unit_tests
     unity
     terminal
-    ThermalKnives
     MainTimer
-    commands
     TelemetryUpdater
-    ObcWatchdog
 )

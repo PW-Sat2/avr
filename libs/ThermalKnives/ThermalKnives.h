@@ -1,16 +1,16 @@
-#ifndef EPS_A_EPS_LIBS_THERMALKNIVES_THERMALKNIVES_H_
-#define EPS_A_EPS_LIBS_THERMALKNIVES_THERMALKNIVES_H_
+#ifndef LIBS_THERMALKNIVES_THERMALKNIVES_H_
+#define LIBS_THERMALKNIVES_THERMALKNIVES_H_
 
 #include <logger.h>
 #include <hal/hal>
 #include "SoftwareTimer.h"
 
-namespace avr {
+namespace eps {
 
 /*!
- * ThermalKnives handling for EPS_A.
+ * ThermalKnives handling for EPS.
  * It is responsible for auto-turnoff Burn switches after timeout.
- * Pins used by this module are considered active-low.
+ * Pins used by this module are considered active-high.
  * @tparam SailPin pin connected to sail BURN switch
  * @tparam SadsPin pin connected to sads BURN switch
  */
@@ -65,12 +65,12 @@ class ThermalKnives : hal::libs::PureStatic {
         }
     };
 
-    using sail_timer = avr::SoftwareTimer<
-        ThermalKniveTimerCallbacks<SailPin, 'S', 'A', 'I', 'L', 'm', 'a', 'i', 'n'>,
-        AutoDisableTicks>;
-    using sads_timer = avr::SoftwareTimer<
-        ThermalKniveTimerCallbacks<SadsPin, 'S', 'A', 'D', 'S', 'm', 'a', 'i', 'n'>,
-        AutoDisableTicks>;
+    using sail_timer =
+        avr::SoftwareTimer<ThermalKniveTimerCallbacks<SailPin, 'S', 'A', 'I', 'L'>,
+                           AutoDisableTicks>;
+    using sads_timer =
+        avr::SoftwareTimer<ThermalKniveTimerCallbacks<SadsPin, 'S', 'A', 'D', 'S'>,
+                           AutoDisableTicks>;
 };
 
 
@@ -78,12 +78,12 @@ template<typename SailPin, typename SadsPin>
 void ThermalKnives<SailPin, SadsPin>::burn(uint8_t burn_id) {
     switch (burn_id) {
         case num(Types::Sail):
-            LOG_INFO("Enable burn switch: SAILmain");
+            LOG_INFO("Enable burn switch: SAIL");
             sail_timer::reset();
             break;
 
         case num(Types::Sads):
-            LOG_INFO("Enable burn switch: SADSmain");
+            LOG_INFO("Enable burn switch: SADS");
             sads_timer::reset();
             break;
         default:
@@ -102,6 +102,6 @@ void ThermalKnives<SailPin, SadsPin>::tick() {
     sads_timer::tick();
 }
 
-}  // namespace avr
+}  // namespace eps
 
-#endif  // EPS_A_EPS_LIBS_THERMALKNIVES_THERMALKNIVES_H_
+#endif  // LIBS_THERMALKNIVES_THERMALKNIVES_H_

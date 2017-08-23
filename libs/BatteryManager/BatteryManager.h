@@ -4,7 +4,7 @@
 #include "TwoStateFsm.h"
 #include "logger.h"
 
-namespace avr {
+namespace eps {
 
 /*!
  * Battery manager.
@@ -35,7 +35,7 @@ class BatteryManager {
     }
 
  private:
-    using BatteryChargeFSM = TwoStateFsm<float, float>;
+    using BatteryChargeFSM = avr::TwoStateFsm<float, float>;
 
     struct StateChargingON : BatteryChargeFSM::IState {
         void action() override {
@@ -64,7 +64,7 @@ class BatteryManager {
     BatteryChargeFSM battery_charger;
 
 
-    using BatteryHeaterFSM = TwoStateFsm<float>;
+    using BatteryHeaterFSM = avr::TwoStateFsm<float>;
 
     struct StateHeaterON : BatteryHeaterFSM::IState {
         void action() override {
@@ -93,7 +93,7 @@ class BatteryManager {
     BatteryHeaterFSM battery_heater;
 
 
-    using BatteryDischargeFSM = TwoStateFsm<float, float>;
+    using BatteryDischargeFSM = avr::TwoStateFsm<float, float>;
 
     struct StateDischargingON : BatteryDischargeFSM::IState {
         void action() override {
@@ -121,6 +121,6 @@ class BatteryManager {
     BatteryDischargeFSM battery_discharger;
 };
 
-}  // namespace avr
+}  // namespace eps
 
 #endif  // LIBS_BATTERYMANAGER_BATTERYMANAGER_H_

@@ -45,8 +45,8 @@ uint8_t LclCommanderMock::last_id;
 
 using cmd = LclCommanderMock;
 
-eps_a::commands::EnableLCL<cmd> enable;
-eps_a::commands::DisableLCL<cmd> disable;
+eps::commands::EnableLCL<cmd> enable;
+eps::commands::DisableLCL<cmd> disable;
 
 void test_LCL_Commands_ON() {
     uint8_t i = 0;
