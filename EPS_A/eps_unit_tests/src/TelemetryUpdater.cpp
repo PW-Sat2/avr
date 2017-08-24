@@ -101,36 +101,31 @@ struct EpsMock {
             using MpptYn = MpptChannelMock<MpptChannel::Yn>;
         };
 
-        struct battery_controller {
-            template<int tag>
-            struct TempSensorMock {
-                static bool initialised;
+        template<int tag>
+        struct TempSensorMock {
+            static bool initialised;
 
-                struct Spi {
-                    static void init() {
-                        initialised = true;
-                    }
-                };
-
-                struct Tmp121 {
-                    static uint13_t value;
-
-                    static uint13_t read_raw() {
-                        if (!initialised)
-                            return 0;
-
-                        initialised = false;
-                        return value;
-                    }
-                };
+            struct Spi {
+                static void init() {
+                    initialised = true;
+                }
             };
 
+            struct Tmp121 {
+                static uint13_t value;
 
-            struct TemperatureSensors {
-                using TemperatureSensorA = TempSensorMock<0>;
-                using TemperatureSensorB = TempSensorMock<1>;
+                static uint13_t read_raw() {
+                    if (!initialised)
+                        return 0;
+
+                    initialised = false;
+                    return value;
+                }
             };
         };
+
+        using BatteryTemperatureSensorA = TempSensorMock<0>;
+        using BatteryTemperatureSensorB = TempSensorMock<1>;
     };
 
     struct LclCommander {
@@ -148,12 +143,13 @@ struct EpsMock {
     };
 };
 
-using General         = EpsMock::IOMap::General;
-using Mppt            = EpsMock::IOMap::Mppt;
-using LclCommander    = EpsMock::LclCommander;
-using TempSensorsMock = EpsMock::IOMap::battery_controller::TemperatureSensors;
+using General      = EpsMock::IOMap::General;
+using Mppt         = EpsMock::IOMap::Mppt;
+using LclCommander = EpsMock::LclCommander;
 template<int tag>
-using TempSensorMock = EpsMock::IOMap::battery_controller::TempSensorMock<tag>;
+using TempSensorMock            = EpsMock::IOMap::TempSensorMock<tag>;
+using BatteryTemperatureSensorA = EpsMock::IOMap::BatteryTemperatureSensorA;
+using BatteryTemperatureSensorB = EpsMock::IOMap::BatteryTemperatureSensorB;
 
 General::Data General::data;
 Mppt::Data Mppt::data;
@@ -161,9 +157,9 @@ uint8_t LclCommander::on_status_val;
 uint8_t LclCommander::overcurrent_status_val;
 
 template<int tag>
-bool EpsMock::IOMap::battery_controller::TempSensorMock<tag>::initialised;
+bool EpsMock::IOMap::TempSensorMock<tag>::initialised;
 template<int tag>
-uint13_t EpsMock::IOMap::battery_controller::TempSensorMock<tag>::Tmp121::value;
+uint13_t EpsMock::IOMap::TempSensorMock<tag>::Tmp121::value;
 
 // using tm_updater =
 //    TelemetryUpdater<tm, General::Mux, General::ADCMock, Mppt::MpptMock,
@@ -268,11 +264,11 @@ void test_TelemetryUpdater_lcl_status() {
 }
 
 void test_TelemetryUpdater_battery_pack_temperature_sensors() {
-    TempSensorsMock::TemperatureSensorB::Tmp121::value = 0x1FEF;
+    BatteryTemperatureSensorB::Tmp121::value = 0x1FEF;
 
     uint16_t val = 0;
     do {
-        TempSensorsMock::TemperatureSensorA::Tmp121::value = val;
+        BatteryTemperatureSensorA::Tmp121::value = val;
 
         tm_updater::update_general();
 
@@ -282,11 +278,11 @@ void test_TelemetryUpdater_battery_pack_temperature_sensors() {
     } while (val++ != 0x1FFF);
 
 
-    TempSensorsMock::TemperatureSensorA::Tmp121::value = 0x1ABC;
+    BatteryTemperatureSensorA::Tmp121::value = 0x1ABC;
 
     val = 0;
     do {
-        TempSensorsMock::TemperatureSensorB::Tmp121::value = val;
+        BatteryTemperatureSensorB::Tmp121::value = val;
 
         tm_updater::update_general();
 

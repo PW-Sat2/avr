@@ -62,13 +62,13 @@ class TelemetryUpdater : hal::libs::PureStatic {
         tm.distribution.lcl_state = Eps::LclCommander::on_status();
         tm.distribution.lcl_flagb = Eps::LclCommander::overcurrent_status();
 
-        Eps::IOMap::battery_controller::TemperatureSensors::TemperatureSensorA::Spi::init();
-        tm.battery_pack.temperature_a = Eps::IOMap::battery_controller::
-            TemperatureSensors::TemperatureSensorA::Tmp121::read_raw();
+        Eps::IOMap::BatteryTemperatureSensorA::Spi::init();
+        tm.battery_pack.temperature_a =
+            Eps::IOMap::BatteryTemperatureSensorA::Tmp121::read_raw();
 
-        Eps::IOMap::battery_controller::TemperatureSensors::TemperatureSensorB::Spi::init();
-        tm.battery_pack.temperature_b = Eps::IOMap::battery_controller::
-            TemperatureSensors::TemperatureSensorB::Tmp121::read_raw();
+        Eps::IOMap::BatteryTemperatureSensorB::Spi::init();
+        tm.battery_pack.temperature_b =
+            Eps::IOMap::BatteryTemperatureSensorB::Tmp121::read_raw();
 
 
         telemetry.general = tm;

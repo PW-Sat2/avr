@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 
+set(EPS TRUE)
+
 set(HAL_PATH ../AVR-HAL)
 set(HAL_MCU ATMEGA128A_TQFP64)
 set(F_CPU 8000000)

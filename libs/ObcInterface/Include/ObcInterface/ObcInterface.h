@@ -110,7 +110,7 @@ void ObcInterface<i2c_address, callback, rx_max_length, DataType>::process_inter
         case TW_ST_SLA_ACK:  // 0xA8
             tx_buffer_cnt   = rx_buffer[0];
             memory_buffered = memory;
-            // fallthrough
+        // fallthrough
 
         case TW_ST_DATA_ACK:  // 0xB8
             if (tx_buffer_cnt < tx_buffer_cnt_max) {

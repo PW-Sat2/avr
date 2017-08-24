@@ -6,60 +6,44 @@
 
 namespace eps {
 
-struct IOMap {
+class IOMap {
+    enum class LclId : std::uint8_t {
+        TkRed = 1,
+        Ants  = 2,
+    };
+
+    template<int pin_on, int pin_flagb, LclId id, char... name>
+    using Lcl =
+        eps::LclInterface<hal::DigitalIO::GPIO<pin_on>, hal::DigitalIO::GPIO<pin_flagb>, LclId, id, name...>;
+
+    using TkMain = Lcl<1, 1, LclId::TkRed, 'T', 'K', 'r', 'e', 'd'>;
+    using Ants   = Lcl<1, 1, LclId::Ants, 'A', 'n', 't', 's'>;
+
+    using PinKick = hal::DigitalIO::GPIO<1>;
+
+ public:
+    // ~~~~~~~~~~~~~~~~ common for both EPS ~~~~~~~~~~~~~~~~
+
     using PowerCycle = hal::DigitalIO::GPIO<1>;
     using SerialRx   = hal::DigitalIO::GPIO<1>;
 
-    struct watchdog {
-        using PinKick  = hal::DigitalIO::GPIO<1>;
-        using Watchdog = hal::devices::TPS3813<PinKick, 10>;
+    using Watchdog = hal::devices::TPS3813<PinKick, 10>;
+
+    struct ThermalKnives {
+        using Sail = hal::DigitalIO::GPIO<1>;
+        using Sads = hal::DigitalIO::GPIO<1>;
     };
 
-    struct thermal_knives {
-        using PinSail = hal::DigitalIO::GPIO<1>;
-        using PinSads = hal::DigitalIO::GPIO<1>;
+    struct Battery {
+        using Heater    = hal::DigitalIO::GPIO<1>;
+        using Charge    = hal::DigitalIO::GPIO<1>;
+        using Discharge = hal::DigitalIO::GPIO<1>;
     };
 
-    struct battery_controller {
-        using PinHeater    = hal::DigitalIO::GPIO<1>;
-        using PinCharge    = hal::DigitalIO::GPIO<1>;
-        using PinDischarge = hal::DigitalIO::GPIO<1>;
-    };
+    using AllLcls = std::tuple<TkMain, Ants>;
 
 
-    struct lcl {
-        struct ants {
-            using PinOn    = hal::DigitalIO::GPIO<1>;
-            using PinFlagB = hal::DigitalIO::GPIO<1>;
-        };
-
-        struct tk_red {
-            using PinOn    = hal::DigitalIO::GPIO<1>;
-            using PinFlagB = hal::DigitalIO::GPIO<1>;
-        };
-
-
-        enum class LclId : std::uint8_t {
-            TkRed = 1,
-            Ants  = 2,
-        };
-
-        // clang-format off
-using TkRed = eps::LclInterface<tk_red::PinOn,
-        tk_red::PinFlagB,
-        LclId,
-        LclId::TkRed,
-        'T', 'K', 'r', 'e', 'd'>;
-
-using Ants = eps::LclInterface<ants::PinOn,
-        ants::PinFlagB,
-        LclId,
-        LclId::Ants,
-        'A', 'n', 't', 's'>;
-        // clang-format on
-
-        using AllLcls = std::tuple<TkRed, Ants>;
-    };
+    // ~~~~~~~~~~~~~~~~ EPS_A specific ~~~~~~~~~~~~~~~~
 };
 
 }  // namespace eps
