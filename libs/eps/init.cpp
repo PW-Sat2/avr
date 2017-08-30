@@ -56,7 +56,8 @@ void avr::Eps::init() {
 
     eps::power_cycle_counters::bootup([]() {
         LOG_FATAL("Opening SAIL");
-        LOG_FATAL("Unimplemented!");
+        LclCommander::on(num(IOMap::LclId::ThermalKnives));
+        ThermalKnives::burn(ThermalKnives::Types::Sail);
     });
 
     init_obc_interface();

@@ -7,6 +7,17 @@
 namespace eps {
 
 class IOMap {
+ public:
+    enum class LclId : std::uint8_t {
+        ThermalKnives = 1,
+        Suns          = 2,
+        CamNadir      = 3,
+        CamWing       = 4,
+        Sens          = 5,
+        Ants          = 6,
+    };
+
+ private:
     template<int adc_cs_nr, int dac_cs_nr>
     struct MpptChannel {
         using PinAdcCS = hal::DigitalIO::GPIO<adc_cs_nr>;
@@ -42,26 +53,17 @@ class IOMap {
         using Tmp121 = hal::devices::TMP121<Spi>;
     };
 
-    enum class LclId : std::uint8_t {
-        TkMain   = 1,
-        Suns     = 2,
-        CamNadir = 3,
-        CamWing  = 4,
-        Sens     = 5,
-        Ants     = 6,
-    };
-
     template<int pin_on, int pin_flagb, LclId id, char... name>
     using Lcl =
         eps::LclInterface<hal::DigitalIO::GPIO<pin_on>, hal::DigitalIO::GPIO<pin_flagb>, LclId, id, name...>;
 
     // clang-format off
-    using TkMain   = Lcl<35, 51, LclId::TkMain,   'T', 'K', 'm', 'a', 'i', 'n'>;
-    using Suns     = Lcl<36, 50, LclId::Suns,     'S', 'u', 'n', 'S'>;
-    using CamNadir = Lcl<37, 49, LclId::CamNadir, 'C', 'a', 'm', 'N', 'a', 'd', 'i', 'r'>;
-    using CamWing  = Lcl<38, 48, LclId::CamWing,  'C', 'a', 'm', 'W', 'i', 'n', 'g'>;
-    using Sens     = Lcl<39, 47, LclId::Sens,     'S', 'e', 'n', 's'>;
-    using Ants     = Lcl<40, 46, LclId::Ants,     'A', 'n', 't', 's'>;
+    using TkMain   = Lcl<35, 51, LclId::ThermalKnives, 'T', 'K', 'm', 'a', 'i', 'n'>;
+    using Suns     = Lcl<36, 50, LclId::Suns,          'S', 'u', 'n', 'S'>;
+    using CamNadir = Lcl<37, 49, LclId::CamNadir,      'C', 'a', 'm', 'N', 'a', 'd', 'i', 'r'>;
+    using CamWing  = Lcl<38, 48, LclId::CamWing,       'C', 'a', 'm', 'W', 'i', 'n', 'g'>;
+    using Sens     = Lcl<39, 47, LclId::Sens,          'S', 'e', 'n', 's'>;
+    using Ants     = Lcl<40, 46, LclId::Ants,          'A', 'n', 't', 's'>;
     // clang-format on
 
     using PinKick = hal::DigitalIO::GPIO<17>;

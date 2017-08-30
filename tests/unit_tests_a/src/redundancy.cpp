@@ -4,8 +4,7 @@
 
 #include "redundancy.h"
 
-using std::uint32_t;
-using std::uint8_t;
+using namespace std;
 
 using namespace avr::redundancy;
 

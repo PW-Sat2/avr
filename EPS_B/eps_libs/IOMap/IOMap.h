@@ -7,16 +7,18 @@
 namespace eps {
 
 class IOMap {
+ public:
     enum class LclId : std::uint8_t {
-        TkRed = 1,
-        Ants  = 2,
+        ThermalKnives = 1,
+        Ants          = 2,
     };
 
+ private:
     template<int pin_on, int pin_flagb, LclId id, char... name>
     using Lcl =
         eps::LclInterface<hal::DigitalIO::GPIO<pin_on>, hal::DigitalIO::GPIO<pin_flagb>, LclId, id, name...>;
 
-    using TkMain = Lcl<1, 1, LclId::TkRed, 'T', 'K', 'r', 'e', 'd'>;
+    using TkMain = Lcl<1, 1, LclId::ThermalKnives, 'T', 'K', 'r', 'e', 'd'>;
     using Ants   = Lcl<1, 1, LclId::Ants, 'A', 'n', 't', 's'>;
 
     using PinKick = hal::DigitalIO::GPIO<1>;
