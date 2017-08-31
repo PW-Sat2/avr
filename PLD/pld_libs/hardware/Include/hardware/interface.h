@@ -47,13 +47,17 @@ struct Interface {
         bool timeout_vth1;
         bool timeout_vth2;
         bool timeout_temperature;
+        bool overcurrent_3v3;
+        bool overcurrent_5v;
         pld::Telemetry::Radfet::Measurement measurement;
 
         RadfetMeasurement()
             : timeout_vth0{false},
               timeout_vth1{false},
               timeout_vth2{false},
-              timeout_temperature{false} {
+              timeout_temperature{false},
+              overcurrent_3v3{false},
+              overcurrent_5v{false} {
         }
     };
 

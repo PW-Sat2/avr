@@ -86,6 +86,8 @@ void pld::hardware::RealHardware::init() {
     interrupt::reset();
     interrupt::init(DigitalIO::Mode::OUTPUT);
 
+    radfet_off();
+
     adc128_interface::spi::init();
 
     adg708::init();

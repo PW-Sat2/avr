@@ -35,6 +35,11 @@ struct RadFET_Measure : public Command<0x85, 0> {
         telemetry.radfet.status.set_status(Fields::TimeoutTemperature,
                                            tm.timeout_temperature);
 
+        telemetry.radfet.status.set_status(
+            Telemetry::Radfet::Status::Fields::LCL_3V3_error, tm.overcurrent_3v3);
+        telemetry.radfet.status.set_status(
+            Telemetry::Radfet::Status::Fields::LCL_5V_error, tm.overcurrent_5v);
+
         telemetry.radfet.status.set_status(Fields::MeasurementDone, true);
 
         telemetry.radfet.measurement = tm.measurement;

@@ -38,7 +38,9 @@ using interrupt    = hal::DigitalIO::GPIO<10>;
 
 
 namespace radfet {
-using pin_en = hal::DigitalIO::GPIO<35>;
+using pin_en                  = hal::DigitalIO::GPIO<35>;
+using pin_lcl_3v3_overcurrent = hal::DigitalIO::GPIO<34>;
+using pin_lcl_5v_overcurrent  = hal::DigitalIO::GPIO<36>;
 
 namespace adc {
 using pin_ss   = hal::DigitalIO::GPIO<33>;

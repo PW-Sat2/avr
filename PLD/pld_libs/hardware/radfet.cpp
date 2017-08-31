@@ -76,6 +76,9 @@ void read_channel(uint32_t& value, bool& timeout) {
  * Commands
  */
 void pld::hardware::RealHardware::radfet_on() {
+    radfet::pin_lcl_3v3_overcurrent::init(hal::DigitalIO::Mode::INPUT);
+    radfet::pin_lcl_5v_overcurrent::init(hal::DigitalIO::Mode::INPUT);
+
     radfet::pin_en::init(hal::DigitalIO::Mode::OUTPUT);
     radfet::pin_en::set();
 
@@ -99,6 +102,9 @@ pld::hardware::RealHardware::radfet_read() {
     read_channel<RadfetChannel::Temperature>(data.measurement.temperature,
                                              data.timeout_temperature);
 
+    data.overcurrent_3v3 = !radfet::pin_lcl_3v3_overcurrent::read();
+    data.overcurrent_5v  = !radfet::pin_lcl_5v_overcurrent::read();
+
     radfet::mux::mos_mux::disable();
 
     return data;
@@ -115,6 +121,9 @@ void pld::hardware::RealHardware::radfet_off() {
 
 
     deInit<radfet::mux::pin_en>();
+
+    deInit<radfet::pin_lcl_3v3_overcurrent>();
+    deInit<radfet::pin_lcl_5v_overcurrent>();
 
     deInit<mux::pin_en>();
     deInit<mux::pin_a0>();

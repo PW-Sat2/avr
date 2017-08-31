@@ -346,6 +346,27 @@ void test_commands_radfet_measure_status_timeout() {
     test(1, 1, 1, 1, 0b111110);
 }
 
+void test_commands_radfet_measure_status_overcurrent() {
+    auto test = [](bool error_3v3, bool error_5v, uint8_t expected) {
+        telemetry.init();
+        hw                  = MockHW();
+        hw.radfet_telemetry = Interface::RadfetMeasurement();
+        set_radfet_status(0);
+
+        hw.radfet_telemetry.overcurrent_3v3 = error_3v3;
+        hw.radfet_telemetry.overcurrent_5v  = error_5v;
+
+        pld::commands::RadFET_Measure().invoke(telemetry, hw, {});
+
+        TEST_ASSERT_EQUAL(expected, get_radfet_status());
+    };
+
+    test(0, 0, 0b00100000);
+    test(0, 1, 0b10100000);
+    test(1, 0, 0b01100000);
+    test(1, 1, 0b11100000);
+}
+
 void test_radfet_off_invoke() {
     hw = MockHW();
 
@@ -387,6 +408,7 @@ void test_commands() {
     RUN_TEST(test_commands_radfet_measure_invoke);
     RUN_TEST(test_commands_radfet_measure_telemetry);
     RUN_TEST(test_commands_radfet_measure_timeout);
+    RUN_TEST(test_commands_radfet_measure_status_overcurrent);
     RUN_TEST(test_commands_radfet_measure_status_ok);
     RUN_TEST(test_commands_radfet_measure_status_timeout);
 
