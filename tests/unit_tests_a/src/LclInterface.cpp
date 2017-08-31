@@ -94,9 +94,9 @@ void test_LclInterface_off() {
 }
 
 void test_LclInterface_overcurrent() {
-    FlagBMock::value = true;
-    TEST_ASSERT_TRUE(LCL1::overcurrent());
     FlagBMock::value = false;
+    TEST_ASSERT_TRUE(LCL1::overcurrent());
+    FlagBMock::value = true;
     TEST_ASSERT_FALSE(LCL1::overcurrent());
 }
 
