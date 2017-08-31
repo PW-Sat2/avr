@@ -33,8 +33,7 @@ void each_1sec() {
     }
     Eps::TelemetryUpdater::update_general();
 
-    // TODO(ggajoch): use real temperature
-    OverheatProtection::tick(0);
+    OverheatProtection::tick(ControllerSpecialisation::max_eps_temperature());
 
     if (timer_10second.expired()) {
         each_10sec();
@@ -43,9 +42,8 @@ void each_1sec() {
 
 avr::Prescaler<6 * 30> timer_30min;
 void each_10sec() {
-    // TODO(ggajoch): replace with real battery voltage when calibrated
-    // TODO(ggajoch): replace with real temperatures when they are measured
-    battery_manager.tick(10, 0);
+    battery_manager.tick(ControllerSpecialisation::battery_voltage(),
+                         ControllerSpecialisation::battery_temperature());
 
     if (timer_30min.expired()) {
         each_30min();

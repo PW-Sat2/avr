@@ -11,6 +11,10 @@ struct ControllerSpecialisation {
     static void init();
     static void each_33ms() {
     }
+
+    static float max_eps_temperature();
+    static float battery_temperature();
+    static float battery_voltage();
 };
 
 #endif  // EPS_B_EPS_LIBS_SETTINGS_SETTINGS_H_

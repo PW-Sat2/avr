@@ -5,7 +5,6 @@ if(EPS)
         obc_interface.cpp
         periodics.cpp
         init.cpp
-
         eps.h
         defs.h
     )
@@ -25,5 +24,6 @@ if(EPS)
         BatteryManager
         PowerCycleCounter
         eps_specs
+        calibration
     )
 endif()

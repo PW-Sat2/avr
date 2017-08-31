@@ -13,4 +13,5 @@ target_link_libraries(${NAME}
     IOMap
     MainTimer
     TelemetryUpdater
+    calibration
 )

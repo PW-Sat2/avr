@@ -45,6 +45,9 @@ struct Eps {
      * Continuous loop. Should never end.
      */
     static void run();
+
+    static void overheat_submode_tick();
+    static void battery_manager_tick();
 };
 
 }  // namespace avr
