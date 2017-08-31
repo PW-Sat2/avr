@@ -15,7 +15,7 @@ struct Telemetry {
     };
 
     struct BatteryController {
-        std::uint16_t temperature;
+        std::uint16_t voltage;
     };
 
     struct ControllerA {

@@ -9,12 +9,9 @@ namespace eps {
 
 /*!
  * Telemetry updater module. Updates telemetry values when ivoked.
- * This is split in two parts: general (1 second interval) and MPPT (33 ms)
  * @tparam telemetry Telemetry to update
- * @tparam Mux ADG709 mux type (device from IOMap)
  * @tparam InternalADC InternalADC from hal (hal::Analog::AnalogGPIO)
- * @tparam Mppt MPPT structure to use (from IOMap)
- * @tparam LclCommander LCL commander to use to get statuses of LCLs
+ * @tparam Eps EPS main structure
  */
 template<eps::Telemetry& telemetry,
          template<hal::Analog::InternalADC::Input> typename InternalADC,
@@ -27,12 +24,25 @@ class TelemetryUpdater : hal::libs::PureStatic {
      * stores result atomically in telemetry table.
      */
     static void update_general() {
-        //        eps_b::Telemetry::General tm = telemetry.general;
+        eps::Telemetry::General tm = telemetry.general;
+
+        tm.controller_b.temperature        = Adc<AdcCh::ADC0>::read();
+        tm.battery_controller.voltage      = Adc<AdcCh::ADC1>::read();
+        tm.controller_a.supply_voltage     = Adc<AdcCh::ADC2>::read();
+        tm.controller_b.supply_temperature = Adc<AdcCh::ADC3>::read();
+        tm.battery_pack.temperature        = Adc<AdcCh::ADC5>::read();
+
+        auto power_cycles              = eps::power_cycle_counters::get();
+        tm.controller_b.safety_counter = power_cycles.safety;
+        tm.controller_b.power_cycles   = power_cycles.all;
+
+        static uint32_t uptime = 0;
+        tm.controller_b.uptime = uptime++;
+
+        telemetry.general = tm;
     }
 
  private:
-    using MuxCh = hal::devices::ADG709::Channel;
-
     template<hal::Analog::InternalADC::Input input>
     using Adc = InternalADC<input>;
 

@@ -56,6 +56,7 @@ EPS_A_unit_tests:
 EPS_B_unit_tests:
 	make -C EPS_B/cmake-build-release unit_tests_a.run
 	make -C EPS_B/cmake-build-release unit_tests_b.run
+	make -C EPS_B/cmake-build-release eps_unit_tests.run
 
 SunS_unit_tests:
 	make -C SunS/cmake-build-release unit_tests_a.run
