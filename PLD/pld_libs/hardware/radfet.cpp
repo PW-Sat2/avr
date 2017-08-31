@@ -102,8 +102,17 @@ pld::hardware::RealHardware::radfet_read() {
     read_channel<RadfetChannel::Temperature>(data.measurement.temperature,
                                              data.timeout_temperature);
 
-    data.overcurrent_3v3 = !radfet::pin_lcl_3v3_overcurrent::read();
-    data.overcurrent_5v  = !radfet::pin_lcl_5v_overcurrent::read();
+    data.overcurrent_3v3 = false;
+    data.overcurrent_5v  = false;
+    for (auto i = 0; i < 100; ++i) {
+        bool now_3v3 = !radfet::pin_lcl_3v3_overcurrent::read();
+        bool now_5v  = !radfet::pin_lcl_5v_overcurrent::read();
+
+        data.overcurrent_3v3 |= now_3v3;
+        data.overcurrent_5v |= now_5v;
+
+        hal::sleep_for(1ms);
+    }
 
     radfet::mux::mos_mux::disable();
 
