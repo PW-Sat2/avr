@@ -18,34 +18,37 @@ class IOMap {
     using Lcl =
         eps::LclInterface<hal::DigitalIO::GPIO<pin_on>, hal::DigitalIO::GPIO<pin_flagb>, LclId, id, name...>;
 
-    using TkMain = Lcl<1, 1, LclId::ThermalKnives, 'T', 'K', 'r', 'e', 'd'>;
-    using Ants   = Lcl<1, 1, LclId::Ants, 'A', 'n', 't', 's'>;
+    using TkRed = Lcl<25, 31, LclId::ThermalKnives, 'T', 'K', 'r', 'e', 'd'>;
+    using Ants  = Lcl<26, 30, LclId::Ants, 'A', 'n', 't', 's'>;
 
-    using PinKick = hal::DigitalIO::GPIO<1>;
+    using PinKick = hal::DigitalIO::GPIO<42>;
 
  public:
     // ~~~~~~~~~~~~~~~~ common for both EPS ~~~~~~~~~~~~~~~~
 
-    using PowerCycle = hal::DigitalIO::GPIO<1>;
-    using SerialRx   = hal::DigitalIO::GPIO<1>;
+    using PowerCycle = hal::DigitalIO::GPIO<14>;
+    using SerialRx   = hal::DigitalIO::GPIO<9>;
 
     using Watchdog = hal::devices::TPS3813<PinKick, 10>;
 
     struct ThermalKnives {
-        using Sail = hal::DigitalIO::GPIO<1>;
-        using Sads = hal::DigitalIO::GPIO<1>;
+        using Sail = hal::DigitalIO::GPIO<15>;
+        using Sads = hal::DigitalIO::GPIO<16>;
     };
 
     struct Battery {
-        using Heater    = hal::DigitalIO::GPIO<1>;
-        using Charge    = hal::DigitalIO::GPIO<1>;
-        using Discharge = hal::DigitalIO::GPIO<1>;
+        using Heater    = hal::DigitalIO::GPIO<12>;
+        using Charge    = hal::DigitalIO::GPIO<11>;
+        using Discharge = hal::DigitalIO::GPIO<13>;
     };
 
-    using AllLcls = std::tuple<TkMain, Ants>;
+    using AllLcls = std::tuple<TkRed, Ants>;
 
 
     // ~~~~~~~~~~~~~~~~ EPS_A specific ~~~~~~~~~~~~~~~~
+    using MpptXDisable  = hal::DigitalIO::GPIO<1>;
+    using MpptYpDisable = hal::DigitalIO::GPIO<2>;
+    using MpptYnDisable = hal::DigitalIO::GPIO<3>;
 };
 
 }  // namespace eps
