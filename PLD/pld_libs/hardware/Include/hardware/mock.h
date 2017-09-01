@@ -23,14 +23,6 @@ struct Mock : public Interface {
 };
 
 namespace mock {
-enum class MockEvent : uint8_t {
-    Init     = 0,
-    Standby  = 1,
-    Radfet   = 2,
-    Watchdog = 3,
-    IntSet   = 4,
-    IntReset = 5,
-};
 
 extern std::array<std::uint16_t, 20> adc_channels;
 

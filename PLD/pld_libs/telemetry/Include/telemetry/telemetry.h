@@ -41,13 +41,6 @@ struct Telemetry {
         std::uint16_t obc_3v3d;
     };
 
-    enum class RadfetState : std::uint8_t {
-        TURNED_ON            = 1,
-        TURNED_OFF           = 2,
-        MEASUREMENT_EXECUTED = 3,
-        MEASUREMENT_TIMEOUT  = 4,
-    };
-
     struct Radfet {
         struct Status {
             enum class Fields {
@@ -65,11 +58,13 @@ struct Telemetry {
 
 
             void set_status(Fields field, bool value) {
-                std::bitset<num(Fields::Length)> bitset{this->status};
+                static_assert(num(Fields::Length) <= 8, "One byte status allowed!");
+
+                std::bitset<num(Fields::Length)> bitset(this->status);
 
                 bitset[num(field)] = value;
 
-                status = bitset.to_ulong();
+                status = static_cast<uint8_t>(bitset.to_ulong());
             }
 
          private:

@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <avr/sleep.h>
 
 #include "logger.h"
