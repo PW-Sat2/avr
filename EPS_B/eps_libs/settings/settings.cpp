@@ -9,6 +9,8 @@
 #include "calibration/LMT87.h"
 #include "calibration/TMP121.h"
 
+#include <hal/libs/device_supports/RTD.h>
+
 using namespace avr;
 
 using InternalADC = avr::calibration::Adc<10, 3000>;
@@ -22,10 +24,12 @@ constexpr static auto lmt87 = [](auto x) {
     return avr::calibration::lmt87::volts_to_celsius(voltage);
 };
 
-constexpr static auto pt1000 = [](auto) {
-//    auto voltage = InternalADC::reading_to_voltage(x);
-//    return avr::calibration::pt1000::volts_to_celsius(voltage);
-    return 0.0f;
+constexpr static auto pt1000 = [](auto reading) {
+    hal::libs::RTD rtd{1000};
+
+    auto voltage    = InternalADC::reading_to_voltage(reading);
+    auto resistance = 3300 * voltage / (3.0f - voltage);
+    return rtd.temperature(resistance);
 };
 
 float ControllerSpecialisation::max_eps_temperature() {
