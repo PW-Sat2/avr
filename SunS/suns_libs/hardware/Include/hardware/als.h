@@ -2,6 +2,7 @@
 #define SUNS_SUNS_LIBS_HARDWARE_INCLUDE_HARDWARE_ALS_H_
 
 #include <hal/hal>
+#include "i2c_multiple.h"
 
 namespace BH1730FVCMulti {
 enum class Gain : std::uint8_t {
@@ -53,7 +54,7 @@ class BH1730FVCMulti : hal::libs::PureStatic {
         i2c::stop();
 
         result |= i2c::start(address, SoftI2CMulti::Action::START_READ);
-        result |= i2c::read(ids, false);
+        i2c::read(ids, false);
 
         i2c::stop();
 
@@ -73,10 +74,10 @@ class BH1730FVCMulti : hal::libs::PureStatic {
 
         result |= i2c::start(address, SoftI2CMulti::Action::START_READ);
 
-        result = i2c::read(vl_lsb, true);
-        result = i2c::read(vl_msb, true);
-        result = i2c::read(ir_lsb, true);
-        result = i2c::read(ir_msb, false);
+        i2c::read(vl_lsb, true);
+        i2c::read(vl_msb, true);
+        i2c::read(ir_lsb, true);
+        i2c::read(ir_msb, false);
 
         i2c::stop();
 
@@ -114,7 +115,7 @@ class BH1730FVCMulti : hal::libs::PureStatic {
         result |= i2c::start(address, SoftI2CMulti::Action::START_READ);
 
         std::array<std::uint8_t, 4> control_registers;
-        result = i2c::read(control_registers, false);
+        i2c::read(control_registers, false);
 
         hal::libs::write_bit<0>(data_status,
                                 hal::libs::read_bit<4>(control_registers[0]));

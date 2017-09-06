@@ -60,7 +60,7 @@ class SoftI2CMulti : hal::libs::PureStatic {
         return result;
     }
 
-    static bool read(std::array<std::uint8_t, 4>& data, bool ack) {
+    static void read(std::array<std::uint8_t, 4>& data, bool ack) {
         std::array<std::uint8_t, 4> SDA_read_data = {0};
         for (int8_t i = 7; i >= 0; i--) {
             _scl_low_high();
@@ -91,8 +91,6 @@ class SoftI2CMulti : hal::libs::PureStatic {
         sda_hi_z();
         _delay_loop_1(hDelay);
         data = SDA_read_data;
-
-        return false;
     }
 
  private:
