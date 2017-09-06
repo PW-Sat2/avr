@@ -9,13 +9,7 @@ set(CMAKE_TOOLCHAIN_FILE "${HAL_PATH}/toolchain.cmake")
 
 add_definitions(-DLOG_LEVEL=LOG_LEVEL_INFO)
 
-include(../cmake-modules/GetGitRevisionDescription.cmake)
-get_git_head_revision(GIT_BRANCH GIT_REVISION)
-git_local_changes(GIT_LOCAL_CHANGES)
-string(SUBSTRING ${GIT_REVISION} 0 6 GIT_REVISION_SHORT)
-add_definitions(-DGIT_REVISION=\"${GIT_REVISION_SHORT}\")
-add_definitions(-DGIT_CHANGES=\"${GIT_LOCAL_CHANGES}\")
-message("Revision ${GIT_REVISION_SHORT} ${GIT_LOCAL_CHANGES}")
+include(../cmake-modules/nameplate.cmake)
 
 project(eps_b)
 

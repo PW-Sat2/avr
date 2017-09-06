@@ -7,6 +7,8 @@ set(CMAKE_TOOLCHAIN_FILE "${HAL_PATH}/toolchain.cmake")
 
 add_definitions(-DLOG_LEVEL=LOG_LEVEL_INFO)
 
+include(../cmake-modules/nameplate.cmake)
+
 project(pld_libs)
 
 add_subdirectory(${HAL_PATH} hal)
