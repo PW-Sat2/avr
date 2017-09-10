@@ -20,7 +20,7 @@ using FullPowerCycle =
 
 using ObcWatchdog = eps::ObcWatchdog<FullPowerCycle::perform>;
 
-using OverheatProtection = eps::OverheatProtection<avr::Eps::LclCommander, 50>;
+using OverheatProtection = eps::OverheatProtection<avr::Eps::LclCommander, 80>;
 
 
 using ThermalKnives =
