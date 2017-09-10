@@ -105,8 +105,8 @@ class TelemetryUpdater : hal::libs::PureStatic {
 
         tm.solar_current = MpptCh::Adc124::read_and_change_channel(Adc124Ch::IN1);
         tm.solar_voltage = MpptCh::Adc124::read_and_change_channel(Adc124Ch::IN2);
-        tm.output_voltage = MpptCh::Adc124::read_and_change_channel(Adc124Ch::IN3);
         tm.temperature = MpptCh::Adc124::read_and_change_channel(Adc124Ch::IN3);
+        tm.output_voltage = MpptCh::Adc124::read_and_change_channel(Adc124Ch::IN3);
     }
 };
 
