@@ -4,14 +4,14 @@
 
 using hal::Serial0;
 
-void test_telecommands();
+void test_commands();
 
 int main() {
     Serial0.init(38400);
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
 
-    test_telecommands();
+    test_commands();
 
     cli();
     sleep_mode();
