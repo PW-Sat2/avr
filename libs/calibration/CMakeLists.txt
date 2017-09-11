@@ -6,6 +6,7 @@ add_library(${NAME} STATIC
     Include/calibration/Adc.h
     TMP121.cpp
     LMT87.cpp
+    Include/calibration/VoltageDivider.h
 )
 
 target_include_directories(${NAME} PUBLIC Include)

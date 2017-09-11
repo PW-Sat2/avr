@@ -8,6 +8,7 @@
 #include "calibration/Adc.h"
 #include "calibration/LMT87.h"
 #include "calibration/TMP121.h"
+#include "calibration/VoltageDivider.h"
 
 using namespace avr;
 
@@ -49,9 +50,10 @@ float ControllerSpecialisation::battery_temperature() {
 }
 
 float ControllerSpecialisation::battery_voltage() {
+    constexpr static VoltageDivider voltage_divider(150e3, 470e3);
+
     auto tm = avr::Eps::telemetry.general.get();
 
-    return InternalADC::reading_to_voltage(
-        tm.battery_controller.controller_a_voltage);
+    return voltage_divider.lower_to_full(InternalADC::reading_to_voltage(
+        tm.battery_controller.controller_a_voltage));
 }
-

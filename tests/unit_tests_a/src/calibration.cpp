@@ -4,6 +4,7 @@
 #include "calibration/Adc.h"
 #include "calibration/LMT87.h"
 #include "calibration/TMP121.h"
+#include "calibration/VoltageDivider.h"
 
 using namespace avr::calibration;
 
@@ -41,6 +42,23 @@ void test_calibration_Adc() {
     TEST_ASSERT_EQUAL_FLOAT(2.048, Adc2::reading_to_voltage(65535));
 }
 
+void test_calibration_voltage_divider() {
+    constexpr static VoltageDivider div2(10.0f, 10.0f);
+
+    TEST_ASSERT_EQUAL_FLOAT(1.0f, div2.lower_to_full(0.5f));
+    TEST_ASSERT_EQUAL_FLOAT(2.0f, div2.lower_to_full(1.0f));
+
+    constexpr static VoltageDivider div7p234(20.0f, 20 * 6.234f);
+
+    TEST_ASSERT_EQUAL_FLOAT(0.5f * 7.234, div7p234.lower_to_full(0.5f));
+    TEST_ASSERT_EQUAL_FLOAT(7.234f, div7p234.lower_to_full(1.0f));
+
+    constexpr static VoltageDivider div_large(150.0e3f, 470.0e3f);
+
+    TEST_ASSERT_EQUAL_FLOAT(4.133333333, div_large.lower_to_full(1.0f));
+    TEST_ASSERT_EQUAL_FLOAT(13.64, div_large.lower_to_full(3.3f));
+    TEST_ASSERT_EQUAL_FLOAT(18.6, div_large.lower_to_full(4.5f));
+}
 
 void test_calibration() {
     UnityBegin("");
@@ -48,6 +66,7 @@ void test_calibration() {
     RUN_TEST(test_calibration_TMP121);
     RUN_TEST(test_calibration_LMT87);
     RUN_TEST(test_calibration_Adc);
+    RUN_TEST(test_calibration_voltage_divider);
 
     UnityEnd();
 }

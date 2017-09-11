@@ -2,8 +2,8 @@ LINTER_PARAMS=--extensions=hpp,cpp,h,c --filter=-legal/copyright,-build/include,
 
 SOURCES := $(shell find . -type f \( -name "*.cpp" -o -name "*.h" \) | grep -v "AVR-HAL" | grep -v "cmake-build-")
 
-all: PLD_build PLD_unit_tests EPS_A_build EPS_A_unit_tests EPS_B_build EPS_B_unit_tests SunS_build SunS_unit_tests EGSE checkStyle checkFormat
-.PHONY: checkStyle format checkFormat PLD_build EPS_A_build EPS_B_build PLD_unit_tests EPS_A_unit_tests EPS_B_unit_tests SunS_build SunS_unit_tests EGSE 
+all: PLD_build PLD_unit_tests EPS_A_build EPS_A_unit_tests EPS_B_build EPS_B_unit_tests EGSE checkStyle checkFormat
+.PHONY: checkStyle format checkFormat PLD_build EPS_A_build EPS_B_build PLD_unit_tests EPS_A_unit_tests EPS_B_unit_tests EGSE
 
 clean:
 	rm -rf PLD/cmake-build-release
@@ -57,11 +57,6 @@ EPS_B_unit_tests:
 	make -C EPS_B/cmake-build-release unit_tests_a.run
 	make -C EPS_B/cmake-build-release unit_tests_b.run
 	make -C EPS_B/cmake-build-release eps_unit_tests.run
-
-SunS_unit_tests:
-	make -C SunS/cmake-build-release unit_tests_a.run
-	make -C SunS/cmake-build-release unit_tests_b.run
-	make -C SunS/cmake-build-release unit_tests_suns.run
 
 ## -------------------------- NON-FLIGHT STUFF  -------------------------------------
 
