@@ -230,8 +230,8 @@ void test_TelemetryUpdater_mppt() {
 
     check(Mppt::Adc124Ch::IN0, &Telemetry::SingleMpptChannel::solar_current);
     check(Mppt::Adc124Ch::IN1, &Telemetry::SingleMpptChannel::solar_voltage);
-    check(Mppt::Adc124Ch::IN2, &Telemetry::SingleMpptChannel::output_voltage);
-    check(Mppt::Adc124Ch::IN3, &Telemetry::SingleMpptChannel::temperature);
+    check(Mppt::Adc124Ch::IN2, &Telemetry::SingleMpptChannel::temperature);
+    check(Mppt::Adc124Ch::IN3, &Telemetry::SingleMpptChannel::output_voltage);
 }
 
 void test_TelemetryUpdater_lcl_status() {
