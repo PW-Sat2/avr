@@ -5,29 +5,9 @@
 #include <array>
 #include <cstdint>
 #include <cstring>
+#include "atomic.h"
 
 namespace suns {
-namespace details {
-
-template<class T>
-class Atomic {
- public:
-    void operator=(const T& rhs) {
-        ATOMIC_BLOCK(ATOMIC_FORCEON) {
-            value = rhs;
-        }
-    }
-
-    operator T() const {
-        return value;
-    }
-
- private:
-    T value;
-};
-
-
-}  // namespace details
 
 struct Telemetry {
     struct Temperatures {
@@ -55,12 +35,17 @@ struct Telemetry {
         uint16_t adc_valid;
     };
 
+    struct WholeTelemetry {
+        Status als_status;
+        LightData vl_data;
+        Temperatures temperature_data;
+        Params parameters;
+        LightData ir_data;
+    };
+
     uint8_t who_am_i;
-    details::Atomic<Status> als_status;
-    details::Atomic<LightData> vl_data;
-    details::Atomic<Temperatures> temperature_data;
-    details::Atomic<Params> parameters;
-    details::Atomic<LightData> ir_data;
+
+    avr::Atomic<WholeTelemetry> tm;
 
     void init() {
         std::memset(this, 0xFF, sizeof(suns::Telemetry));

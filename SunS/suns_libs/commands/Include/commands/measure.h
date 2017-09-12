@@ -26,11 +26,14 @@ class Measure : public Command<0x80, 2> {
         hardware.als_measure(args[0], args[1], als_status, vl, ir);
         LOG_INFO("[finished] measure als");
 
-        telemetry.als_status       = als_status;
-        telemetry.vl_data          = vl;
-        telemetry.ir_data          = ir;
-        telemetry.temperature_data = temperature;
-        telemetry.parameters       = {args[0], args[1]};
+        Telemetry::WholeTelemetry tm;
+        tm.als_status       = als_status;
+        tm.vl_data          = vl;
+        tm.ir_data          = ir;
+        tm.temperature_data = temperature;
+        tm.parameters       = {args[0], args[1]};
+
+        telemetry.tm = tm;
 
         LOG_INFO("[finished] SunS measure");
     }
