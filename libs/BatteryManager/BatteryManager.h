@@ -39,7 +39,7 @@ class BatteryManager {
 
     struct StateChargingON : BatteryChargeFSM::IState {
         void action() override {
-            LOG_INFO("[BATC] Charging ON");
+            LOG_DEBUG("[BATC] Charging ON");
             PinCharge::set();
         }
 
@@ -50,7 +50,7 @@ class BatteryManager {
 
     struct StateChargingOFF : BatteryChargeFSM::IState {
         void action() override {
-            LOG_INFO("[BATC] Charging OFF");
+            LOG_DEBUG("[BATC] Charging OFF");
             PinCharge::reset();
         }
 
@@ -68,7 +68,7 @@ class BatteryManager {
 
     struct StateHeaterON : BatteryHeaterFSM::IState {
         void action() override {
-            LOG_INFO("[BATC] Heating ON");
+            LOG_DEBUG("[BATC] Heating ON");
             PinHeater::set();
         }
 
@@ -79,7 +79,7 @@ class BatteryManager {
 
     struct StateHeaterOFF : BatteryHeaterFSM::IState {
         void action() override {
-            LOG_INFO("[BATC] Heating OFF");
+            LOG_DEBUG("[BATC] Heating OFF");
             PinHeater::reset();
         }
 
@@ -97,6 +97,7 @@ class BatteryManager {
 
     struct StateDischargingON : BatteryDischargeFSM::IState {
         void action() override {
+            LOG_INFO("[BATC] Discharging ON");
             PinDischarge::set();
         }
 
@@ -107,7 +108,7 @@ class BatteryManager {
 
     struct StateDischargingOFF : BatteryDischargeFSM::IState {
         void action() override {
-            LOG_ERROR("[BATC] Battery Disconnected");
+            LOG_ERROR("[BATC] Discharging OFF");
             PinDischarge::reset();
         }
 
