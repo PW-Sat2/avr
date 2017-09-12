@@ -46,7 +46,7 @@ class IOMap {
         using Spi =
             hal::SPI::Hardware<PinCs,
                                hal::SPI::HardwareClockDivisor::SPIHard_DIV_16,
-                               hal::SPI::Polarity::idle_low,
+                               hal::SPI::Polarity::idle_high,
                                hal::SPI::Phase::leading_sample,
                                hal::SPI::DataOrder::MSB_first>;
 

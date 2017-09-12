@@ -32,6 +32,7 @@ class BatteryManager {
         battery_charger.tick(battery_voltage, max_battery_temperature);
         battery_discharger.tick(battery_voltage, max_battery_temperature);
         battery_heater.tick(max_battery_temperature);
+        LOG_DEBUG("[BATC] Max temperature: %f", max_battery_temperature);
     }
 
  private:
