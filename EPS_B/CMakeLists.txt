@@ -4,7 +4,7 @@ set(EPS TRUE)
 
 set(HAL_PATH ../AVR-HAL)
 set(HAL_MCU ATMEGA324P_44)
-set(F_CPU 8000000)
+set(F_CPU 1000000)
 set(CMAKE_TOOLCHAIN_FILE "${HAL_PATH}/toolchain.cmake")
 
 add_definitions(-DLOG_LEVEL=LOG_LEVEL_INFO)

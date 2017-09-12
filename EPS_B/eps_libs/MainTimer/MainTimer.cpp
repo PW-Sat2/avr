@@ -4,7 +4,7 @@ using namespace eps;
 
 void MainTimer::init() {
     //     Timer1 - 1us tick
-    hal::mcu::Timer1::init(hal::mcu::Timer1::Prescaler::DIV_8,
+    hal::mcu::Timer1::init(hal::mcu::Timer1::Prescaler::DIV_1,
                            hal::mcu::Timer1::Mode::Normal);
 
     //     output compare to provide 33.333ms tick
