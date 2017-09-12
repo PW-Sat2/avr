@@ -9,7 +9,8 @@ clean:
 	rm -rf PLD/cmake-build-release
 	rm -rf EPS_A/cmake-build-release
 	rm -rf EPS_B/cmake-build-release
-	rm -rf SunS/cmake-build-release
+	rm -rf SunS/cmake-build-release-em
+	rm -rf SunS/cmake-build-release-fm
 
 ## -------------------------- STYLE -------------------------------------
 
@@ -38,8 +39,10 @@ EPS_B_build:
 	make -C EPS_B/cmake-build-release all
 
 SunS_build:
-	cd SunS && mkdir -p cmake-build-release && cd cmake-build-release && cmake .. -DCMAKE_BUILD_TYPE=RELEASE
-	make -C SunS/cmake-build-release all
+	cd SunS && mkdir -p cmake-build-release-em && cd cmake-build-release-em && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DPLATFORM=EM
+	make -C SunS/cmake-build-release-em all
+	cd SunS && mkdir -p cmake-build-release-fm && cd cmake-build-release-fm && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DPLATFORM=FM
+	make -C SunS/cmake-build-release-fm all
 
 ## -------------------------- RUN TESTS -------------------------------------
 
@@ -57,6 +60,12 @@ EPS_B_unit_tests:
 	make -C EPS_B/cmake-build-release unit_tests_a.run
 	make -C EPS_B/cmake-build-release unit_tests_b.run
 	make -C EPS_B/cmake-build-release eps_unit_tests.run
+
+SunS_unit_tests:
+	make -C SunS/cmake-build-release-em unit_tests_a.run
+	make -C SunS/cmake-build-release-em unit_tests_b.run
+	make -C SunS/cmake-build-release-fm unit_tests_a.run
+	make -C SunS/cmake-build-release-fm unit_tests_b.run
 
 ## -------------------------- NON-FLIGHT STUFF  -------------------------------------
 

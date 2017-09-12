@@ -1,2 +1,4 @@
 cmake-build-debug
 .idea
+cmake-build-release-em
+cmake-build-release-fm

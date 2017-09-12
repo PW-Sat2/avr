@@ -1,5 +1,3 @@
-add_compile_options(-g)
-
 add_hal_executable(SunS
     main.cpp
     debug/mock.cpp
