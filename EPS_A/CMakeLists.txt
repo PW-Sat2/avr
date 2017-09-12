@@ -12,7 +12,7 @@ set(LOAD_EEPROM TRUE CACHE BOOL "")
 
 set(CMAKE_TOOLCHAIN_FILE "${HAL_PATH}/toolchain.cmake")
 
-add_definitions(-DLOG_LEVEL=LOG_LEVEL_INFO)
+add_definitions(-DLOG_LEVEL=LOG_LEVEL_DEBUG)
 
 include(../cmake-modules/GetGitRevisionDescription.cmake)
 get_git_head_revision(GIT_BRANCH GIT_REVISION)

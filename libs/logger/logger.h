@@ -12,6 +12,7 @@
 #define LOG_LEVEL_ERROR 1
 #define LOG_LEVEL_WARNING 2
 #define LOG_LEVEL_INFO 3
+#define LOG_LEVEL_DEBUG 4
 #define LOG_LEVEL_ALL 0xFF
 
 /*
@@ -23,6 +24,7 @@
  * LOG_ERROR
  * LOG_WARNING
  * LOG_INFO
+ * LOG_DEBUG
  */
 
 #if LOG_LEVEL < LOG_LEVEL_FATAL
@@ -48,6 +50,12 @@
 #define LOG_INFO(...) logger::null_logger(__VA_ARGS__)
 #else
 #define LOG_INFO(format, ...) logger::print_log(3, PSTR(format), ##__VA_ARGS__)
+#endif
+
+#if LOG_LEVEL < LOG_LEVEL_DEBUG
+#define LOG_DEBUG(...) logger::null_logger(__VA_ARGS__)
+#else
+#define LOG_DEBUG(format, ...) logger::print_log(4, PSTR(format), ##__VA_ARGS__)
 #endif
 
 
