@@ -7,6 +7,7 @@ add_hal_executable(unit_tests_b
     src/OverheatProtection.cpp
     src/ThermalKnives.cpp
     src/TwoStateFsm.cpp
+    src/DisablePowerCycle.cpp
 )
 
 add_custom_target(unit_tests_b.run

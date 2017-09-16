@@ -1,6 +1,7 @@
 #include "defs.h"
 
 #include "commands/DisableOverheatProtection.h"
+#include "commands/DisablePowerCycle.h"
 #include "commands/LCL.h"
 #include "commands/ObcWatchdog.h"
 #include "commands/PowerCycle.h"
@@ -18,14 +19,21 @@ struct Executor {
     }
 };
 
-using EPSACommandDispatcher =
-    CommandDispatcher<Executor,
-                      eps::commands::PowerCycle<FullPowerCycle>,
-                      eps::commands::EnableLCL<Eps::LclCommander>,
-                      eps::commands::DisableLCL<Eps::LclCommander>,
-                      eps::commands::ThermalKnives<ThermalKnives>,
-                      eps::commands::ObcWatchdog<ObcWatchdog>,
-                      eps::commands::DisableOverheatProtection<OverheatProtection>>;
+namespace power_cycle {
+bool armed   = false;
+bool enabled = true;
+};  // namespace power_cycle
+
+using EPSACommandDispatcher = CommandDispatcher<
+    Executor,
+    eps::commands::PowerCycle<FullPowerCycle>,
+    eps::commands::EnableLCL<Eps::LclCommander>,
+    eps::commands::DisableLCL<Eps::LclCommander>,
+    eps::commands::ThermalKnives<ThermalKnives>,
+    eps::commands::ObcWatchdog<ObcWatchdog>,
+    eps::commands::DisableOverheatProtection<OverheatProtection>,
+    eps::commands::ArmDisablePowerCycle<power_cycle::armed>,
+    eps::commands::DisablePowerCycle<power_cycle::armed, power_cycle::enabled>>;
 
 EPSACommandDispatcher dispatcher;
 

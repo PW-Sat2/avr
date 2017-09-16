@@ -6,6 +6,7 @@ add_library(${NAME} STATIC
     commands/ThermalKnives.h
     commands/ObcWatchdog.h
     commands/DisableOverheatProtection.h
+    commands/DisablePowerCycle.h
 )
 
 target_include_directories(${NAME} PUBLIC .)

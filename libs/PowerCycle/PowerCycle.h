@@ -1,12 +1,19 @@
 #ifndef LIBS_POWERCYCLE_POWERCYCLE_H_
 #define LIBS_POWERCYCLE_POWERCYCLE_H_
 
+#include "logger.h"
+
 namespace eps {
 
-template<typename PowerCyclePin, typename Watchdog>
+template<typename PowerCyclePin, typename Watchdog, const bool& enabled>
 struct FullPowerCycle {
     static void perform() {
         LOG_WARNING("Performing full power cycle...");
+
+        if (enabled == false) {
+            LOG_FATAL("Full Power Cycle Disabled!");
+            return;
+        }
 
         // Performing power cycle on supply lines
         PowerCyclePin::set();
