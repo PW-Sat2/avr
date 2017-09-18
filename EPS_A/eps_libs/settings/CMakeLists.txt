@@ -14,5 +14,7 @@ target_link_libraries(${NAME}
     MainTimer
     TelemetryUpdater
     calibration
+    MpptUpdater
+    telemetry
     Temperatures
 )

@@ -7,16 +7,12 @@
 namespace eps {
 
 struct Telemetry {
-    struct SingleMpptChannelState {
-        bool mppt_achieved;
-    };
-
     struct SingleMpptChannel {
         std::uint16_t solar_current;
         std::uint16_t solar_voltage;
         std::uint16_t output_voltage;
         std::uint16_t temperature;
-        SingleMpptChannelState state;
+        std::uint8_t state;
     };
 
     struct Distribution {

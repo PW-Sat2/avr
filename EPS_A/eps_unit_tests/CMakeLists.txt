@@ -4,6 +4,7 @@ add_hal_executable(eps_unit_tests
     main.cpp
     src/MainTimer.cpp
     src/TelemetryUpdater.cpp
+    src/MpptUpdater.cpp
     src/Temperatures.cpp
 )
 
@@ -20,5 +21,6 @@ target_link_libraries(eps_unit_tests
     terminal
     MainTimer
     TelemetryUpdater
+    MpptUpdater
     Temperatures
 )
