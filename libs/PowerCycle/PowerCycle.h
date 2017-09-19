@@ -5,12 +5,12 @@
 
 namespace eps {
 
-template<typename PowerCyclePin, typename Watchdog, const bool& enabled>
+template<typename PowerCyclePin, typename Watchdog, const bool& armed, const bool& disabled>
 struct FullPowerCycle {
     static void perform() {
         LOG_WARNING("Performing full power cycle...");
 
-        if (enabled == false) {
+        if (hal::libs::ToInt(armed) == 1 && hal::libs::ToInt(disabled) == 1) {
             LOG_FATAL("Full Power Cycle Disabled!");
             return;
         }

@@ -20,8 +20,8 @@ struct Executor {
 };
 
 namespace power_cycle {
-bool armed   = false;
-bool enabled = true;
+bool armed    = false;
+bool disabled = false;
 };  // namespace power_cycle
 
 using EPSACommandDispatcher = CommandDispatcher<
@@ -33,7 +33,7 @@ using EPSACommandDispatcher = CommandDispatcher<
     eps::commands::ObcWatchdog<ObcWatchdog>,
     eps::commands::DisableOverheatProtection<OverheatProtection>,
     eps::commands::ArmDisablePowerCycle<power_cycle::armed>,
-    eps::commands::DisablePowerCycle<power_cycle::armed, power_cycle::enabled>>;
+    eps::commands::DisablePowerCycle<power_cycle::armed, power_cycle::disabled>>;
 
 EPSACommandDispatcher dispatcher;
 

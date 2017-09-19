@@ -7,8 +7,8 @@
 namespace eps {
 namespace commands {
 
-constexpr static uint8_t arm_code[]     = {0xDE, 0xAD, 0xBE, 0xEF};
-constexpr static uint8_t disable_code[] = {0xDE, 0xFA, 0xCE, 0xD, 0xF0, 0x0D};
+constexpr static uint8_t arm_code[]     = {0xFE, 0xE1, 0xDE, 0xAD};
+constexpr static uint8_t disable_code[] = {0xBA, 0xAD, 0xC0, 0x01, 0xC0, 0xDE};
 
 template<bool& flag_armed>
 struct ArmDisablePowerCycle : public Command<0xEA, 5> {
@@ -21,13 +21,14 @@ struct ArmDisablePowerCycle : public Command<0xEA, 5> {
     }
 };
 
-template<const bool& flag_armed, bool& flag_enabled>
-struct DisablePowerCycle : public Command<0xE8, 5> {
+template<const bool& flag_armed, bool& flag_disabled>
+struct DisablePowerCycle : public Command<0xEB, 5> {
     void invoke(gsl::span<const std::uint8_t> cmd) {
-        if (flag_armed && cmd == gsl::make_span(disable_code)) {
-            flag_enabled = false;
+        if (hal::libs::ToInt(flag_armed) == 1 &&
+            cmd == gsl::make_span(disable_code)) {
+            flag_disabled = true;
         } else {
-            flag_enabled = true;
+            flag_disabled = false;
         }
     }
 };

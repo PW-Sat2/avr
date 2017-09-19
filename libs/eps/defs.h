@@ -13,12 +13,14 @@
 #include "settings.h"
 
 namespace power_cycle {
-extern bool enabled;
-};
+extern bool armed;
+extern bool disabled;
+};  // namespace power_cycle
 
 using FullPowerCycle = eps::FullPowerCycle<typename eps::IOMap::PowerCycle,
                                            typename eps::IOMap::Watchdog,
-                                           power_cycle::enabled>;
+                                           power_cycle::armed,
+                                           power_cycle::disabled>;
 
 using ObcWatchdog = eps::ObcWatchdog<FullPowerCycle::perform>;
 
