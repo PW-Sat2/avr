@@ -10,8 +10,7 @@ namespace hardware {
 
 struct Interface {
     virtual void init()                                      = 0;
-    virtual void als_measure(uint8_t gain,
-                             uint8_t itime,
+    virtual void als_measure(suns::Telemetry::Params parameters,
                              suns::Telemetry::Status& als_status,
                              suns::Telemetry::LightData& vl,
                              suns::Telemetry::LightData& ir) = 0;

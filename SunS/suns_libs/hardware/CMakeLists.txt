@@ -15,4 +15,5 @@ target_link_libraries(hardware
     hal
     telemetry
     logger
+    helpers
 )

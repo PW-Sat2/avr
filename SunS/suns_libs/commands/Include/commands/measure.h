@@ -1,6 +1,7 @@
 #ifndef SUNS_SUNS_LIBS_COMMANDS_INCLUDE_COMMANDS_MEASURE_H_
 #define SUNS_SUNS_LIBS_COMMANDS_INCLUDE_COMMANDS_MEASURE_H_
 
+#include <helpers/validate_params.h>
 #include "ObcInterface/Command.h"
 #include "logger.h"
 
@@ -23,7 +24,9 @@ class Measure : public Command<0x80, 2> {
         LOG_INFO("[finished] measure temperature");
 
         LOG_INFO("[start] measure als");
-        hardware.als_measure(args[0], args[1], als_status, vl, ir);
+        Telemetry::Params valid_parameters = suns::helpers::validate_and_correct_params(args[0], args[1]);
+
+        hardware.als_measure(valid_parameters, als_status, vl, ir);
         LOG_INFO("[finished] measure als");
 
         Telemetry::WholeTelemetry tm;
@@ -31,7 +34,7 @@ class Measure : public Command<0x80, 2> {
         tm.vl_data          = vl;
         tm.ir_data          = ir;
         tm.temperature_data = temperature;
-        tm.parameters       = {args[0], args[1]};
+        tm.parameters       = valid_parameters;
 
         telemetry.tm = tm;
 

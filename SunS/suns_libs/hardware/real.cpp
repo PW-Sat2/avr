@@ -70,22 +70,6 @@ using i2c =
 using als = BH1730FVCMulti::BH1730FVCMulti<i2c>;
 }  // namespace third
 
-void validate_and_correct_params(std::uint8_t& gain, std::uint8_t& itime) {
-    constexpr std::uint8_t default_gain  = 0;
-    constexpr std::uint8_t default_itime = 10;
-    constexpr std::uint8_t max_gain      = 3;
-    constexpr std::uint8_t min_itime     = 1;
-
-    if (gain > max_gain) {
-        gain = default_gain;
-        LOG_WARNING("[params] Setting default gain = 0");
-    }
-
-    if (itime < min_itime) {
-        itime = default_itime;
-        LOG_WARNING("[params] Setting default itime = 10");
-    }
-}
 
 namespace all {
 void init() {
@@ -225,20 +209,18 @@ void suns::hardware::RealHardware::init() {
     _delay_ms(10);
 }
 
-void suns::hardware::RealHardware::als_measure(std::uint8_t gain,
-                                               std::uint8_t itime,
+void suns::hardware::RealHardware::als_measure(suns::Telemetry::Params parameters,
                                                suns::Telemetry::Status& als_status,
                                                suns::Telemetry::LightData& vl,
                                                suns::Telemetry::LightData& ir) {
     als::all::init();
-    als::validate_and_correct_params(gain, itime);
 
     als::all::part_id(als_status);
 
-    als::all::set_itime(als_status, itime);
-    als::all::set_gain(als_status, static_cast<BH1730FVCMulti::Gain>(gain));
+    als::all::set_itime(als_status, parameters.itime);
+    als::all::set_gain(als_status, static_cast<BH1730FVCMulti::Gain>(parameters.gain));
     als::all::trigger(als_status);
-    als::all::wait_for_als(als_status, itime);
+    als::all::wait_for_als(als_status, parameters.itime);
     als::all::read_light(als_status, vl, ir);
 }
 

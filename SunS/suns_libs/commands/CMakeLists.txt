@@ -10,4 +10,5 @@ target_link_libraries(${NAME}
     hal
     hardware
     telemetry
+    helpers
 )
