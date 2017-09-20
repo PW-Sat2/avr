@@ -24,7 +24,8 @@ class Measure : public Command<0x80, 2> {
         LOG_INFO("[finished] measure temperature");
 
         LOG_INFO("[start] measure als");
-        Telemetry::Params valid_parameters = suns::helpers::validate_and_correct_params(args[0], args[1]);
+        Telemetry::Params valid_parameters =
+            suns::helpers::validate_and_correct_params(args[0], args[1]);
 
         hardware.als_measure(valid_parameters, als_status, vl, ir);
         LOG_INFO("[finished] measure als");

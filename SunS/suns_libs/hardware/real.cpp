@@ -218,7 +218,8 @@ void suns::hardware::RealHardware::als_measure(suns::Telemetry::Params parameter
     als::all::part_id(als_status);
 
     als::all::set_itime(als_status, parameters.itime);
-    als::all::set_gain(als_status, static_cast<BH1730FVCMulti::Gain>(parameters.gain));
+    als::all::set_gain(als_status,
+                       static_cast<BH1730FVCMulti::Gain>(parameters.gain));
     als::all::trigger(als_status);
     als::all::wait_for_als(als_status, parameters.itime);
     als::all::read_light(als_status, vl, ir);
