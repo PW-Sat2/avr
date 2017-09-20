@@ -49,7 +49,8 @@ int main() {
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
     Serial0.enable_rx_interrupt();
-    LOG_INFO("SunS Start.");
+    LOG_FATAL("Loaded SunS software rev. " GIT_REVISION
+              ", local state: " GIT_CHANGES);
 
     real_hardware.init();
     mock_hardware.init();
