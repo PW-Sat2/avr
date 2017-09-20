@@ -3,14 +3,16 @@
 
 namespace logger {
 
-constexpr static char _level_fatal[] PROGMEM   = "[FATAL] ";
-constexpr static char _level_error[] PROGMEM   = "[ERROR] ";
-constexpr static char _level_warning[] PROGMEM = "[WARN]  ";
-constexpr static char _level_info[] PROGMEM    = "[INFO]  ";
-constexpr static char _level_debug[] PROGMEM   = "[DEBUG] ";
+constexpr static char _level_always[] PROGMEM  = "[ALWAYS] ";
+constexpr static char _level_fatal[] PROGMEM   = "[FATAL]  ";
+constexpr static char _level_error[] PROGMEM   = "[ERROR]  ";
+constexpr static char _level_warning[] PROGMEM = "[WARN]   ";
+constexpr static char _level_info[] PROGMEM    = "[INFO]   ";
+constexpr static char _level_debug[] PROGMEM   = "[DEBUG]  ";
 constexpr static char _newline[] PROGMEM       = "\n";
 
-constexpr static const char* _level_table[] PROGMEM = {_level_fatal,
+constexpr static const char* _level_table[] PROGMEM = {_level_always,
+                                                       _level_fatal,
                                                        _level_error,
                                                        _level_warning,
                                                        _level_info,
