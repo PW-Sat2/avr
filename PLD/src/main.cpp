@@ -63,8 +63,8 @@ int main() {
     Serial1.redirect_stderr();
     Serial1.enable_rx_interrupt();
 
-    LOG_INFO("Loaded PLD software rev. " GIT_REVISION
-             ", local state: " GIT_CHANGES);
+    LOG_ALWAYS("Loaded PLD software rev. " GIT_REVISION
+               ", local state: " GIT_CHANGES);
 
     real_hardware.init();
     mock_hardware.init();
