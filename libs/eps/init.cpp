@@ -57,9 +57,9 @@ void init_obc_interface();
 
 void avr::Eps::init() {
     init_hardware();
-    LOG_INFO("Loaded EPS_%c software rev. " GIT_REVISION
-             ", local state: " GIT_CHANGES,
-             ControllerSpecialisation::side);
+    LOG_ALWAYS("Loaded EPS_%c software rev. " GIT_REVISION
+               ", local state: " GIT_CHANGES,
+               ControllerSpecialisation::side);
 
     eps::power_cycle_counters::bootup([]() {
         LOG_FATAL("Opening SAIL");
