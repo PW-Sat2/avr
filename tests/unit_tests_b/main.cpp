@@ -3,6 +3,7 @@
 
 using hal::Serial0;
 
+void test_BatteryHeater();
 void test_BatteryManager();
 void test_TwoStateFsm();
 void test_OverheatProtection();
@@ -15,6 +16,7 @@ int main() {
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
 
+    test_BatteryHeater();
     test_BatteryManager();
     test_TwoStateFsm();
     test_OverheatProtection();

@@ -1,6 +1,7 @@
 #ifndef LIBS_BATTERYMANAGER_BATTERYMANAGER_H_
 #define LIBS_BATTERYMANAGER_BATTERYMANAGER_H_
 
+#include <hal/hal>
 #include "TwoStateFsm.h"
 #include "logger.h"
 
@@ -10,10 +11,10 @@ namespace eps {
  * Battery manager.
  * Implements battery charging algorithm and battery heater.
  * @tparam PinCharge Pin used to enable battery charging LCL.
- * @tparam PinHeater Pin used to enable battery heater.
+ * @tparam BatteryHeater BatteryHeater object.
  * @tparam PinDischarge Pin used to enable discharging battery.
  */
-template<typename PinCharge, typename PinDischarge, typename PinHeater>
+template<typename PinCharge, typename PinDischarge, typename BatteryHeater>
 class BatteryManager {
  public:
     BatteryManager()
@@ -32,7 +33,20 @@ class BatteryManager {
         battery_charger.tick(battery_voltage, max_battery_temperature);
         battery_discharger.tick(battery_voltage, max_battery_temperature);
         battery_heater.tick(max_battery_temperature);
-        LOG_DEBUG("[BATC] Max temperature: %f", max_battery_temperature);
+        LOG_DEBUG("[BATC] Temp %.2f; Vbat %.2f; CHG %d; DCHG %d; HTR %d",
+                  max_battery_temperature,
+                  battery_voltage,
+                  hal::libs::read_bit<0>(state()),
+                  hal::libs::read_bit<1>(state()),
+                  hal::libs::read_bit<2>(state()));
+    }
+
+    uint8_t state() {
+        auto charging    = static_cast<uint8_t>(PinCharge::read());
+        auto discharging = static_cast<uint8_t>(PinDischarge::read());
+        auto heater      = static_cast<uint8_t>(BatteryHeater::heating());
+
+        return (heater << 2) | (discharging << 1) | charging;
     }
 
  private:
@@ -40,7 +54,6 @@ class BatteryManager {
 
     struct StateChargingON : BatteryChargeFSM::IState {
         void action() override {
-            LOG_DEBUG("[BATC] Charging ON");
             PinCharge::set();
         }
 
@@ -51,7 +64,6 @@ class BatteryManager {
 
     struct StateChargingOFF : BatteryChargeFSM::IState {
         void action() override {
-            LOG_DEBUG("[BATC] Charging OFF");
             PinCharge::reset();
         }
 
@@ -69,8 +81,7 @@ class BatteryManager {
 
     struct StateHeaterON : BatteryHeaterFSM::IState {
         void action() override {
-            LOG_DEBUG("[BATC] Heating ON");
-            PinHeater::set();
+            BatteryHeater::enable();
         }
 
         bool should_change(float max_temperature) override {
@@ -80,8 +91,7 @@ class BatteryManager {
 
     struct StateHeaterOFF : BatteryHeaterFSM::IState {
         void action() override {
-            LOG_DEBUG("[BATC] Heating OFF");
-            PinHeater::reset();
+            BatteryHeater::disable();
         }
 
         bool should_change(float max_temperature) override {
@@ -98,7 +108,6 @@ class BatteryManager {
 
     struct StateDischargingON : BatteryDischargeFSM::IState {
         void action() override {
-            LOG_INFO("[BATC] Discharging ON");
             PinDischarge::set();
         }
 
@@ -109,7 +118,6 @@ class BatteryManager {
 
     struct StateDischargingOFF : BatteryDischargeFSM::IState {
         void action() override {
-            LOG_ERROR("[BATC] Discharging OFF");
             PinDischarge::reset();
         }
 

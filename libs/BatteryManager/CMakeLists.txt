@@ -2,6 +2,7 @@ set(NAME BatteryManager)
 
 add_library(${NAME} STATIC
     BatteryManager.h
+    BatteryHeater.h
 )
 
 target_include_directories(${NAME} PUBLIC .)

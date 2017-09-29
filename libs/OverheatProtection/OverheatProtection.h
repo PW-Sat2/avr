@@ -16,7 +16,7 @@ struct OverheatProtection {
 
     static void tick(float max_temperature) {
         if (enabled && max_temperature > temp_threshold) {
-            LOG_ERROR("Overheat - disable all LCLs");
+            LOG_ERROR("Overheat (%f) - disable all LCLs", max_temperature);
             LclCommander::off_all();
         }
     }

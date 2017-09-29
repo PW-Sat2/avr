@@ -39,8 +39,7 @@ void init_hardware() {
     IOMap::ThermalKnives::Sail::init(DigitalIO::Mode::OUTPUT);
     IOMap::ThermalKnives::Sads::init(DigitalIO::Mode::OUTPUT);
 
-    IOMap::Battery::Heater::set();
-    IOMap::Battery::Heater::init(DigitalIO::Mode::OUTPUT);
+    IOMap::Battery::Heater::init();
 
     IOMap::Battery::Charge::init(DigitalIO::Mode::OUTPUT);
     IOMap::Battery::Discharge::init(DigitalIO::Mode::OUTPUT);
@@ -48,7 +47,7 @@ void init_hardware() {
     IOMap::SerialRx::init(DigitalIO::Mode::INPUT_PULLUP);
 
     // delay to make sure capacitances in power cycle circuit are
-    // discharged. Epss is to prevent to fast power cycle.
+    // discharged. This is to prevent too frequent power cycle.
     hal::sleep_for(150ms);
     IOMap::PowerCycle::set();
 }

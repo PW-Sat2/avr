@@ -5,7 +5,7 @@
 
 using namespace avr;
 
-BatteryManager battery_manager;
+Eps::BatteryManager Eps::battery_manager;
 eps::Telemetry Eps::telemetry;
 
 
@@ -42,8 +42,8 @@ void each_1sec() {
 
 avr::Prescaler<6 * 30> timer_30min;
 void each_10sec() {
-    battery_manager.tick(ControllerSpecialisation::battery_voltage(),
-                         ControllerSpecialisation::battery_temperature());
+    Eps::battery_manager.tick(ControllerSpecialisation::battery_voltage(),
+                              ControllerSpecialisation::battery_temperature());
 
     if (timer_30min.expired()) {
         each_30min();

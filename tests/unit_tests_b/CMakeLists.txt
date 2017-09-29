@@ -1,5 +1,6 @@
 add_hal_executable(unit_tests_b
     main.cpp
+    src/BatteryHeater.cpp
     src/BatteryManager.cpp
     src/LCLCommands.cpp
     src/ObcWatchdog.cpp

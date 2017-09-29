@@ -1,9 +1,6 @@
 #ifndef LIBS_EPS_DEFS_H_
 #define LIBS_EPS_DEFS_H_
 
-#include <BatteryManager.h>
-
-
 #include "ObcWatchdog.h"
 #include "OverheatProtection.h"
 #include "PowerCycle.h"
@@ -26,11 +23,6 @@ using OverheatProtection = eps::OverheatProtection<avr::Eps::LclCommander, 80>;
 using ThermalKnives =
     eps::ThermalKnives<typename eps::IOMap::ThermalKnives::Sail,
                        typename eps::IOMap::ThermalKnives::Sads>;
-
-
-using BatteryManager = eps::BatteryManager<typename eps::IOMap::Battery::Charge,
-                                           typename eps::IOMap::Battery::Discharge,
-                                           typename eps::IOMap::Battery::Heater>;
 
 
 #endif  // LIBS_EPS_DEFS_H_

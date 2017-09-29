@@ -1,6 +1,7 @@
 #ifndef LIBS_EPS_EPS_H_
 #define LIBS_EPS_EPS_H_
 
+#include "BatteryManager.h"
 #include "LclCommander.h"
 
 #include "IOMap.h"
@@ -28,6 +29,13 @@ struct Eps {
      * Telemetry object, sent to OBC
      */
     static eps::Telemetry telemetry;
+
+
+    using BatteryManager =
+        eps::BatteryManager<typename eps::IOMap::Battery::Charge,
+                            typename eps::IOMap::Battery::Discharge,
+                            typename eps::IOMap::Battery::Heater>;
+    static BatteryManager battery_manager;
 
     /*!
      * Telemetry Updater is invoked and telemetry is read periodically.

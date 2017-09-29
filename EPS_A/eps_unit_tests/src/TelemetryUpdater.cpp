@@ -141,6 +141,13 @@ struct EpsMock {
             return overcurrent_status_val;
         }
     };
+
+    struct BatteryManager {
+        uint8_t state() {
+            return 0xAB;
+        }
+    };
+    static BatteryManager battery_manager;
 };
 
 using General      = EpsMock::IOMap::General;
@@ -199,6 +206,8 @@ void test_TelemetryUpdater_general() {
     check(MuxCh::S4, AdcCh::ADC1, tm.dcdc_5v_temperature);
     check(MuxCh::S4, AdcCh::ADC2, tm.controller_a.supply_temperature);
     check(MuxCh::S4, AdcCh::ADC3, tm.battery_controller.controller_a_voltage);
+
+    TEST_ASSERT_EQUAL(0xAB, tm.battery_controller.state);
 }
 
 void test_TelemetryUpdater_mppt() {

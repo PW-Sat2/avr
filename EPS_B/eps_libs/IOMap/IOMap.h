@@ -2,6 +2,7 @@
 #define EPS_B_EPS_LIBS_IOMAP_IOMAP_H_
 
 #include <hal/hal>
+#include "BatteryHeater.h"
 #include "LclInterface.h"
 
 namespace eps {
@@ -37,7 +38,9 @@ class IOMap {
     };
 
     struct Battery {
-        using Heater    = hal::DigitalIO::GPIO<12>;
+        using Heater =
+            eps::battery_heater::BatteryHeater<hal::DigitalIO::GPIO<12>,
+                                               eps::battery_heater::LogicLevel::ActiveLow>;
         using Charge    = hal::DigitalIO::GPIO<11>;
         using Discharge = hal::DigitalIO::GPIO<13>;
     };
