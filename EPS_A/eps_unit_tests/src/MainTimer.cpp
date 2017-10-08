@@ -34,11 +34,20 @@ void test_MainTimer_duration() {
     test_timeout<1000, true>();
 }
 
+void test_MainTimer_wakeup() {
+    MainTimer::init();
+
+    sleep_mode();
+
+    TEST_PASS();
+}
+
 void test_MainTimer() {
     UnityBegin("");
 
     RUN_TEST(test_MainTimer_interrupt);
     RUN_TEST(test_MainTimer_duration);
+    RUN_TEST(test_MainTimer_wakeup);
 
     UnityEnd();
 }

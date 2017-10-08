@@ -2,12 +2,17 @@
 
 using namespace eps;
 
+ISR(TIMER1_OVF_vect) {
+}
+
 void MainTimer::init() {
     // Timer1 - 1us tick
-    hal::Timer1::init(hal::Timer1::Prescaler::DIV_8, hal::Timer1::Mode::normal);
+    hal::Timer1::init(hal::Timer1::Prescaler::DIV_8,
+                      hal::Timer1::Mode::CTC_OCRnA_TOP);
 
     // output compare to provide 33.333ms tick
     OCR1A = 33333;
+    hal::Timer1::enable_overflow_interrupt();
 }
 
 bool MainTimer::expired() {

@@ -62,6 +62,8 @@ void Eps::run() {
             Eps::IOMap::SerialRx::set();
             each_33ms();
             Eps::IOMap::SerialRx::reset();
+        } else {
+            // sleep_mode();
         }
     }
 }

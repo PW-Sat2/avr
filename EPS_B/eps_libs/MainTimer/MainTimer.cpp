@@ -2,13 +2,17 @@
 
 using namespace eps;
 
-void MainTimer::init() {
-    //     Timer1 - 1us tick
-    hal::mcu::Timer1::init(hal::mcu::Timer1::Prescaler::DIV_1,
-                           hal::mcu::Timer1::Mode::Normal);
+ISR(TIMER1_OVF_vect) {
+}
 
-    //     output compare to provide 33.333ms tick
+void MainTimer::init() {
+    // Timer1 - 1us tick
+    hal::mcu::Timer1::init(hal::mcu::Timer1::Prescaler::DIV_1,
+                           hal::mcu::Timer1::Mode::CTC_OCRnA_TOP);
+
+    // output compare to provide 33.333ms tick
     OCR1A = 33333;
+    hal::mcu::Timer1::enable_overflow_interrupt();
 }
 
 bool MainTimer::expired() {
