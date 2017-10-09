@@ -11,7 +11,7 @@ struct OverheatProtection {
 
     static void disable() {
         enabled = false;
-        LOG_INFO("Disable Overheat protection");
+        LOG_FATAL("Disabled Overheat protection");
     }
 
     static void tick(float max_temperature) {

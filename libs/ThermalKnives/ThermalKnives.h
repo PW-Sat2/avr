@@ -55,7 +55,7 @@ class ThermalKnives : hal::libs::PureStatic {
         static void countdown(uint16_t count) {
             ThermalKnifePin::set();
             if (count == 0) {
-                const char tkname[] = {name..., '\0'};
+                constexpr char tkname[] = {name..., '\0'};
                 LOG_INFO("Auto disable burn switch: %s", tkname);
             }
         }
