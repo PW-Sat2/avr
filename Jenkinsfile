@@ -45,4 +45,10 @@ node('linux') {
 
 	stage 'EGSE'
 	sh 'make EGSE'
+
+	stage 'Archive'
+	step([$class: 'ArtifactArchiver', artifacts: '*EPS*/cmake-build-release/src/*.hex', fingerprint: true])
+	step([$class: 'ArtifactArchiver', artifacts: '*EPS*/cmake-build-release/src/*.eep', fingerprint: true])
+	step([$class: 'ArtifactArchiver', artifacts: '*PLD*/cmake-build-release/src/*.hex', fingerprint: true])
+	step([$class: 'ArtifactArchiver', artifacts: '*SunS*/cmake-build-release-*/src/*.hex', fingerprint: true])
 }
