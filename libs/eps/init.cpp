@@ -11,7 +11,14 @@ void init_hardware() {
 
     hal::Watchdog::disable();
 
-    Serial0.init(38400);
+    // Serial init to max possible baudrate
+    UBRR0H = 0;
+    UBRR0L = 0;
+
+    UCSR0A = (1 << U2X0);
+    UCSR0B = (1 << TXEN0);
+    UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
 
