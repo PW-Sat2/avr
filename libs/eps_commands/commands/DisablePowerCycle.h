@@ -11,7 +11,7 @@ constexpr static uint8_t arm_code[]     = {0xFE, 0xE1, 0xDE, 0xAD};
 constexpr static uint8_t disable_code[] = {0xBA, 0xAD, 0xC0, 0x01, 0xC0, 0xDE};
 
 template<bool& flag_armed>
-struct ArmDisablePowerCycle : public Command<0xEA, 5> {
+struct ArmDisablePowerCycle : public Command<0xEA, sizeof(arm_code)> {
     void invoke(gsl::span<const std::uint8_t> cmd) {
         LOG_FATAL("ARM power cycle disabling command received");
         if (cmd == gsl::make_span(arm_code)) {
@@ -25,7 +25,7 @@ struct ArmDisablePowerCycle : public Command<0xEA, 5> {
 };
 
 template<const bool& flag_armed, bool& flag_disabled>
-struct DisablePowerCycle : public Command<0xEB, 5> {
+struct DisablePowerCycle : public Command<0xEB, sizeof(disable_code)> {
     void invoke(gsl::span<const std::uint8_t> cmd) {
         LOG_FATAL("Disable power cycle command received");
         if (hal::libs::ToInt(flag_armed) == 1 &&
