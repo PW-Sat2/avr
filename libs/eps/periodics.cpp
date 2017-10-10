@@ -56,9 +56,12 @@ void each_30min() {
 }
 
 void Eps::run() {
+    Eps::IOMap::SerialRx::init(hal::DigitalIO::Mode::OUTPUT);
     while (1) {
         if (eps::MainTimer::expired()) {
+            Eps::IOMap::SerialRx::set();
             each_33ms();
+            Eps::IOMap::SerialRx::reset();
         }
     }
 }
