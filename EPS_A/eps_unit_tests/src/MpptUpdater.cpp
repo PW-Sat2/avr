@@ -123,9 +123,7 @@ void test_MpptUpdater_MppTracking_SinusPVCurve_StartingPointSweep() {
         for (int i = 0; i < 1000; i++) {
             dac_set = updater.mpp_tracking(single_mppt_telemetry);
 
-// clang-format off
             single_mppt_telemetry.solar_voltage = mock_PVCurveSinus(dac_set) + ((rand() % 3) - 1);
-// clang-format on
         }
 
         TEST_ASSERT_LESS_THAN(dac_upper_boundary, dac_set);
@@ -152,9 +150,7 @@ void test_MpptUpdater_MppTracking_SinusPVCurve_SolarCurrentSweep() {
         for (int i = 0; i < 1000; i++) {
             dac_set = updater.mpp_tracking(single_mppt_telemetry);
 
-// clang-format off
             single_mppt_telemetry.solar_voltage = mock_PVCurveSinus(dac_set) + ((rand() % 3) - 1);
-// clang-format on
         }
 
         TEST_ASSERT_LESS_THAN(dac_upper_boundary, dac_set);
