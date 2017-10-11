@@ -56,5 +56,5 @@ void ControllerSpecialisation::each_33ms() {
 void ControllerSpecialisation::init() {
     eps::IOMap::Mux::init();
 
-    set_sleep_mode(SLEEP_MODE_ADC);
+    set_sleep_mode(SLEEP_MODE_IDLE);
 }
