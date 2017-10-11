@@ -12,15 +12,6 @@
 
 using namespace avr;
 
-void ControllerSpecialisation::init() {
-    eps::IOMap::Mux::init();
-}
-
-void ControllerSpecialisation::each_33ms() {
-    Eps::TelemetryUpdater::update_mppt();
-}
-
-
 using InternalADC = avr::calibration::Adc<10, 3000>;
 
 constexpr static auto tmp121 = [](auto raw) {
@@ -56,4 +47,14 @@ float ControllerSpecialisation::battery_voltage() {
 
     return voltage_divider.lower_to_full(InternalADC::reading_to_voltage(
         tm.battery_controller.controller_a_voltage));
+}
+
+void ControllerSpecialisation::each_33ms() {
+    Eps::TelemetryUpdater::update_mppt();
+}
+
+void ControllerSpecialisation::init() {
+    eps::IOMap::Mux::init();
+
+    set_sleep_mode(SLEEP_MODE_ADC);
 }

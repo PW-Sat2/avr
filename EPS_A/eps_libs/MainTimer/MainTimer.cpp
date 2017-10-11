@@ -2,23 +2,23 @@
 
 using namespace eps;
 
-ISR(TIMER1_OVF_vect) {
+static volatile bool timer0_expired = false;
+
+ISR(TIMER0_OVF_vect) {
+    timer0_expired = true;
 }
 
 void MainTimer::init() {
-    // Timer1 - 1us tick
-    hal::Timer1::init(hal::Timer1::Prescaler::DIV_8,
-                      hal::Timer1::Mode::CTC_OCRnA_TOP);
+    hal::Timer0::init(hal::Timer0::Prescaler::DIV_1024, hal::Timer0::Mode::Normal);
 
-    // output compare to provide 33.333ms tick
-    OCR1A = 33333;
-    hal::Timer1::enable_overflow_interrupt();
+    TCNT0 = 0;
+    hal::Timer0::enable_overflow_interrupt();
+    // overflow each 30.5 ms
 }
 
 bool MainTimer::expired() {
-    if (TIFR & (1 << OCF1A)) {  // Timer1 compare flag
-        TCNT1 = 0;              // reset Timer1 counter
-        TIFR  = (1 << OCF1A);   // clear Timer1 overflow flag
+    if (timer0_expired) {
+        timer0_expired = false;
 
         return true;
     }

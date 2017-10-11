@@ -2,23 +2,27 @@
 
 using namespace eps;
 
-ISR(TIMER1_OVF_vect) {
+static volatile bool timer2_expired = false;
+
+ISR(TIMER2_COMPA_vect) {
+    timer2_expired = true;
 }
 
 void MainTimer::init() {
-    // Timer1 - 1us tick
-    hal::mcu::Timer1::init(hal::mcu::Timer1::Prescaler::DIV_1,
-                           hal::mcu::Timer1::Mode::CTC_OCRnA_TOP);
+    TCCR2A = (1 << WGM21) | (0 << WGM20);  // CTC mode
+    TCCR2B = (0 << WGM22) | (1 << CS22) | (1 << CS21) |
+             (0 << CS20);  // prescaler 256
 
-    // output compare to provide 33.333ms tick
-    OCR1A = 33333;
-    hal::mcu::Timer1::enable_overflow_interrupt();
+    // output compare = 130
+    // result frequency = 30.04 Hz
+    OCR2A  = 130;
+    TCNT2  = 0;
+    TIMSK2 = (1 << OCIE2A);  // compare A compare
 }
 
 bool MainTimer::expired() {
-    if (TIFR1 & (1 << OCF1A)) {  // Timer1 compare flag
-        TCNT1 = 0;               // reset Timer1 counter
-        TIFR1 = (1 << OCF1A);    // clear Timer1 overflow flag
+    if (timer2_expired) {
+        timer2_expired = false;
 
         return true;
     }
