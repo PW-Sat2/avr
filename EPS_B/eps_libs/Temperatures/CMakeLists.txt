@@ -1,8 +1,7 @@
-set(NAME eps_specs)
+set(NAME Temperatures)
 
 add_library(${NAME} STATIC
-    settings.h
-    settings.cpp
+    Temperatures.h
 )
 
 target_include_directories(${NAME} PUBLIC .)
@@ -10,8 +9,5 @@ target_include_directories(${NAME} PUBLIC .)
 target_link_libraries(${NAME}
     hal
     eps
-    IOMap
-    MainTimer
-    TelemetryUpdater
-    Temperatures
+    TemperatureSensorsValidation
 )

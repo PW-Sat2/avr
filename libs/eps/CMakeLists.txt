@@ -7,7 +7,7 @@ if(EPS)
         init.cpp
         eps.h
         defs.h
-        calibration.h)
+    )
 
     target_include_directories(${NAME} PUBLIC .)
 

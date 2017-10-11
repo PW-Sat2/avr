@@ -14,11 +14,11 @@ class Atomic {
         }
     }
 
-    operator T() const {
+    constexpr operator T() const {
         return value;
     }
 
-    const T& get() const {
+    constexpr const T& get() const {
         return value;
     }
 

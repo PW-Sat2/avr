@@ -11,6 +11,7 @@ void test_LCL_Commands();
 void test_TK();
 void test_ObcWatchdog();
 void test_DisablePowerCycle();
+void test_TemperatureCheck();
 
 int main() {
     Serial0.init(38400);
@@ -25,6 +26,7 @@ int main() {
     test_TK();
     test_ObcWatchdog();
     test_DisablePowerCycle();
+    test_TemperatureCheck();
 
     hal::libs::sim::stop_simulation();
 }

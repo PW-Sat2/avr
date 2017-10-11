@@ -8,6 +8,7 @@ add_hal_executable(unit_tests_b
     src/ThermalKnives.cpp
     src/TwoStateFsm.cpp
     src/DisablePowerCycle.cpp
+    src/TemperatureChecks.cpp
 )
 
 add_custom_target(unit_tests_b.run
@@ -27,4 +28,7 @@ target_link_libraries(unit_tests_b
     eps_commands
     ObcWatchdog
     ThermalKnives
+    calibration
+    atomic
+    TemperatureSensorsValidation
 )

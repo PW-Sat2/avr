@@ -4,6 +4,7 @@ add_hal_executable(eps_unit_tests
     main.cpp
     src/MainTimer.cpp
     src/TelemetryUpdater.cpp
+    src/Temperatures.cpp
 )
 
 add_custom_target(eps_unit_tests.run
@@ -19,4 +20,5 @@ target_link_libraries(eps_unit_tests
     terminal
     MainTimer
     TelemetryUpdater
+    Temperatures
 )
