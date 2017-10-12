@@ -5,9 +5,15 @@
 
 using namespace eps;
 
-static constexpr uint12_t dac_upper_boundary = 4080;
-static constexpr uint12_t dac_lower_boundary = 1500;
-static constexpr uint12_t max_mpp_error      = 10;
+static_assert(voltage_to_adc_reading(0) == 0, "");
+static_assert(voltage_to_adc_reading(9.405) == 2047, "");
+static_assert(voltage_to_adc_reading(18.81) == 4095, "");
+
+using Cfg = eps::MpptSettings::Y;
+
+static constexpr auto dac_upper_boundary = Cfg::dac_upper_boundary;
+static constexpr auto dac_lower_boundary = Cfg::dac_lower_boundary;
+static constexpr uint12_t max_mpp_error  = 10;
 
 template<typename T, typename Tm>
 uint16_t mock_only_mppt_tracking(T& updater, Tm tm) {
@@ -31,8 +37,13 @@ uint16_t mock_only_sweep_up(T& updater) {
     return updater.dac;
 }
 
+void check_constrains(uint16_t output) {
+    TEST_ASSERT_TRUE(dac_lower_boundary <= output);
+    TEST_ASSERT_TRUE(output <= dac_upper_boundary);
+}
+
 void test_MpptUpdater_Init() {
-    MpptUpdater<eps::MpptSettings::Y> updater;
+    MpptUpdater<Cfg> updater;
     Telemetry::SingleMpptChannel tm;
     tm.solar_current  = 10;
     tm.solar_voltage  = 10;
@@ -44,7 +55,7 @@ void test_MpptUpdater_Init() {
 }
 
 void test_MpptUpdater_UpperBoundary() {
-    MpptUpdater<eps::MpptSettings::Y> updater;
+    MpptUpdater<Cfg> updater(dac_lower_boundary);
 
     Telemetry::SingleMpptChannel tm;
     tm.solar_current  = 10;
@@ -53,12 +64,11 @@ void test_MpptUpdater_UpperBoundary() {
     mock_only_mppt_tracking(updater, tm);
     tm.solar_voltage = 100;
 
-    for (int i = 0; i < 150; i++) {
+    for (int i = 0; i < 500; i++) {
         updater.update_tm(tm);
         auto output = mock_only_mppt_tracking(updater, tm);
 
-        TEST_ASSERT_LESS_THAN(dac_upper_boundary + 1, output);
-        TEST_ASSERT_GREATER_THAN(dac_lower_boundary - 1, output);
+        check_constrains(output);
     }
 
     updater.update_tm(tm);
@@ -67,7 +77,7 @@ void test_MpptUpdater_UpperBoundary() {
 }
 
 void test_MpptUpdater_LowerBoundary() {
-    MpptUpdater<eps::MpptSettings::Y> updater;
+    MpptUpdater<Cfg> updater(dac_upper_boundary);
 
     Telemetry::SingleMpptChannel tm;
     tm.solar_current  = 10;
@@ -77,12 +87,11 @@ void test_MpptUpdater_LowerBoundary() {
     mock_only_mppt_tracking(updater, tm);
     tm.solar_voltage = 0;
 
-    for (int i = 0; i < 1500; i++) {
+    for (int i = 0; i < 500; i++) {
         updater.update_tm(tm);
         auto output = mock_only_mppt_tracking(updater, tm);
 
-        TEST_ASSERT_LESS_THAN(dac_upper_boundary + 1, output);
-        TEST_ASSERT_GREATER_THAN(dac_lower_boundary - 1, output);
+        check_constrains(output);
     }
 
     updater.update_tm(tm);
@@ -97,16 +106,15 @@ void test_MpptUpdater_LowerBoundary() {
  * @param upper_limit - value for upper limit.
  * @return clamped value with lower and upper limits.
  */
-uint12_t clamp_value(float value, float lower_limit, float upper_limit) {
-    uint16_t output = round(value);
-
-    if (value > upper_limit) {
-        output = upper_limit;
+constexpr uint16_t
+clamp_value(float value, uint16_t lower_limit, uint16_t upper_limit) {
+    if (value > static_cast<float>(upper_limit)) {
+        return upper_limit;
     }
-    if (value < lower_limit) {
-        output = lower_limit;
+    if (value < static_cast<float>(lower_limit)) {
+        return lower_limit;
     }
-    return output;
+    return value;
 }
 
 /*!
@@ -114,9 +122,8 @@ uint12_t clamp_value(float value, float lower_limit, float upper_limit) {
  * @param solar_voltage 12-bit solar voltage.
  * @return Calculated solar power at specified solar voltage.
  */
-uint12_t mock_PVCurveSinus(uint12_t solar_voltage) {
-    int sine =
-        round(sin(((solar_voltage - 1300) / 4096.0) * M_PI * 1.5) * 1100) + 1000;
+constexpr uint16_t mock_PVCurveSinus(uint16_t solar_voltage) {
+    float sine = sin(((solar_voltage - 1300) / 4096.0) * M_PI * 1.5) * 1100 + 1000;
     uint16_t output_power = clamp_value(sine, 0, 4095);
     return output_power;
 }
@@ -125,7 +132,7 @@ uint12_t mock_PVCurveSinus(uint12_t solar_voltage) {
  * Function to find MPP on a Voltage-vs-Power curve.
  * @return Power value at MPP.
  */
-uint12_t mock_PVCurve_FindMppPower() {
+constexpr uint16_t mock_PVCurve_FindMppPower() {
     uint16_t mpp_power = 0;
 
     for (uint16_t solar_voltage = 0; solar_voltage < 4095; solar_voltage += 8) {
@@ -136,13 +143,12 @@ uint12_t mock_PVCurve_FindMppPower() {
         }
     }
 
-    LOG_DEBUG("MPP at solar_power = %u", mpp_power);
     return mpp_power;
 }
 
 void test_MpptUpdater_MppTracking_SinusPVCurve_StartingPointSweep() {
-    uint12_t dac_set   = 0;
-    uint12_t mpp_power = mock_PVCurve_FindMppPower();
+    uint12_t dac_set             = 0;
+    constexpr uint12_t mpp_power = mock_PVCurve_FindMppPower();
 
     Telemetry::SingleMpptChannel tm;
     tm.solar_current  = 4000;
@@ -152,17 +158,17 @@ void test_MpptUpdater_MppTracking_SinusPVCurve_StartingPointSweep() {
     for (uint16_t starting_point = dac_lower_boundary;
          starting_point <= dac_upper_boundary;
          starting_point += 8) {
-        MpptUpdater<eps::MpptSettings::Y> updater(starting_point);
+        MpptUpdater<Cfg> updater(starting_point);
 
         for (int i = 0; i < 1000; i++) {
             updater.update_tm(tm);
             dac_set = mock_only_mppt_tracking(updater, tm);
 
             tm.solar_voltage = mock_PVCurveSinus(dac_set) + ((rand() % 3) - 1);
+
+            check_constrains(dac_set);
         }
 
-        TEST_ASSERT_LESS_THAN(dac_upper_boundary, dac_set);
-        TEST_ASSERT_GREATER_THAN(dac_lower_boundary, dac_set);
 
         TEST_ASSERT_LESS_THAN(mpp_power + max_mpp_error, tm.solar_voltage);
         TEST_ASSERT_GREATER_THAN(mpp_power - max_mpp_error, tm.solar_voltage);
@@ -172,14 +178,14 @@ void test_MpptUpdater_MppTracking_SinusPVCurve_StartingPointSweep() {
 }
 
 void test_MpptUpdater_MppTracking_SinusPVCurve_SolarCurrentSweep() {
-    uint12_t mpp_power = mock_PVCurve_FindMppPower();
+    constexpr uint12_t mpp_power = mock_PVCurve_FindMppPower();
 
     Telemetry::SingleMpptChannel tm;
     tm.solar_voltage  = 10;
     tm.output_voltage = 0;
 
     for (uint16_t solar_current = 1; solar_current <= 4095; solar_current += 16) {
-        MpptUpdater<eps::MpptSettings::Y> updater(3000);
+        MpptUpdater<Cfg> updater(3000);
         uint12_t dac_set = 0;
         tm.solar_current = solar_current;
 
@@ -188,10 +194,8 @@ void test_MpptUpdater_MppTracking_SinusPVCurve_SolarCurrentSweep() {
             dac_set = mock_only_mppt_tracking(updater, tm);
 
             tm.solar_voltage = mock_PVCurveSinus(dac_set) + ((rand() % 3) - 1);
+            check_constrains(dac_set);
         }
-
-        TEST_ASSERT_LESS_THAN(dac_upper_boundary, dac_set);
-        TEST_ASSERT_GREATER_THAN(dac_lower_boundary, dac_set);
 
         TEST_ASSERT_LESS_THAN(mpp_power + max_mpp_error, tm.solar_voltage);
         TEST_ASSERT_GREATER_THAN(mpp_power - max_mpp_error, tm.solar_voltage);
@@ -201,48 +205,50 @@ void test_MpptUpdater_MppTracking_SinusPVCurve_SolarCurrentSweep() {
 }
 
 void test_MpptUpdater_DacSweepDown() {
-    for (uint16_t starting_point = dac_lower_boundary;
-         starting_point <= dac_upper_boundary;
-         starting_point++) {
-        MpptUpdater<eps::MpptSettings::Y> updater(starting_point);
+    MpptUpdater<Cfg> updater(4095);
 
-        for (int i = 0; i < 300; i++) {
-            auto output = mock_only_sweep_down(updater);
-            TEST_ASSERT_LESS_THAN(dac_upper_boundary + 1, output);
-            TEST_ASSERT_GREATER_THAN(dac_lower_boundary - 1, output);
-        }
+    updater.dac_constrain();
+    uint16_t last = updater.dac;
+    check_constrains(last);
 
+    TEST_ASSERT_EQUAL(dac_upper_boundary, last);
+
+    for (int i = 0; i < 300; i++) {
         auto output = mock_only_sweep_down(updater);
-        TEST_ASSERT_EQUAL(dac_lower_boundary, output);
+        check_constrains(output);
+        TEST_ASSERT_TRUE(output < last || output == dac_lower_boundary);
+        last = output;
     }
+
+    TEST_ASSERT_EQUAL(dac_lower_boundary, last);
 }
 
 void test_MpptUpdater_DacSweepUp() {
-    for (uint16_t starting_point = dac_lower_boundary;
-         starting_point <= dac_upper_boundary;
-         starting_point++) {
-        MpptUpdater<eps::MpptSettings::Y> updater(starting_point);
+    MpptUpdater<Cfg> updater(1);
 
-        for (int i = 0; i < 300; i++) {
-            auto output = mock_only_sweep_up(updater);
-            TEST_ASSERT_LESS_THAN(dac_upper_boundary + 1, output);
-            TEST_ASSERT_GREATER_THAN(dac_lower_boundary - 1, output);
-        }
+    uint16_t last = mock_only_sweep_up(updater);
+    TEST_ASSERT_EQUAL(dac_lower_boundary, last);
 
+    for (int i = 0; i < 300; i++) {
         auto output = mock_only_sweep_up(updater);
-        TEST_ASSERT_EQUAL(dac_upper_boundary, output);
+        check_constrains(output);
+        TEST_ASSERT_TRUE(output > last || output == dac_upper_boundary);
+        last = output;
     }
+
+    TEST_ASSERT_EQUAL(dac_upper_boundary, last);
 }
 
 void test_MpptUpdater_MppRestart() {
-    MpptUpdater<eps::MpptSettings::Y> updater(127);
+    MpptUpdater<Cfg> updater(127);
 
     updater.mpp_restart();
+    updater.dac_constrain();
     TEST_ASSERT_EQUAL(dac_upper_boundary, updater.dac);
 }
 
 void test_MpptUpdater_CalculatePower() {
-    MpptUpdater<eps::MpptSettings::Y> updater(dac_lower_boundary);
+    MpptUpdater<Cfg> updater(dac_lower_boundary);
     Telemetry::SingleMpptChannel tm;
 
     auto test = [&](uint16_t a, uint16_t b, uint32_t result) {
@@ -261,6 +267,117 @@ void test_MpptUpdater_CalculatePower() {
     test(0xFFFF, 0xFFFF, 0xfffe0001ULL);
 }
 
+
+void test_MpptUpdater_load_detect() {
+    auto check =
+        [](auto start, auto solar, auto out, bool overloaded, bool underloaded) {
+            MpptUpdater<Cfg> updater(start);
+
+            Telemetry::SingleMpptChannel tm;
+            tm.solar_voltage  = solar;
+            tm.output_voltage = out;
+            tm.solar_current  = 0;
+
+            auto dac = updater.tick(tm);
+
+            if (overloaded) {
+                TEST_ASSERT_EQUAL(dac_upper_boundary, dac);
+            } else {
+                TEST_ASSERT_LESS_THAN(dac_upper_boundary, dac);
+            }
+
+            auto expect = start - Cfg::dac_sweep_down_value;
+            if (underloaded) {
+                TEST_ASSERT_EQUAL(expect, dac);
+            } else {
+                TEST_ASSERT_GREATER_THAN(expect, dac);
+            }
+
+            check_constrains(dac);
+        };
+
+    auto lower = Cfg::dac_lower_boundary;
+    auto solar = Cfg::min_solar_voltage;
+    auto out   = Cfg::min_output_voltage;
+
+    check(lower + 1, solar, out + 10, false, false);
+    check(lower + 1, solar - 10, out + 10, true, false);
+    check(lower, solar, out + 10, true, false);
+    check(lower, 4095, 0, true, false);
+
+    check(lower + 1000, solar, out, false, false);
+    check(lower + 1000, solar + 1, out - 1, false, true);
+    check(lower + 1000, solar + 10, out + 10, false, false);
+}
+
+void test_MpptUpdater_delta_power() {
+    MpptUpdater<Cfg> updater(2500);
+
+    updater.dac = Cfg::dac_lower_boundary + 10;
+
+    Telemetry::SingleMpptChannel tm;
+    tm.solar_voltage  = Cfg::min_solar_voltage;
+    tm.output_voltage = 0;
+
+    tm.solar_current = 0;
+    updater.tick(tm);
+
+    tm.solar_current = 20000;
+    updater.dac      = 2000;
+
+    for (int i = 1; i <= 10; ++i) {
+        updater.tick(tm);
+        TEST_ASSERT_EQUAL(2000 + Cfg::dac_sweep_up_value - i * Cfg::dac_perturb,
+                          updater.dac);
+    }
+
+    tm.solar_current = 0;
+    updater.tick(tm);
+    TEST_ASSERT_EQUAL(
+        2000 + 2 * Cfg::dac_sweep_up_value - 11 * Cfg::dac_perturb, updater.dac);
+}
+
+void test_MpptUpdater_tick() {
+    constexpr auto mpp_power = mock_PVCurve_FindMppPower();
+
+    Telemetry::SingleMpptChannel tm;
+    tm.solar_current  = 4000;
+    tm.solar_voltage  = 10;
+    tm.output_voltage = 5000;
+
+    for (uint16_t starting_point = dac_lower_boundary + 100;
+         starting_point <= dac_upper_boundary;
+         starting_point += 80) {
+        MpptUpdater<Cfg> updater(starting_point);
+
+        uint12_t dac_set = starting_point;
+
+        for (int i = 0; i < 1000; i++) {
+            tm.solar_voltage =
+                mock_PVCurveSinus(dac_set) + 1000 + ((rand() % 3) - 1);
+
+            if (dac_set < 2500) {
+                tm.solar_current = 0;
+            } else {
+                tm.solar_current = 4000;
+            }
+
+            tm.output_voltage = tm.solar_voltage / 2;
+
+            updater.update_tm(tm);
+            dac_set = updater.tick(tm);
+
+            check_constrains(dac_set);
+        }
+
+        TEST_ASSERT_LESS_THAN(mpp_power + max_mpp_error, tm.solar_voltage - 1000);
+        TEST_ASSERT_GREATER_THAN(mpp_power - max_mpp_error,
+                                 tm.solar_voltage - 1000);
+
+        LOG_DEBUG("MppTracking mode found MPP at: %u", tm.solar_voltage);
+    }
+}
+
 void test_MpptUpdater() {
     UnityBegin("");
 
@@ -273,6 +390,9 @@ void test_MpptUpdater() {
     RUN_TEST(test_MpptUpdater_DacSweepUp);
     RUN_TEST(test_MpptUpdater_MppRestart);
     RUN_TEST(test_MpptUpdater_CalculatePower);
+    RUN_TEST(test_MpptUpdater_load_detect);
+    RUN_TEST(test_MpptUpdater_delta_power);
+    RUN_TEST(test_MpptUpdater_tick);
 
     UnityEnd();
 }

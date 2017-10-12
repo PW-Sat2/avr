@@ -22,8 +22,8 @@ constexpr static std::uint16_t voltage_to_adc_reading(float voltage) {
 
 namespace MpptSettings {
 struct X {
-    static constexpr std::uint16_t dac_lower_boundary   = 750;
-    static constexpr std::uint16_t dac_upper_boundary   = 4080;
+    static constexpr std::int16_t dac_lower_boundary    = 750;
+    static constexpr std::int16_t dac_upper_boundary    = 4080;
     static constexpr std::uint16_t dac_perturb          = 3;
     static constexpr std::uint16_t dac_sweep_down_value = 50;
     static constexpr std::uint16_t dac_sweep_up_value   = 10;
@@ -34,8 +34,8 @@ struct X {
 };
 
 struct Y {
-    static constexpr std::uint16_t dac_lower_boundary   = 1500;
-    static constexpr std::uint16_t dac_upper_boundary   = 4080;
+    static constexpr std::int16_t dac_lower_boundary    = 1500;
+    static constexpr std::int16_t dac_upper_boundary    = 4080;
     static constexpr std::uint16_t dac_perturb          = 6;
     static constexpr std::uint16_t dac_sweep_down_value = 50;
     static constexpr std::uint16_t dac_sweep_up_value   = 10;
@@ -49,7 +49,7 @@ struct Y {
 template<typename MpptChannelSettings>
 struct MpptUpdater {
     std::uint32_t last_power;
-    std::uint16_t dac;
+    std::int16_t dac;
     std::int8_t last_perturb;
 
     std::uint16_t solar_voltage, solar_current, output_voltage;
@@ -182,7 +182,7 @@ struct MpptUpdater {
      * @return true if delta_power is too high.
      */
     bool is_delta_power_too_high(std::int32_t delta_power) {
-        return abs(delta_power) > MpptChannelSettings::max_delta_power;
+        return labs(delta_power) > MpptChannelSettings::max_delta_power;
     }
 };
 

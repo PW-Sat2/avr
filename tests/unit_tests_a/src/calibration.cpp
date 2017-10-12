@@ -58,6 +58,14 @@ void test_calibration_voltage_divider() {
     TEST_ASSERT_EQUAL_FLOAT(4.133333333, div_large.lower_to_full(1.0f));
     TEST_ASSERT_EQUAL_FLOAT(13.64, div_large.lower_to_full(3.3f));
     TEST_ASSERT_EQUAL_FLOAT(18.6, div_large.lower_to_full(4.5f));
+
+    for (float x = -1000; x < 1000; x += 10) {
+        TEST_ASSERT_EQUAL_FLOAT(x, div2.full_to_lower(div2.lower_to_full(x)));
+        TEST_ASSERT_EQUAL_FLOAT(
+            x, div7p234.full_to_lower(div7p234.lower_to_full(x)));
+        TEST_ASSERT_EQUAL_FLOAT(
+            x, div_large.full_to_lower(div_large.lower_to_full(x)));
+    }
 }
 
 void test_calibration() {
