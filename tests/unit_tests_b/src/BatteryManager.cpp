@@ -182,8 +182,9 @@ void test_BatteryManager_discharging_temperature() {
     checkDischarge(true);
 }
 
-constexpr static float heater_temp_high = 5;
-constexpr static float heater_temp_low  = 0;
+constexpr static float heater_temp_high = -2;
+constexpr static float heater_temp_low  = -7;
+
 void test_BatteryManager_heater() {
     for (float t = -50; t < heater_temp_high; t += 1) {
         battery_manager.tick(0, t);

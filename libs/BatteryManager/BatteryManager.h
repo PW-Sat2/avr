@@ -85,7 +85,7 @@ class BatteryManager {
         }
 
         bool should_change(float max_temperature) override {
-            return (max_temperature > 5);
+            return (max_temperature > -2);
         }
     };
 
@@ -95,7 +95,7 @@ class BatteryManager {
         }
 
         bool should_change(float max_temperature) override {
-            return (max_temperature < 0);
+            return (max_temperature < -7);
         }
     };
 
