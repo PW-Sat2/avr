@@ -25,11 +25,11 @@ void test_MainTimer_duration() {
     MainTimer::init();
 
     test_timeout<1, false>();
-    test_timeout<30000, false>();
-    test_timeout<32254, false>();
+    test_timeout<32000, false>();
+    test_timeout<32200, false>();
 
-    test_timeout<32255, true>();
-    test_timeout<50000, true>();
+    test_timeout<32300, true>();
+    test_timeout<35000, true>();
     test_timeout<100000, true>();
 }
 

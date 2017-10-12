@@ -9,10 +9,11 @@ ISR(TIMER0_COMP_vect) {
 }
 
 void MainTimer::init() {
-    hal::Timer0::init(hal::Timer0::Prescaler::DIV_1024, hal::Timer0::Mode::CTC);
+    TCCR0 = 0b1110;  // CTC, prescaler 256
 
-    OCR0 = 252 - 1;
-    hal::Timer0::enable_compare_interrupt();
+    OCR0  = 126 - 1;
+    TIMSK = (1 << OCIE0);  // Output Compare 0 interrupt only
+
     timer0_expired = false;
 
     TCNT0 = 0;

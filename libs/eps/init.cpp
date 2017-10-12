@@ -28,7 +28,7 @@ void init_hardware() {
 
     IOMap::Watchdog::init();
 
-    Analog::InternalADC::init(Analog::InternalADC::Prescaler::DIV_128,
+    Analog::InternalADC::init(Analog::InternalADC::Prescaler::DIV_8,
                               Analog::InternalADC::Reference::AREF);
 
     Eps::LclCommander::init();
