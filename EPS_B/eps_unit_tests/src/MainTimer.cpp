@@ -13,12 +13,11 @@ void test_MainTimer_interrupt() {
     TEST_ASSERT_TRUE(MainTimer::expired());
 }
 
-template<uint32_t timeout_ms, bool should_expire>
+template<uint32_t timeout_us, bool should_expire>
 void test_timeout() {
     MainTimer::init();
-    MainTimer::expired();
 
-    _delay_ms(timeout_ms);
+    _delay_us(timeout_us);
     TEST_ASSERT_EQUAL(should_expire, MainTimer::expired());
 }
 
@@ -26,12 +25,12 @@ void test_MainTimer_duration() {
     MainTimer::init();
 
     test_timeout<1, false>();
-    test_timeout<30, false>();
-    test_timeout<33, false>();
+    test_timeout<30000, false>();
+    test_timeout<32245, false>();
 
-    test_timeout<34, true>();
-    test_timeout<50, true>();
-    test_timeout<1000, true>();
+    test_timeout<32246, true>();
+    test_timeout<50000, true>();
+    test_timeout<100000, true>();
 }
 
 void test_MainTimer_wakeup() {

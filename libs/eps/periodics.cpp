@@ -14,7 +14,7 @@ void each_1sec();
 void each_10sec();
 void each_30min();
 
-avr::Prescaler<33> timer_1second;
+avr::Prescaler<30> timer_1second;
 void each_33ms() {
     ControllerSpecialisation::each_33ms();
 
