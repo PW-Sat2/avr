@@ -6,7 +6,7 @@
 #include "TemperatureSensorsValidation.h"
 
 
-void test_Temperature_LMT87_always_valid() {
+void Tmp_LMT87_valid() {
     for (uint16_t i = 0; i < 0xFFFF; ++i) {
         TEST_ASSERT_FLOAT_IS_DETERMINATE(lmt87(i));
         TEST_ASSERT_FLOAT_IS_DETERMINATE(lmt87_adc124(i << 2));
@@ -15,7 +15,7 @@ void test_Temperature_LMT87_always_valid() {
     TEST_ASSERT_FLOAT_IS_DETERMINATE(lmt87_adc124(0xFFFF << 2));
 }
 
-void test_Temperature_LMT87() {
+void Tmp_LMT() {
     TEST_ASSERT_FLOAT_WITHIN(5, 150., lmt87(183));
     TEST_ASSERT_FLOAT_WITHIN(2, 100., lmt87(429));
     TEST_ASSERT_FLOAT_WITHIN(0.1, 50., lmt87(668));
@@ -33,14 +33,14 @@ void test_Temperature_LMT87() {
     TEST_ASSERT_FLOAT_WITHIN(5, -50., lmt87_adc124(4065));
 }
 
-void test_Temperature_TMP121_always_valid() {
+void Tmp_TMP_valid() {
     for (uint16_t i = 0; i < 0xFFFF; ++i) {
         TEST_ASSERT_FLOAT_IS_DETERMINATE(tmp121(i));
     }
     TEST_ASSERT_FLOAT_IS_DETERMINATE(tmp121(0xFFFF));
 }
 
-void test_Temperature_TMP121() {
+void Tmp_TMP() {
     TEST_ASSERT_EQUAL_FLOAT(150.0, tmp121(0x960));
     TEST_ASSERT_EQUAL_FLOAT(125.0, tmp121(0x7D0));
     TEST_ASSERT_EQUAL_FLOAT(25.0, tmp121(0x0190));
@@ -51,7 +51,7 @@ void test_Temperature_TMP121() {
     TEST_ASSERT_EQUAL_FLOAT(-55, tmp121(0x1C90));
 }
 
-void test_Temperature_PT1000_valid() {
+void Tmp_PT_ok() {
     float prev = pt1000(0);
     TEST_ASSERT_FLOAT_IS_DETERMINATE(prev);
 
@@ -73,7 +73,7 @@ void test_Temperature_PT1000_valid() {
     }
 }
 
-void test_Temperature_PT1000() {
+void Tmp_PT() {
     TEST_ASSERT_FLOAT_WITHIN(3, -200, pt1000(54));
     TEST_ASSERT_FLOAT_WITHIN(1, -150, pt1000(110));
     TEST_ASSERT_FLOAT_WITHIN(0.5, -100, pt1000(158));
@@ -94,7 +94,7 @@ uint16_t value;
 
 static constexpr char name[] PROGMEM = "x";
 TemperatureConversion conversion(dummy_conversion, -70.5, 89.3, name, value);
-void test_Temperature_Conversion() {
+void Tmp_Conv() {
     auto checkOK = [](uint16_t raw, float temperature) {
         value  = raw;
         auto x = conversion.get();
@@ -124,7 +124,7 @@ void test_Temperature_Conversion() {
     checkFail(0xFFFF);
 }
 
-void test_Temperature_Conversion_NaN() {
+void Tmp_Conv_NaN() {
     offset = std::numeric_limits<float>::quiet_NaN();
     TEST_ASSERT_FALSE(conversion.get());
 
@@ -133,13 +133,13 @@ void test_Temperature_Conversion_NaN() {
     TEST_ASSERT_TRUE(conversion.get());
 }
 
-void test_Temperature_merge_max() {
+void Tmp_max() {
     TEST_ASSERT_EQUAL_FLOAT(15, merge_temperatures({10.0, 15.0}));
     TEST_ASSERT_EQUAL_FLOAT(115.0, merge_temperatures({115.0}));
     TEST_ASSERT_EQUAL_FLOAT(15.5, merge_temperatures({10.0, 15.5, 2., 3., 7.}));
 }
 
-void test_Temperature_merge_drop_incorrect() {
+void Tmp_drop_incorrect() {
     std::experimental::optional<float> f = 8000;
 
     f = {};
@@ -150,7 +150,7 @@ void test_Temperature_merge_drop_incorrect() {
         15.5, merge_temperatures({10.0, f, 15.5, {}, 2., f, f, 3., 7.}));
 }
 
-void test_Temperature_merge_none_valid() {
+void Tmp_none_valid() {
     std::experimental::optional<float> f = 8000;
 
     f = {};
@@ -166,21 +166,21 @@ void test_Temperature_merge_none_valid() {
 void test_TemperatureCheck() {
     UnityBegin("");
 
-    RUN_TEST(test_Temperature_LMT87_always_valid);
-    RUN_TEST(test_Temperature_LMT87);
+    RUN_TEST(Tmp_LMT87_valid);
+    RUN_TEST(Tmp_LMT);
 
-    RUN_TEST(test_Temperature_TMP121_always_valid);
-    RUN_TEST(test_Temperature_TMP121);
+    RUN_TEST(Tmp_TMP_valid);
+    RUN_TEST(Tmp_TMP);
 
-    RUN_TEST(test_Temperature_PT1000_valid);
-    RUN_TEST(test_Temperature_PT1000);
+    RUN_TEST(Tmp_PT_ok);
+    RUN_TEST(Tmp_PT);
 
-    RUN_TEST(test_Temperature_Conversion);
-    RUN_TEST(test_Temperature_Conversion_NaN);
+    RUN_TEST(Tmp_Conv);
+    RUN_TEST(Tmp_Conv_NaN);
 
-    RUN_TEST(test_Temperature_merge_max);
-    RUN_TEST(test_Temperature_merge_drop_incorrect);
-    RUN_TEST(test_Temperature_merge_none_valid);
+    RUN_TEST(Tmp_max);
+    RUN_TEST(Tmp_drop_incorrect);
+    RUN_TEST(Tmp_none_valid);
 
     UnityEnd();
 }
