@@ -64,7 +64,7 @@ void ControllerSpecialisation::init() {
     eps::IOMap::MpptYpDisable::set();
     eps::IOMap::MpptYnDisable::set();
 
-    set_sleep_mode(SLEEP_MODE_PWR_SAVE);
+    set_sleep_mode(SLEEP_MODE_IDLE);
 
     // power reduction register
     PRR = (1 << PRTIM0) |    // disable Timer0
