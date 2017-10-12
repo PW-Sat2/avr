@@ -2,9 +2,9 @@
 #define EPS_A_EPS_LIBS_SETTINGS_SETTINGS_H_
 
 #include <cstdint>
+#include "MpptUpdater.h"
 #include "eps.h"
 #include "telemetry.h"
-#include "MpptUpdater.h"
 
 struct ControllerSpecialisation {
     constexpr static char side                = 'A';
@@ -17,12 +17,6 @@ struct ControllerSpecialisation {
     static float max_eps_temperature();
     static float battery_temperature();
     static float battery_voltage();
-
-    struct MpptUpdaters {
-        static eps::MpptUpdater<eps::MpptSettings::Channel::X> X;
-        static eps::MpptUpdater<eps::MpptSettings::Channel::Y> Yp;
-        static eps::MpptUpdater<eps::MpptSettings::Channel::Y> Yn;
-    };
 };
 
 #endif  // EPS_A_EPS_LIBS_SETTINGS_SETTINGS_H_

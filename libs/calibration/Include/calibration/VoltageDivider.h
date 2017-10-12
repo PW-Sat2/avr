@@ -11,6 +11,10 @@ class VoltageDivider {
         return lower_voltage / scale();
     }
 
+    constexpr float full_to_lower(float full_voltage) const {
+        return full_voltage * scale();
+    }
+
  private:
     const float resistance_lower, resistance_higher;
 

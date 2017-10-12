@@ -51,6 +51,7 @@ float ControllerSpecialisation::battery_voltage() {
         tm.battery_controller.controller_a_voltage));
 }
 
+
 void ControllerSpecialisation::init() {
     eps::IOMap::Mux::init();
 
@@ -58,34 +59,34 @@ void ControllerSpecialisation::init() {
 }
 
 
-static constexpr uint8_t number_of_mppt_phases = 3;
-static uint8_t mppt_phase = number_of_mppt_phases - 1;
-
-eps::MpptUpdater<eps::MpptSettings::Channel::X> ControllerSpecialisation::MpptUpdaters::X;
-eps::MpptUpdater<eps::MpptSettings::Channel::Y> ControllerSpecialisation::MpptUpdaters::Yp;
-eps::MpptUpdater<eps::MpptSettings::Channel::Y> ControllerSpecialisation::MpptUpdaters::Yn;
+eps::MpptUpdater<eps::MpptSettings::X> Mppt_X;
+eps::MpptUpdater<eps::MpptSettings::Y> Mppt_Yp;
+eps::MpptUpdater<eps::MpptSettings::Y> Mppt_Yn;
 
 void ControllerSpecialisation::each_33ms() {
     Eps::TelemetryUpdater::update_mppt();
 
-    auto tm_mppt = avr::Eps::telemetry.mppt.get();
+    auto tm = avr::Eps::telemetry.mppt.get();
 
+    static uint8_t mppt_phase = 2;
     if (mppt_phase == 0) {
         eps::IOMap::Mppt::MpptYp::DacSpi::init();
-        uint12_t mppt_new_dac_value = ControllerSpecialisation::MpptUpdaters::Yp.tick(tm_mppt.mpptyp);
+        uint12_t mppt_new_dac_value = Mppt_Yp.tick(tm.mpptyp);
         eps::IOMap::Mppt::MpptYp::Dac121::write_to_output(mppt_new_dac_value);
     } else if (mppt_phase == 1) {
         eps::IOMap::Mppt::MpptYn::DacSpi::init();
-        uint12_t mppt_new_dac_value = ControllerSpecialisation::MpptUpdaters::Yn.tick(tm_mppt.mpptyn);
+        uint12_t mppt_new_dac_value = Mppt_Yn.tick(tm.mpptyn);
         eps::IOMap::Mppt::MpptYn::Dac121::write_to_output(mppt_new_dac_value);
     } else if (mppt_phase == 2) {
         eps::IOMap::Mppt::MpptX::DacSpi::init();
-        uint12_t mppt_new_dac_value = ControllerSpecialisation::MpptUpdaters::X.tick(tm_mppt.mpptx);
+        uint12_t mppt_new_dac_value = Mppt_X.tick(tm.mpptx);
         eps::IOMap::Mppt::MpptX::Dac121::write_to_output(mppt_new_dac_value);
+    } else {
+        mppt_phase = 0;
     }
 
     if (mppt_phase == 0) {
-        mppt_phase = number_of_mppt_phases;
+        mppt_phase = 3;
     }
     mppt_phase--;
 }
