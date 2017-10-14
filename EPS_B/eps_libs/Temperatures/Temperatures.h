@@ -14,7 +14,7 @@ constexpr static float higher_eps = 100;
 constexpr static float lower_battery_pack  = -50;
 constexpr static float higher_battery_pack = 80;
 
-constexpr static char battery_pack_a_name[] PROGMEM = "BP A";
+constexpr static char battery_pack_a_name[] PROGMEM = "BP";
 constexpr static TemperatureConversion
     battery_pack(pt1000,
                  lower_battery_pack,
