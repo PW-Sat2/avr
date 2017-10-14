@@ -9,6 +9,7 @@ node('linux') {
 	}
 	sh 'git submodule sync'
 	sh 'git submodule update'
+	sh 'git update-index --assume-unchanged .gitmodules'
 	
 	stage 'clean'
 	sh 'make clean'
