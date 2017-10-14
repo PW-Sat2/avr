@@ -18,9 +18,6 @@ include(../cmake-modules/nameplate.cmake)
 
 project(eps_a)
 
-add_compile_options(-g)
-add_definitions(-D__ASSERT_USE_STDERR)
-
 add_subdirectory(${HAL_PATH} hal)
 add_subdirectory(../libs libs)
 add_subdirectory(../tests tests)
