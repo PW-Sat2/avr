@@ -27,6 +27,7 @@ void each_33ms() {
 
 avr::Prescaler<10> timer_10second;
 void each_1sec() {
+    Eps::IOMap::Watchdog::kick();
     ATOMIC_BLOCK(ATOMIC_FORCEON) {
         ThermalKnives::tick();
         ObcWatchdog::tick();
