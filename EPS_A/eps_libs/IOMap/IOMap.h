@@ -104,6 +104,19 @@ class IOMap {
 
     using AllLcls = std::tuple<TkMain, Suns, CamNadir, CamWing, Sens, Ants, Imtq>;
 
+    using PinsAsInputPullup = std::tuple<hal::DigitalIO::GPIO<2>,
+                                         hal::DigitalIO::GPIO<3>,
+                                         hal::DigitalIO::GPIO<4>,
+                                         hal::DigitalIO::GPIO<5>,
+                                         hal::DigitalIO::GPIO<7>,
+                                         hal::DigitalIO::GPIO<10>,
+                                         hal::DigitalIO::GPIO<16>,
+                                         hal::DigitalIO::GPIO<18>,
+                                         hal::DigitalIO::GPIO<19>,
+                                         hal::DigitalIO::GPIO<25>,
+                                         hal::DigitalIO::GPIO<26>,
+                                         hal::DigitalIO::GPIO<44>,
+                                         hal::DigitalIO::GPIO<45>>;
 
     // ~~~~~~~~~~~~~~~~ EPS_A specific ~~~~~~~~~~~~~~~~
 

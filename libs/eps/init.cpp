@@ -3,6 +3,13 @@
 
 #include "defs.h"
 
+template<typename T>
+struct PinInitExec {
+    static void run() {
+        T::init(hal::DigitalIO::Mode::INPUT_PULLUP);
+    }
+};
+
 void init_hardware() {
     using namespace avr;
     using namespace eps;
@@ -44,7 +51,7 @@ void init_hardware() {
     IOMap::Battery::Charge::init(DigitalIO::Mode::OUTPUT);
     IOMap::Battery::Discharge::init(DigitalIO::Mode::OUTPUT);
 
-    IOMap::SerialRx::init(DigitalIO::Mode::INPUT_PULLUP);
+    hal::libs::for_each_tuple_type<PinInitExec, IOMap::PinsAsInputPullup>();
 
     // delay to make sure capacitances in power cycle circuit are
     // discharged. This is to prevent too frequent power cycle.

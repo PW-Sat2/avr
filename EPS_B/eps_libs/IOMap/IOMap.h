@@ -47,11 +47,18 @@ class IOMap {
 
     using AllLcls = std::tuple<TkRed, Ants>;
 
-
-    // ~~~~~~~~~~~~~~~~ EPS_A specific ~~~~~~~~~~~~~~~~
-    using MpptXDisable  = hal::DigitalIO::GPIO<1>;
-    using MpptYpDisable = hal::DigitalIO::GPIO<2>;
-    using MpptYnDisable = hal::DigitalIO::GPIO<3>;
+    using PinsAsInputPullup = std::tuple<hal::DigitalIO::GPIO<1>,
+                                         hal::DigitalIO::GPIO<2>,
+                                         hal::DigitalIO::GPIO<3>,
+                                         hal::DigitalIO::GPIO<9>,
+                                         hal::DigitalIO::GPIO<10>,
+                                         hal::DigitalIO::GPIO<19>,
+                                         hal::DigitalIO::GPIO<20>,
+                                         hal::DigitalIO::GPIO<33>,
+                                         hal::DigitalIO::GPIO<40>,
+                                         hal::DigitalIO::GPIO<41>,
+                                         hal::DigitalIO::GPIO<43>,
+                                         hal::DigitalIO::GPIO<44>>;
 };
 
 }  // namespace eps
