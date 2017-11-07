@@ -42,7 +42,7 @@ struct Y {
     static constexpr std::int32_t max_delta_power       = 100000;
     static constexpr std::uint16_t min_solar_voltage = voltage_to_adc_reading(5.3);
     static constexpr std::uint16_t min_output_voltage =
-        voltage_to_adc_reading(6.7);
+        voltage_to_adc_reading(6.5);
 };
 }  // namespace MpptSettings
 
