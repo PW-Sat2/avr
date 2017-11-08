@@ -18,6 +18,7 @@ void init_hardware() {
 
     hal::Watchdog::disable();
 
+#if LOG_LEVEL != LOG_LEVEL_NONE
     // Serial init to max possible baudrate
     UBRR0H = 0;
     UBRR0L = 0;
@@ -28,6 +29,7 @@ void init_hardware() {
 
     Serial0.redirect_stdio();
     Serial0.redirect_stderr();
+#endif
 
     eps::MainTimer::init();
 

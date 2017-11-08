@@ -46,9 +46,11 @@ OptFloat TemperatureConversion::get() const {
         return temperature;
     }
 
+#if LOG_LEVEL >= LOG_LEVEL_ERROR
     printf_P(PSTR("[ERROR]  Temperature sensor ["));
     printf_P(name);
     printf_P(PSTR("] failed: %f!\n"), temperature);
+#endif
 
     return {};
 }
