@@ -237,8 +237,7 @@ struct MpptUpdater {
         if (mpp_reached_counter > 0) {
             mpp_reached_counter--;
             mpp_tracking_state = MppTrackingState::MppNotReachedYet;
-        }
-        else {
+        } else {
             mpp_tracking_state = MppTrackingState::MppReached;
         }
     }

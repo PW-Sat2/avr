@@ -245,7 +245,7 @@ void test_TelemetryUpdater_mppt_state() {
         uint8_t mpptx_state = uint8_t(rand() % 256);
         uint8_t mpptyp_state = uint8_t(rand() % 256);
         uint8_t mpptyn_state = uint8_t(rand() % 256);
-        
+
         tm_updater::update_mppt_states(mpptx_state, mpptyp_state, mpptyn_state);
 
         Telemetry::AllMpptChannels tm_mppt = tm.mppt;
