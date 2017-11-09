@@ -95,13 +95,11 @@ class TelemetryUpdater : hal::libs::PureStatic {
     static void update_mppt_states(uint8_t mpptx_state,
                                    uint8_t mpptyp_state,
                                    uint8_t mpptyn_state) {
-        Telemetry::AllMpptChannels tm = telemetry.mppt;
+        auto& mppt = const_cast<Telemetry::AllMpptChannels&>(telemetry.mppt.get());
 
-        tm.mpptx.state  = mpptx_state;
-        tm.mpptyp.state = mpptyp_state;
-        tm.mpptyn.state = mpptyn_state;
-
-        telemetry.mppt = tm;
+        mppt.mpptx.state  = mpptx_state;
+        mppt.mpptyp.state = mpptyp_state;
+        mppt.mpptyn.state = mpptyn_state;
     }
 
  private:

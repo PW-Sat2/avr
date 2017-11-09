@@ -383,7 +383,7 @@ void test_MpptUpdater_tick() {
  * @return Extracted MPPT mode.
  */
 uint8_t extract_mppt_mode(uint8_t mppt_state) {
-    return mppt_state >> 1;
+    return (mppt_state >> 1) & 0x03;
 }
 
 /*!
@@ -391,7 +391,24 @@ uint8_t extract_mppt_mode(uint8_t mppt_state) {
  * @return Extracted MPP reached flag.
  */
 uint8_t extract_mpp_reached_flag(uint8_t mppt_state) {
-    return mppt_state && 0x01;
+    return hal::libs::read_bit<0>(mppt_state);
+}
+
+void test_MpptUpdater_get_state_extract_functions() {
+    TEST_ASSERT_EQUAL(0, extract_mppt_mode(0));
+    TEST_ASSERT_EQUAL(0, extract_mppt_mode(1));
+    TEST_ASSERT_EQUAL(1, extract_mppt_mode(2));
+    TEST_ASSERT_EQUAL(1, extract_mppt_mode(3));
+    TEST_ASSERT_EQUAL(2, extract_mppt_mode(5));
+    TEST_ASSERT_EQUAL(3, extract_mppt_mode(0xff));
+    TEST_ASSERT_EQUAL(3, extract_mppt_mode(0x0e));
+
+    TEST_ASSERT_EQUAL(0, extract_mpp_reached_flag(0));
+    TEST_ASSERT_EQUAL(1, extract_mpp_reached_flag(1));
+    TEST_ASSERT_EQUAL(0, extract_mpp_reached_flag(2));
+    TEST_ASSERT_EQUAL(1, extract_mpp_reached_flag(5));
+    TEST_ASSERT_EQUAL(0, extract_mpp_reached_flag(0x0e));
+    TEST_ASSERT_EQUAL(1, extract_mpp_reached_flag(0xff));
 }
 
 void test_MpptUpdater_get_state() {
@@ -450,7 +467,6 @@ void test_MpptUpdater_get_state() {
 
 void test_MpptUpdater() {
     UnityBegin("");
-
     RUN_TEST(test_MpptUpdater_Init);
     RUN_TEST(test_MpptUpdater_UpperBoundary);
     RUN_TEST(test_MpptUpdater_LowerBoundary);
@@ -463,6 +479,7 @@ void test_MpptUpdater() {
     RUN_TEST(test_MpptUpdater_load_detect);
     RUN_TEST(test_MpptUpdater_delta_power);
     RUN_TEST(test_MpptUpdater_tick);
+    RUN_TEST(test_MpptUpdater_get_state_extract_functions);
     RUN_TEST(test_MpptUpdater_get_state);
     UnityEnd();
 }
