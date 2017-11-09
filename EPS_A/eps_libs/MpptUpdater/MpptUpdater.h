@@ -11,6 +11,17 @@
 
 namespace eps {
 
+enum class MpptMode : std::uint8_t {
+    MppTracking             = 0,
+    SolarPanelIsUnderloaded = 1,
+    SolarPanelIsOverloaded  = 2,
+    Unknown                 = 3
+};
+
+enum class MppTrackingState : std::uint8_t {
+    MppReached = 0,
+    MppNotReachedYet = 1
+};
 
 constexpr static std::uint16_t voltage_to_adc_reading(float voltage) {
     constexpr VoltageDivider voltage_divider(1e3, 4.7e3);
@@ -24,11 +35,12 @@ namespace MpptSettings {
 struct X {
     static constexpr std::int16_t dac_lower_boundary    = 750;
     static constexpr std::int16_t dac_upper_boundary    = 4080;
-    static constexpr std::uint16_t dac_perturb          = 3;
+    static constexpr std::uint16_t dac_perturb          = 6;
     static constexpr std::uint16_t dac_sweep_down_value = 50;
     static constexpr std::uint16_t dac_sweep_up_value   = 10;
     static constexpr std::int32_t max_delta_power       = 50000;
-    static constexpr std::uint16_t min_solar_voltage = voltage_to_adc_reading(3.3);
+    static constexpr std::uint16_t mpp_reached_flag_timeout = 100;
+    static constexpr std::uint16_t min_solar_voltage    = voltage_to_adc_reading(3.3);
     static constexpr std::uint16_t min_output_voltage =
         voltage_to_adc_reading(6.5);
 };
@@ -40,7 +52,8 @@ struct Y {
     static constexpr std::uint16_t dac_sweep_down_value = 50;
     static constexpr std::uint16_t dac_sweep_up_value   = 10;
     static constexpr std::int32_t max_delta_power       = 100000;
-    static constexpr std::uint16_t min_solar_voltage = voltage_to_adc_reading(5.3);
+    static constexpr std::uint16_t mpp_reached_flag_timeout = 100;
+    static constexpr std::uint16_t min_solar_voltage    = voltage_to_adc_reading(5.3);
     static constexpr std::uint16_t min_output_voltage =
         voltage_to_adc_reading(6.5);
 };
@@ -51,13 +64,19 @@ struct MpptUpdater {
     std::uint32_t last_power;
     std::int16_t dac;
     std::int8_t last_perturb;
+    MpptMode mode;
+    std::uint16_t mpp_reached_counter;
+    MppTrackingState mpp_tracking_state;
 
     std::uint16_t solar_voltage, solar_current, output_voltage;
 
     MpptUpdater(uint12_t starting_point = 4080)
         : last_power(1),
           dac(starting_point),
-          last_perturb(MpptChannelSettings::dac_perturb) {
+          last_perturb(MpptChannelSettings::dac_perturb),
+          mode(MpptMode::Unknown),
+          mpp_reached_counter(MpptChannelSettings::mpp_reached_flag_timeout),
+          mpp_tracking_state(MppTrackingState::MppNotReachedYet) {
     }
 
 
@@ -79,10 +98,15 @@ struct MpptUpdater {
         update_tm(single_mppt_telemetry);
 
         if (is_solar_panel_overloaded()) {
+            mode = MpptMode::SolarPanelIsOverloaded;
+            mpp_reached_counter_restart();
             mpp_restart();
         } else if (is_solar_panel_underloaded()) {
+            mode = MpptMode::SolarPanelIsUnderloaded;
+            mpp_reached_counter_restart();
             dac_sweep_down();
         } else {
+            mode = MpptMode::MppTracking;
             mpp_tracking();
         }
 
@@ -101,8 +125,10 @@ struct MpptUpdater {
         std::int32_t delta_power = power - last_power;
 
         if (is_delta_power_too_high(delta_power)) {
+            mpp_reached_counter_restart();
             dac_sweep_up();
         } else if (delta_power < 0) {
+            mpp_reached_counter_tick();
             last_perturb *= -1;
         }
 
@@ -136,7 +162,7 @@ struct MpptUpdater {
      * Function to calulate power.
      * @return calulated 32bit power.
      */
-    uint32_t calculate_power() {
+    std::uint32_t calculate_power() {
         return static_cast<std::uint32_t>(solar_voltage) *
                static_cast<std::uint32_t>(solar_current);
     }
@@ -183,6 +209,38 @@ struct MpptUpdater {
      */
     bool is_delta_power_too_high(std::int32_t delta_power) {
         return labs(delta_power) > MpptChannelSettings::max_delta_power;
+    }
+
+    /*!
+     * Function to get current MPPT STATE for telemetry.
+     * @return current MPPT STATE byte for telemetry.
+     */
+    std::uint8_t get_state() {
+        uint8_t current_mode = static_cast<std::uint8_t>(mode);
+        uint8_t current_mpp_tracking_state = static_cast<std::uint8_t>(mpp_tracking_state);
+
+        return (current_mode << 1) | current_mpp_tracking_state;
+    }
+
+    /*!
+     * Function to restart MPP reached counter.
+     */
+    void mpp_reached_counter_restart() {
+        mpp_reached_counter = MpptChannelSettings::mpp_reached_flag_timeout;
+        mpp_tracking_state = MppTrackingState::MppNotReachedYet;
+    }
+
+    /*!
+     * Function to tick MPP reached counter.
+     */
+    void mpp_reached_counter_tick() {
+        if (mpp_reached_counter > 0) {
+            mpp_reached_counter--;
+            mpp_tracking_state = MppTrackingState::MppNotReachedYet;
+        }
+        else {
+            mpp_tracking_state = MppTrackingState::MppReached;
+        }
     }
 };
 

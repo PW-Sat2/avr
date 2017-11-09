@@ -378,6 +378,69 @@ void test_MpptUpdater_tick() {
     }
 }
 
+/*!
+ * Function to extract MPPT mode from a STATE byte.
+ * @return Extracted MPPT mode.
+ */
+uint8_t extract_mppt_mode(uint8_t mppt_state) {
+    return mppt_state >> 1;
+}
+
+/*!
+ * Function to extract MPP reached flag from a STATE byte.
+ * @return Extracted MPP reached flag.
+ */
+uint8_t extract_mpp_reached_flag(uint8_t mppt_state) {
+    return mppt_state && 0x01;
+}
+
+void test_MpptUpdater_get_state() {
+    Telemetry::SingleMpptChannel tm;
+    tm.solar_current  = 100;
+    tm.solar_voltage  = 3000;
+    tm.output_voltage = 10;
+
+    MpptUpdater<Cfg> updater(1);
+
+    TEST_ASSERT_EQUAL(MpptMode::Unknown, extract_mppt_mode(updater.get_state()));
+
+    for (int i = 0; i < 10; i++) {
+        updater.tick(tm);
+    }
+
+    TEST_ASSERT_EQUAL(MpptMode::SolarPanelIsUnderloaded, extract_mppt_mode(updater.get_state()));
+
+    tm.solar_current  = 10;
+    tm.solar_voltage  = 10;
+    updater.tick(tm);
+
+    TEST_ASSERT_EQUAL(MpptMode::SolarPanelIsOverloaded, extract_mppt_mode(updater.get_state()));
+
+    tm.solar_current  = 1000;
+    tm.output_voltage = 3000;
+    uint12_t dac_set = 2000;
+
+    TEST_ASSERT_EQUAL(MppTrackingState::MppNotReachedYet, extract_mpp_reached_flag(updater.get_state()));
+
+    for (int i = 0; i < 100; i++) {
+        tm.solar_voltage = mock_PVCurveSinus(dac_set) + 1000 + ((rand() % 3) - 1);
+        dac_set = updater.tick(tm);
+
+        TEST_ASSERT_EQUAL(MpptMode::MppTracking, extract_mppt_mode(updater.get_state()));
+    }
+
+    TEST_ASSERT_EQUAL(MppTrackingState::MppNotReachedYet, extract_mpp_reached_flag(updater.get_state()));
+
+    for (int i = 0; i < 1500; i++) {
+        tm.solar_voltage = mock_PVCurveSinus(dac_set) + 1000 + ((rand() % 3) - 1);
+        dac_set = updater.tick(tm);
+
+        TEST_ASSERT_EQUAL(MpptMode::MppTracking, extract_mppt_mode(updater.get_state()));
+    }
+
+    TEST_ASSERT_EQUAL(MppTrackingState::MppReached, extract_mpp_reached_flag(updater.get_state()));
+}
+
 void test_MpptUpdater() {
     UnityBegin("");
 
@@ -393,6 +456,6 @@ void test_MpptUpdater() {
     RUN_TEST(test_MpptUpdater_load_detect);
     RUN_TEST(test_MpptUpdater_delta_power);
     RUN_TEST(test_MpptUpdater_tick);
-
+    RUN_TEST(test_MpptUpdater_get_state);
     UnityEnd();
 }

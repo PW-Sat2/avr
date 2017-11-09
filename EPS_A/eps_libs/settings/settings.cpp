@@ -85,6 +85,8 @@ void ControllerSpecialisation::each_33ms() {
         mppt_phase = 0;
     }
 
+    Eps::TelemetryUpdater::update_mppt_states(Mppt_X.get_state(), Mppt_Yp.get_state(), Mppt_Yn.get_state());
+
     if (mppt_phase == 0) {
         mppt_phase = 3;
     }

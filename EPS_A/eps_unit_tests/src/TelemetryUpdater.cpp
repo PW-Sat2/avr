@@ -168,9 +168,6 @@ bool EpsMock::IOMap::TempSensorMock<tag>::initialised;
 template<int tag>
 uint13_t EpsMock::IOMap::TempSensorMock<tag>::Tmp121::value;
 
-// using tm_updater =
-//    TelemetryUpdater<tm, General::Mux, General::ADCMock, Mppt::MpptMock,
-//    LclCommander, TempSensorsMock>;
 using tm_updater = TelemetryUpdater<tm, General::ADCMock, EpsMock>;
 
 void test_TelemetryUpdater_general() {
@@ -243,6 +240,22 @@ void test_TelemetryUpdater_mppt() {
     check(Mppt::Adc124Ch::IN3, &Telemetry::SingleMpptChannel::output_voltage);
 }
 
+void test_TelemetryUpdater_mppt_state() {
+    for (int i = 0; i < 10000; i++) {
+        uint8_t mpptx_state = uint8_t(rand() % 256);
+        uint8_t mpptyp_state = uint8_t(rand() % 256);
+        uint8_t mpptyn_state = uint8_t(rand() % 256);
+        
+        tm_updater::update_mppt_states(mpptx_state, mpptyp_state, mpptyn_state);
+
+        Telemetry::AllMpptChannels tm_mppt = tm.mppt;
+
+        TEST_ASSERT_EQUAL(mpptx_state, tm_mppt.mpptx.state);
+        TEST_ASSERT_EQUAL(mpptyp_state, tm_mppt.mpptyp.state);
+        TEST_ASSERT_EQUAL(mpptyn_state, tm_mppt.mpptyn.state);
+    }
+}
+
 void test_TelemetryUpdater_lcl_status() {
     LclCommander::overcurrent_status_val = 0xA7;
 
@@ -306,6 +319,7 @@ void test_TelemetryUpdater() {
 
     RUN_TEST(test_TelemetryUpdater_general);
     RUN_TEST(test_TelemetryUpdater_mppt);
+    RUN_TEST(test_TelemetryUpdater_mppt_state);
     RUN_TEST(test_TelemetryUpdater_lcl_status);
     RUN_TEST(test_TelemetryUpdater_battery_pack_temperature_sensors);
 

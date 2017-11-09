@@ -89,6 +89,19 @@ class TelemetryUpdater : hal::libs::PureStatic {
         telemetry.mppt = tm;
     }
 
+    /*!
+     * Update all MPPT STATE flags in telemetry.
+     */
+    static void update_mppt_states(uint8_t mpptx_state, uint8_t mpptyp_state, uint8_t mpptyn_state) {
+        Telemetry::AllMpptChannels tm = telemetry.mppt;
+
+        tm.mpptx.state = mpptx_state;
+        tm.mpptyp.state = mpptyp_state;
+        tm.mpptyn.state = mpptyn_state;
+
+        telemetry.mppt = tm;
+    }
+
  private:
     using MuxCh = hal::devices::ADG709::Channel;
 
