@@ -12,7 +12,11 @@ set(LOAD_EEPROM TRUE CACHE BOOL "")
 
 set(CMAKE_TOOLCHAIN_FILE "${HAL_PATH}/toolchain.cmake")
 
-add_definitions(-DLOG_LEVEL=LOG_LEVEL_DEBUG)
+if (NOT DEFINED LOG_LEVEL)
+    set(LOG_LEVEL LOG_LEVEL_NONE)
+endif()
+add_definitions(-DLOG_LEVEL=${LOG_LEVEL})
+message("Logging level: ${LOG_LEVEL}")
 
 include(../cmake-modules/nameplate.cmake)
 

@@ -8,7 +8,9 @@ all: PLD_build PLD_unit_tests EPS_A_build EPS_A_unit_tests EPS_B_build EPS_B_uni
 clean:
 	rm -rf PLD/cmake-build-release
 	rm -rf EPS_A/cmake-build-release
+	rm -rf EPS_A/cmake-build-release-logs
 	rm -rf EPS_B/cmake-build-release
+	rm -rf EPS_A/cmake-build-release-logs
 	rm -rf SunS/cmake-build-release-em
 	rm -rf SunS/cmake-build-release-fm
 
@@ -33,10 +35,14 @@ PLD_build:
 EPS_A_build:
 	cd EPS_A && mkdir -p cmake-build-release && cd cmake-build-release && cmake .. -DCMAKE_BUILD_TYPE=RELEASE
 	make -C EPS_A/cmake-build-release all
+	cd EPS_A && mkdir -p cmake-build-release-logs && cd cmake-build-release-logs && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DLOG_LEVEL=LOG_LEVEL_DEBUG
+	make -C EPS_A/cmake-build-release-logs all
 
 EPS_B_build:
 	cd EPS_B && mkdir -p cmake-build-release && cd cmake-build-release && cmake .. -DCMAKE_BUILD_TYPE=RELEASE
 	make -C EPS_B/cmake-build-release all
+	cd EPS_B && mkdir -p cmake-build-release-logs && cd cmake-build-release-logs && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DLOG_LEVEL=LOG_LEVEL_DEBUG
+	make -C EPS_B/cmake-build-release-logs all
 
 SunS_build:
 	cd SunS && mkdir -p cmake-build-release-em && cd cmake-build-release-em && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DPLATFORM=EM
@@ -55,11 +61,17 @@ EPS_A_unit_tests:
 	make -C EPS_A/cmake-build-release unit_tests_a.run
 	make -C EPS_A/cmake-build-release unit_tests_b.run
 	make -C EPS_A/cmake-build-release eps_unit_tests.run
+	make -C EPS_A/cmake-build-release-logs unit_tests_a.run
+	make -C EPS_A/cmake-build-release-logs unit_tests_b.run
+	make -C EPS_A/cmake-build-release-logs eps_unit_tests.run
 
 EPS_B_unit_tests:
 	make -C EPS_B/cmake-build-release unit_tests_a.run
 	make -C EPS_B/cmake-build-release unit_tests_b.run
 	make -C EPS_B/cmake-build-release eps_unit_tests.run
+	make -C EPS_B/cmake-build-release-logs unit_tests_a.run
+	make -C EPS_B/cmake-build-release-logs unit_tests_b.run
+	make -C EPS_B/cmake-build-release-logs eps_unit_tests.run
 
 SunS_unit_tests:
 	make -C SunS/cmake-build-release-em unit_tests_a.run
