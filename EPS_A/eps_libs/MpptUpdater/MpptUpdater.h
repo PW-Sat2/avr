@@ -19,7 +19,7 @@ enum class MpptMode : std::uint8_t {
 };
 
 enum class MppTrackingState : std::uint8_t {
-    MppReached = 0,
+    MppReached       = 0,
     MppNotReachedYet = 1
 };
 
@@ -33,27 +33,27 @@ constexpr static std::uint16_t voltage_to_adc_reading(float voltage) {
 
 namespace MpptSettings {
 struct X {
-    static constexpr std::int16_t dac_lower_boundary    = 750;
-    static constexpr std::int16_t dac_upper_boundary    = 4080;
-    static constexpr std::uint16_t dac_perturb          = 6;
-    static constexpr std::uint16_t dac_sweep_down_value = 50;
-    static constexpr std::uint16_t dac_sweep_up_value   = 10;
-    static constexpr std::int32_t max_delta_power       = 50000;
+    static constexpr std::int16_t dac_lower_boundary        = 750;
+    static constexpr std::int16_t dac_upper_boundary        = 4080;
+    static constexpr std::uint16_t dac_perturb              = 6;
+    static constexpr std::uint16_t dac_sweep_down_value     = 50;
+    static constexpr std::uint16_t dac_sweep_up_value       = 10;
+    static constexpr std::int32_t max_delta_power           = 50000;
     static constexpr std::uint16_t mpp_reached_flag_timeout = 100;
-    static constexpr std::uint16_t min_solar_voltage    = voltage_to_adc_reading(3.3);
+    static constexpr std::uint16_t min_solar_voltage = voltage_to_adc_reading(3.3);
     static constexpr std::uint16_t min_output_voltage =
         voltage_to_adc_reading(6.5);
 };
 
 struct Y {
-    static constexpr std::int16_t dac_lower_boundary    = 1500;
-    static constexpr std::int16_t dac_upper_boundary    = 4080;
-    static constexpr std::uint16_t dac_perturb          = 6;
-    static constexpr std::uint16_t dac_sweep_down_value = 50;
-    static constexpr std::uint16_t dac_sweep_up_value   = 10;
-    static constexpr std::int32_t max_delta_power       = 100000;
+    static constexpr std::int16_t dac_lower_boundary        = 1500;
+    static constexpr std::int16_t dac_upper_boundary        = 4080;
+    static constexpr std::uint16_t dac_perturb              = 6;
+    static constexpr std::uint16_t dac_sweep_down_value     = 50;
+    static constexpr std::uint16_t dac_sweep_up_value       = 10;
+    static constexpr std::int32_t max_delta_power           = 100000;
     static constexpr std::uint16_t mpp_reached_flag_timeout = 100;
-    static constexpr std::uint16_t min_solar_voltage    = voltage_to_adc_reading(5.3);
+    static constexpr std::uint16_t min_solar_voltage = voltage_to_adc_reading(5.3);
     static constexpr std::uint16_t min_output_voltage =
         voltage_to_adc_reading(6.5);
 };
@@ -217,7 +217,8 @@ struct MpptUpdater {
      */
     std::uint8_t get_state() {
         uint8_t current_mode = static_cast<std::uint8_t>(mode);
-        uint8_t current_mpp_tracking_state = static_cast<std::uint8_t>(mpp_tracking_state);
+        uint8_t current_mpp_tracking_state =
+            static_cast<std::uint8_t>(mpp_tracking_state);
 
         return (current_mode << 1) | current_mpp_tracking_state;
     }
@@ -227,7 +228,7 @@ struct MpptUpdater {
      */
     void mpp_reached_counter_restart() {
         mpp_reached_counter = MpptChannelSettings::mpp_reached_flag_timeout;
-        mpp_tracking_state = MppTrackingState::MppNotReachedYet;
+        mpp_tracking_state  = MppTrackingState::MppNotReachedYet;
     }
 
     /*!

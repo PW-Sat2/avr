@@ -242,7 +242,7 @@ void test_TelemetryUpdater_mppt() {
 
 void test_TelemetryUpdater_mppt_state() {
     for (int i = 0; i < 10000; i++) {
-        uint8_t mpptx_state = uint8_t(rand() % 256);
+        uint8_t mpptx_state  = uint8_t(rand() % 256);
         uint8_t mpptyp_state = uint8_t(rand() % 256);
         uint8_t mpptyn_state = uint8_t(rand() % 256);
 
