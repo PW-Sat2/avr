@@ -28,7 +28,6 @@ class IOMap {
     // ~~~~~~~~~~~~~~~~ common for both EPS ~~~~~~~~~~~~~~~~
 
     using PowerCycle = hal::DigitalIO::GPIO<14>;
-    using SerialRx   = hal::DigitalIO::GPIO<9>;
 
     using Watchdog = hal::devices::TPS3813<PinKick, 10>;
 

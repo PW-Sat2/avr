@@ -18,6 +18,8 @@ void init_hardware() {
 
     hal::Watchdog::disable();
 
+    hal::libs::for_each_tuple_type<PinInitExec, IOMap::PinsAsInputPullup>();
+
 #if LOG_LEVEL != LOG_LEVEL_NONE
     // Serial init to max possible baudrate
     UBRR0H = 0;
@@ -52,8 +54,6 @@ void init_hardware() {
 
     IOMap::Battery::Charge::init(DigitalIO::Mode::OUTPUT);
     IOMap::Battery::Discharge::init(DigitalIO::Mode::OUTPUT);
-
-    hal::libs::for_each_tuple_type<PinInitExec, IOMap::PinsAsInputPullup>();
 
     // delay to make sure capacitances in power cycle circuit are
     // discharged. This is to prevent too frequent power cycle.

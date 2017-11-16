@@ -6,6 +6,7 @@ using hal::Serial0;
 void test_TelemetryUpdater();
 void test_MainTimer();
 void test_Temperatures();
+void test_CheckPins();
 
 int main() {
     Serial0.init(38400);
@@ -15,6 +16,7 @@ int main() {
     test_TelemetryUpdater();
     test_MainTimer();
     test_Temperatures();
+    test_CheckPins();
 
     hal::libs::sim::stop_simulation();
 }

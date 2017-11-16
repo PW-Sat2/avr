@@ -78,14 +78,12 @@ class IOMap {
     struct mux {
         using PinA0 = hal::DigitalIO::GPIO<8>;
         using PinA1 = hal::DigitalIO::GPIO<9>;
-        using PinEN = hal::DigitalIO::GPIO<16>;
     };
 
  public:
     // ~~~~~~~~~~~~~~~~ common for both EPS ~~~~~~~~~~~~~~~~
 
     using PowerCycle = hal::DigitalIO::GPIO<15>;
-    using SerialRx   = hal::DigitalIO::GPIO<2>;
 
     using Watchdog = hal::devices::TPS3813<PinKick, 10>;
 
@@ -110,17 +108,18 @@ class IOMap {
                                          hal::DigitalIO::GPIO<5>,
                                          hal::DigitalIO::GPIO<7>,
                                          hal::DigitalIO::GPIO<10>,
+                                         hal::DigitalIO::GPIO<13>,
                                          hal::DigitalIO::GPIO<16>,
                                          hal::DigitalIO::GPIO<18>,
                                          hal::DigitalIO::GPIO<19>,
                                          hal::DigitalIO::GPIO<25>,
                                          hal::DigitalIO::GPIO<26>,
-                                         hal::DigitalIO::GPIO<44>,
                                          hal::DigitalIO::GPIO<45>>;
 
     // ~~~~~~~~~~~~~~~~ EPS_A specific ~~~~~~~~~~~~~~~~
 
-    using Mux = hal::devices::ADG709::ADG709<mux::PinA0, mux::PinA1, mux::PinEN>;
+    using Mux =
+        hal::devices::ADG709::ADG709<mux::PinA0, mux::PinA1, hal::DigitalIO::Dummy<true>>;
 
     struct Mppt {
         using MpptX  = MpptChannel<6, 43>;

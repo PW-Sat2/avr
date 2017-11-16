@@ -5,6 +5,7 @@ add_hal_executable(eps_unit_tests
     src/TelemetryUpdater.cpp
     src/MainTimer.cpp
     src/Temperatures.cpp
+    src/check_pins.cpp
 )
 
 add_custom_target(eps_unit_tests.run

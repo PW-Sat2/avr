@@ -6,6 +6,7 @@ add_hal_executable(eps_unit_tests
     src/TelemetryUpdater.cpp
     src/MpptUpdater.cpp
     src/Temperatures.cpp
+    src/check_pins.cpp
 )
 
 add_custom_target(eps_unit_tests.run
@@ -23,4 +24,5 @@ target_link_libraries(eps_unit_tests
     TelemetryUpdater
     MpptUpdater
     Temperatures
+    eps
 )
